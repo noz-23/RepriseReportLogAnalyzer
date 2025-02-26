@@ -3,9 +3,9 @@ using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventLicenseReread = LogEventBase.Regist("REREAD", (l_) => new LogEventLicenseReread(l_));
+        private bool _logEventLicenseReread = Regist("REREAD", (l_) => new LogEventLicenseReread(l_));
     }
 
     internal class LogEventLicenseReread: LogEventBase, ILogEventUserHost
@@ -27,12 +27,6 @@ namespace RepriseReportLogAnalyzer.Events
             Host = list_[2];
 
             EventDateTime = _GetDateTime(list_[3], list_[4]);
-        }
-
-        new public static string HEADER { get => "Number,Date Time,User,Host,User@Host"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{User},{Host},{UserHost}";
         }
     }
 }

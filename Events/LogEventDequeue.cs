@@ -1,13 +1,11 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Interfaces;
-using System;
-using System.Linq;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventDequeue = LogEventBase.Regist("DEQUE", (l_) => new LogEventDequeue(l_));
+        private bool _logEventDequeue = Regist("DEQUE", (l_) => new LogEventDequeue(l_));
     }
 
     internal class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEventProduct
@@ -65,12 +63,6 @@ namespace RepriseReportLogAnalyzer.Events
                 //
                 EventDateTime = _GetDateTime(list_[9], list_[10]);
             }
-        }
-
-        new public static string HEADER = "Number,Date Time,Product,Version,Product Version,User,Host,UserHost,Why,IsvDef,Count,HandleServer";
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Product},{Version},{ProductVersion},{User},{Host},{UserHost},{Why},{IsvDef},{Count},{HandleServer}";
         }
     }
 }

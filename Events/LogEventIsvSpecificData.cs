@@ -15,11 +15,5 @@ namespace RepriseReportLogAnalyzer.Events
             EventDateTime = _GetDateTime(list_[1], list_[2]);
             IsvSpecificData = list_[3];
         }
-
-        new public static string HEADER { get => "Number,Date Time,IsvSpecificData"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{IsvSpecificData}";
-        }
     }
 }

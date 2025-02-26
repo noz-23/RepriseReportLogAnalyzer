@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RepriseReportLogAnalyzer.Attributes
+﻿namespace RepriseReportLogAnalyzer.Attributes
 {
     public class ColumnSortAttribute : Attribute
     {

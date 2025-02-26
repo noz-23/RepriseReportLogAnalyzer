@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using RepriseReportLogAnalyzer.Events;
+using RepriseReportLogAnalyzer.Files;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -11,6 +13,8 @@ public partial class App : Application
 {
     private void _startup(object sender, StartupEventArgs e)
     {
+        LogFile.Instance.Create();
+        LogEventRegist.Instance.Create();
 
     }
 }

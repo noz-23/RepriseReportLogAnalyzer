@@ -2,9 +2,9 @@
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventTimeZone = LogEventBase.Regist("TIMEZONE", (l_) => new LogEventTimeZone(l_));
+        private bool _logEventTimeZone = Regist("TIMEZONE", (l_) => new LogEventTimeZone(l_));
     }
 
     internal class LogEventTimeZone : LogEventBase

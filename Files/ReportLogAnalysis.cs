@@ -1,13 +1,7 @@
 ﻿using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
-using RepriseReportLogAnalyzer.Windows;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Files
@@ -24,9 +18,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             if (File.Exists(filePath_) == true)
             {
-                var listRead = new List<string>(File.ReadAllLines(filePath_));
-                listRead.RemoveAll(s_ => string.IsNullOrEmpty(s_));
-                foreach (var s in listRead)
+                foreach (var s in File.ReadAllLines(filePath_).Where(s_ => string.IsNullOrEmpty(s_)==false))
                 {
                     var eventBase = LogEventBase.EventData(s);
 
@@ -42,14 +34,11 @@ namespace RepriseReportLogAnalyzer.Files
 
         public void EndAnalysis()
         {
-            ListEvent.Add(new LogEventShutdown());
+            var end = new LogEventShutdown();
+            ListEvent.Add(end);
         }
         //
         public List<LogEventBase> ListEvent { get; private set; } = new List<LogEventBase>();
-        //public List<LogEventBase> ListEventAll { get; private set; }
-
-        //public List<LogEventBase> ListOverLap { get; private set; } = new List<LogEventBase>();
-
 
         public List<LogEventStart> ListStart { get => GetListEvent<LogEventStart>(); }
         public List<LogEventLogFileEnd> ListEnd { get => GetListEvent<LogEventLogFileEnd>(); }
@@ -58,102 +47,75 @@ namespace RepriseReportLogAnalyzer.Files
         public List<LogEventCheckIn> ListCheckIn { get => GetListEvent<LogEventCheckIn>(); }
         public List<LogEventCheckOut> ListCheckOut { get => GetListEvent<LogEventCheckOut>(); }
 
-        //public List<(string Product, string Version)> ListProduct
-        public List<ILogEventProduct> ListProduct
+        public IEnumerable<ILogEventProduct> ListProduct
         {
             get
             {
-                //if (_listProduct == null)
-                //{
-                //    //_listProduct = new List<(string Product, string Version)>(ListEvent?.AsParallel().Where(e_ => e_ is ILogEventProduct)
-                //    //    .Select(p_ => (Product: (p_ as ILogEventProduct).Product, Version: (p_ as ILogEventProduct).Version)).Distinct()
-                //    //    .OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version));
-                //    _listProduct = new List<ILogEventProduct>(ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(p_ => p_ as ILogEventProduct).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version));
-                //    _listProduct.RemoveAll(x_ => string.IsNullOrEmpty(x_.Product));
-                //}
-                _listProduct = _listProduct ?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(p_ => p_ as ILogEventProduct)
-                                                                                               .Where(e_=>string.IsNullOrEmpty(e_.Product) ==false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version).ToList();
+                _listProduct = _listProduct ?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
+                                                                                               .Where(e_=>string.IsNullOrEmpty(e_.Product) ==false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);
 
                 return _listProduct;
             }
         }
-        //private List<(string Product, string Version)> _listProduct = null;
-        private List<ILogEventProduct>? _listProduct = null;
+        private IEnumerable<ILogEventProduct>? _listProduct = null;
 
-        public List<string> ListUser
+        public IEnumerable<string> ListUser
         {
             get
             {
-                //if (_listUser == null)
-                //{
-                //_listUser = new List<string>(ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(p_ => (p_ as ILogEventUser).User).Distinct().OrderBy(x_ => x_));
-                //}
                 _listUser = _listUser ?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
-                                                                                .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_).ToList();
+                                                                                .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_);
                 return _listUser;
             }
         }
-        List<string>? _listUser = null;
+        IEnumerable<string>? _listUser = null;
 
 
-        public List<string> ListHost
+        public IEnumerable<string> ListHost
         {
             get
             {
-                //if (_listHost == null)
-                //{
-                //    _listHost = new List<string>(ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(p_ => (p_ as ILogEventHost).Host).Distinct().OrderBy(x_ => x_));
-                //    _listHost.RemoveAll(x_ => string.IsNullOrEmpty(x_));
-                //}
-                _listHost = _listHost?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_.Host).Distinct().OrderBy(x_ => x_).ToList();
+                _listHost = _listHost?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_.Host).Distinct().OrderBy(x_ => x_);
 
                 return _listHost;
             }
         }
-        List<string>? _listHost = null;
+        IEnumerable<string>? _listHost = null;
 
-        public List<string> ListUserHost
+        public IEnumerable<string> ListUserHost
         {
             get
             {
-                //if (_listUserHost == null)
-                //{
-                //    _listUserHost = new List<string>(ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(p_ => (p_ as ILogEventUserHost).UserHost).Distinct().OrderBy(x_ => x_));
-                //    _listUserHost.RemoveAll(x_ => x_ == "@");
-                //}
-                _listUserHost = _listUserHost?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct().OrderBy(x_ => x_).ToList();
+                _listUserHost = _listUserHost?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct().OrderBy(x_ => x_);
 
                 return _listUserHost;
             }
         }
-        List<string>? _listUserHost = null;
+        IEnumerable<string>? _listUserHost = null;
 
-        public List<DateTime> ListDateTime
+        public IEnumerable<DateTime> ListDateTime
         {
             get
             {
-                _listDateTime = _listDateTime ?? ListEvent.AsParallel().Where(e_ => (e_ is LogEventRlmReportLogFormat) == false).Select(e_ => e_.EventDateTime).Distinct().OrderBy(e_ => e_).ToList();
+                _listDateTime = _listDateTime ?? ListEvent.AsParallel().Where(e_ => (e_ is LogEventRlmReportLogFormat) == false).Select(e_ => e_.EventDateTime).Distinct().OrderBy(e_ => e_);
                 return _listDateTime;
             }
         }
-        public List<DateTime>? _listDateTime = null;
+        public IEnumerable<DateTime>? _listDateTime = null;
 
-        public List<DateTime> ListDate
+        public IEnumerable<DateTime> ListDate
         {
             get
             {
-                _listDate = _listDate ?? ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct().OrderBy(e_ => e_).ToList();
+                _listDate = _listDate ?? ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct().OrderBy(e_ => e_);
                 return _listDate;
             }
         }
-        private List<DateTime>? _listDate = null;
+        private IEnumerable<DateTime>? _listDate = null;
 
-        //public List<DateTime> ListHour { get => ListDateTime.Select(t_ => new DateTime(t_.Ticks - (t_.Ticks % TimeSpan.TicksPerHour))).Distinct().ToList(); }
 
         public List<T> GetListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase
         {
-            //LogFile.Instance.WriteLine($"[{typeof(T)}]");
-
             List<LogEventBase>? rtn = new List<LogEventBase>();
             if (ss_ == null)
             {
@@ -164,23 +126,6 @@ namespace RepriseReportLogAnalyzer.Files
                 else
                 {
                     rtn = new List<LogEventBase>();
-                    //var list =ListEvent.Select(e_ => e_ as T).Where(e_ => e_ !=null).OrderBy(x_ => x_.EventNumber);
-                    //list?.ToList().ForEach(e_ => rtn.Add(e_));
-
-                    //var list = ListEvent.Select(e_ => e_ as T).Where(e_ => e_ != null).OrderBy(x_ => x_.EventNumber);
-                    //long count = -1;
-                    //foreach (var e in list)
-                    //{
-                    //    var comp = (e is ILogEventCountCurrent evCount) ? evCount.CountCurrent : e.EventNumber;
-                    //    if (comp == count)
-                    //    {
-                    //        continue;
-                    //    }
-
-                    //    rtn.Add(e);
-                    //    count = comp;
-                    //}
-                    //rtn.AddRange(ListEvent.AsParallel().Select(e_ => e_ as T).Where(e_ => e_ != null).OrderBy(x_ => x_.EventNumber));
                     rtn.AddRange(ListEvent.AsParallel().Where(e_=> e_ is T).Select(e_ => e_ as T).OrderBy(x_ => x_.EventNumber));
 
                     _listEvent[typeof(T)] = rtn;
@@ -188,19 +133,6 @@ namespace RepriseReportLogAnalyzer.Files
             }
             else
             {
-                //var list = ListEvent.Where(e_ => (e_ is T) && (ss_.IsWithInRange(e_.EventNumber) == true)).Select(e_ => e_ as T)?.OrderBy(x_ => x_.EventNumber);
-                //long count = -1;
-                //foreach (var e in list)
-                //{
-                //    var comp = (e is ILogEventCountCurrent evCount) ? evCount.CountCurrent : e.EventNumber;
-                //    if (comp == count)
-                //    {
-                //        continue;
-                //    }
-
-                //    rtn.Add(e);
-                //    count = comp;
-                //}
                 rtn.AddRange(ListEvent.AsParallel().Where(e_ => (e_ is T) && (ss_.IsWithInRange(e_.EventNumber) == true)).Select(e_ => e_ as T)?.OrderBy(x_ => x_.EventNumber));
             }
             LogFile.Instance.WriteLine($"[{typeof(T)}] {rtn.Count}");
@@ -210,46 +142,6 @@ namespace RepriseReportLogAnalyzer.Files
         }
         private Dictionary<Type, List<LogEventBase>> _listEvent = new Dictionary<Type, List<LogEventBase>>();
 
-        //public ListAnalysisStartShutdown ListRunning
-        //{
-        //    get
-        //    {
-        //        _listRunning = _listRunning ?? new ListAnalysisStartShutdown(this);
-        //        return _listRunning;
-        //    }
-        //}
-        //private ListAnalysisStartShutdown _listRunning = null;
-
-        //public ListAnalysisCheckOutIn ListAnalysisCheckOutIn
-        //{
-        //    get
-        //    {
-        //        _listAnalysisCheckOutIn = _listAnalysisCheckOutIn ?? new ListAnalysisCheckOutIn(this);
-        //        return _listAnalysisCheckOutIn;
-        //    }
-        //}
-        //private ListAnalysisCheckOutIn _listAnalysisCheckOutIn = null;
-
-        //public ListAnalysisLicenseDeny ListDeny
-        //{
-        //    get
-        //    {
-        //        _listDeny =_listDeny?? new ListAnalysisLicenseDeny(this);
-        //        return _listDeny;
-        //     }
-        //}
-        //private ListAnalysisLicenseDeny _listDeny = null;
-
-        //public ListAnalysisLicenseCount ListAnalysisLicenseCount
-        //{
-        //    get
-        //    {
-        //        _listAnalysisLicenseCount = _listAnalysisLicenseCount ?? new ListAnalysisLicenseCount(this);
-        //        return _listAnalysisLicenseCount;
-        //    }
-        //}
-        //private ListAnalysisLicenseCount _listAnalysisLicenseCount = null;
-
         public void WriteSummy(string path_)
         {
             var list = new List<string>();
@@ -257,22 +149,22 @@ namespace RepriseReportLogAnalyzer.Files
             list.Add("License");
             list.AddRange(ListProduct.Select(x_ => $"{x_.Product},{x_.Version}"));
             list.Add("\n");
-            LogFile.Instance.WriteLine($"ListProduct:{ListProduct.Count}");
+            LogFile.Instance.WriteLine($"ListProduct:{ListProduct.Count()}");
 
             list.Add("User");
             list.AddRange(ListUser);
             list.Add("\n");
-            LogFile.Instance.WriteLine($"ListUser:{ListUser.Count}");
+            LogFile.Instance.WriteLine($"ListUser:{ListUser.Count()}");
 
             list.Add("Host");
             list.AddRange(ListHost);
             list.Add("\n");
-            LogFile.Instance.WriteLine($"ListHost:{ListHost.Count}");
+            LogFile.Instance.WriteLine($"ListHost:{ListHost.Count()}");
 
             list.Add("User@Host");
             list.AddRange(ListUserHost);
             list.Add("\n");
-            LogFile.Instance.WriteLine($"ListUserHost:{ListUserHost.Count}");
+            LogFile.Instance.WriteLine($"ListUserHost:{ListUserHost.Count()}");
 
             File.WriteAllLines(path_, list, Encoding.UTF8);
             LogFile.Instance.WriteLine($"Write:{path_}");
@@ -295,25 +187,26 @@ namespace RepriseReportLogAnalyzer.Files
         {
             var list = new List<string>();
 
-            list.Add(_getHeader<T>());
+            //list.Add(_getHeader<T>());
+            list.Add(LogEventBase.Header<T>());
             list.AddRange(_listToString<T>());
             File.WriteAllLines(path_, list, Encoding.UTF8);
 
             LogFile.Instance.WriteLine($"Write:{path_}");
         }
 
-        private string _getHeader<T>()
-        {
-            var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Static | BindingFlags.Public);
-            foreach (var prop in listPropetyInfo)
-            {
-                if (prop.Name == "HEADER")
-                {
-                    return prop?.GetValue(null).ToString();
-                }
-            }
-            return string.Empty;
-        }
+        //private string _getHeader<T>()
+        //{
+        //    var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Static | BindingFlags.Public);
+        //    foreach (var prop in listPropetyInfo)
+        //    {
+        //        if (prop.Name == "HEADER")
+        //        {
+        //            return prop?.GetValue(null).ToString();
+        //        }
+        //    }
+        //    return string.Empty;
+        //}
 
         private class CompareProduct : IEqualityComparer<ILogEventProduct>
         {

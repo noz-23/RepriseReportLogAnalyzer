@@ -1,22 +1,25 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.Reflection;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist: LogEventBase
     {
-        public static EventRegist Instance = new EventRegist();
-        private EventRegist()
+        public static LogEventRegist Instance = new LogEventRegist();
+        private LogEventRegist()
         {
         }
 
         public void Create()
         {
             LogFile.Instance.WriteLine($"{LogEventBase.ListEventDataCount()}");
+        }
+
+        public static bool Regist(string key_, NewEvent event_)
+        {
+            _ListEventData.Add(key_, event_);
+            return true;
         }
     }
 
@@ -25,11 +28,6 @@ namespace RepriseReportLogAnalyzer.Events
         public delegate LogEventBase NewEvent(string [] list);
         protected static Dictionary<string, NewEvent> _ListEventData =new Dictionary<string, NewEvent>();
 
-        public static bool Regist(string key_, NewEvent event_)
-        {
-            _ListEventData.Add(key_, event_);
-            return true;
-        }
         public static int ListEventDataCount() => _ListEventData.Count;
 
         public static DateTime NowDateTime =DateTime.Now;
@@ -65,40 +63,6 @@ namespace RepriseReportLogAnalyzer.Events
         {
             var list = _splitSpace(str_);
 
-            //switch (list[0])
-            //{
-            //    //case "START": return new LogEventStart(list);
-            //    //case "AUTH:": return new LogEventAuthentication(list);
-            //    //case "IN": return new LogEventCheckIn(list);
-            //    //case "OUT": return new LogEventCheckOut(list);
-            //    //case "DEQUE": return new LogEventDequeue(list);
-            //    //case "DYNRES": return new LogEventDynamicReservation(list);
-            //    //case "log": return new LogEventAuthentication(list);
-            //    //case "END": return new LogEventLogFileEnd(list);
-            //    //case "METER_DEC": return new LogEventMeterDecrement(list);
-            //    //case "QUE": return new LogEventQueue(list);
-            //    //case "REPROCESSED": return new LogEventRepProcessed(list);
-            //    //case "RLM": return new LogEventRlmReportLogFormat(list);
-            //    //case "ROAM_EXTEND": return new LogEventRoamExtend(list);
-            //    //case "SHUTDOWN": return new LogEventShutdown(list);
-            //    //case "SWITCH": return new LogEventSwitch(list);
-            //    //case "TIMEJUMP": return new LogEventTimeJump(list);
-            //    //case "TIMEZONE": return new LogEventTimeZone(list);
-            //    //case "DENY": return new LogEventLicenseDenial(list);
-            //    //case "LICENSE": return new LogEventLicenseFile(list);
-            //    //case "INUSE": return new LogEventLicenseInUse(list);
-            //    //case "REREAD": return new LogEventLicenseReread(list);
-            //    //case "TEMP": return new LogEventLicenseTemporary(list);
-            //    //case "PRODUCT": return new LogEventProduct(list);
-
-            //    default:
-            //        if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
-            //        {
-            //            return new LogEventTimeStamp(list);
-            //        }
-            //        break;
-            //}
-
             NewEvent? newEvent =null;
             if (_ListEventData.TryGetValue(list[0], out newEvent) == false)
             {
@@ -120,7 +84,6 @@ namespace RepriseReportLogAnalyzer.Events
 
         public static void Clear()
         {
-            EventRegist.Instance.Create();
 
             NowEventNumber = 0;
             NowDateTime = DateTime.Now;
@@ -176,10 +139,31 @@ namespace RepriseReportLogAnalyzer.Events
             return DateTime.Parse(date_ + "/" + year + " " + time_);
         }
 
-        public static string HEADER { get => "Number,Date Time"; }
+        public static string Header<T>() 
+        {
+                var listColunm = new List<string>();
+                var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnSortAttribute)) as ColumnSortAttribute)?.Sort);
+
+                listPropetyInfo?.ToList().ForEach(prop =>
+                {
+                    listColunm.Add($"{prop.Name}");
+                });
+
+                return string.Join(",", listColunm);
+        }
+
         public override string ToString()
         {
-            return $"{EventNumber},{EventDateTime.ToString()}";
+
+            var listValue = new List<string>();
+            var listPropetyInfo = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnSortAttribute)) as ColumnSortAttribute)?.Sort);
+
+            listPropetyInfo?.ToList().ForEach(prop =>
+            {
+                listValue.Add($"{prop.GetValue(this)}");
+            });
+
+            return string.Join(",", listValue);
         }
     }
 }

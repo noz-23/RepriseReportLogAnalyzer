@@ -1,52 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using RepriseReportLogAnalyzer.Files;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Entity;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Net;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.Arm;
-using System.Security.Cryptography;
-using System.Security.Policy;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using System.Windows;
-using System.Xml.Linq;
-using System.DirectoryServices.ActiveDirectory;
-using System.Reflection.Emit;
-using System.Transactions;
-using System.Windows.Media.Animation;
-using Microsoft.SqlServer.Server;
-using static Dapper.SqlMapper;
-using System.Buffers.Text;
-using System.Collections;
-using System.Data.Common;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-using System.Reflection.Metadata;
-using System.Reflection.PortableExecutable;
-using System.Runtime.Intrinsics.X86;
-using System.Security.Claims;
-using System.Security.Cryptography.Xml;
-using System.Timers;
-using System.Windows.Controls;
-using System.Windows.Markup;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Media3D;
+﻿using System.ComponentModel;
 
 namespace RepriseReportLogAnalyzer.Enums
 {
@@ -83,6 +35,21 @@ namespace RepriseReportLogAnalyzer.Enums
 
     internal enum StatusValue
     {
+        // check-in why value Reason
+        Normal = 1,     //“Normal” check-in by application
+        Automatic =2,   //Application exited, automatic check-in
+        Utilit = 3, //License removed by (rlmremove) utility
+        Timeout = 4,    //License removed by server after timeout
+        Hold = 5,   //License hold/minimum checkout period expired
+        Dequeue = 6,    //Client requested license dequeue
+        HostId = 7, //Portable hostid removed
+        BackUp = 8, //Failed host back up
+        Lost = 9,   //Server lost its transferred licenses
+        Meter = 10, //Meter ran out of count during a periodic decrement
+        heartbeat11,    //Client failed to send heartbeat within “promise” interval.
+        Expired = 12,   //Temporary License expired (RLM Cloud only)
+        Returned = 13,	//Temporary license returned (RLM Cloud only)
+
         // rlm_stat() returns general RLM_HANDLE errors. These are:
         RLM_EH_NOHANDLE = -101, //No handle supplied to call.
         RLM_EH_READ_NOLICENSE = -102,   //Can’t read license data.

@@ -1,12 +1,9 @@
-﻿using RepriseReportLogAnalyzer.Files;
+﻿using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Windows;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using RepriseReportLogAnalyzer.Enums;
 
 namespace RepriseReportLogAnalyzer.Analyses
 {
@@ -49,7 +46,7 @@ namespace RepriseReportLogAnalyzer.Analyses
 
         private ANALYSIS_GROUP _group = ANALYSIS_GROUP.NONE;
 
-        public string Header { get => GetName(_group) + ",Duration"; }
+        public string Header { get => GetName(_group) + ",Duration,Days,Count"; }
 
         private List<string> _listToString()
         {
@@ -61,7 +58,8 @@ namespace RepriseReportLogAnalyzer.Analyses
             {
                 var list = this[key];
                 var sum = new TimeSpan(list.Sum(x => x.DurationDuplication().Ticks));
-                rtn.Add($"{key},{sum.ToString(@"d\.hh\:mm\:ss")}");
+                var days = new HashSet<DateTime>(list.Select(x => x.CheckOutDateTime.Date));
+                rtn.Add($"{key},{sum.ToString(@"d\.hh\:mm\:ss")},{days.Count},{list.Count}");
                 ProgressCount?.Invoke(count++, max, _ANALYSIS);
             }
             return rtn;

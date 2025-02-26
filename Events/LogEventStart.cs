@@ -1,11 +1,10 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
-using System;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventStart = LogEventBase.Regist("START", (l_) => new LogEventStart(l_));
+        private bool _logEventStart = Regist("START", (l_) => new LogEventStart(l_));
     }
 
     internal class LogEventStart : LogEventBase

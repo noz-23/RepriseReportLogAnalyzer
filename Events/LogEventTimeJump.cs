@@ -1,11 +1,10 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
-using System;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventTimeJump = LogEventBase.Regist("TIMEJUMP", (l_) => new LogEventTimeJump(l_));
+        private bool _logEventTimeJump = Regist("TIMEJUMP", (l_) => new LogEventTimeJump(l_));
     }
 
     internal class LogEventTimeJump: LogEventBase

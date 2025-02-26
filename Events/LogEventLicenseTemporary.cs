@@ -1,18 +1,16 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventLicenseTemporary = LogEventBase.Regist("TEMP", (l_) => new LogEventLicenseTemporary(l_));
+        private bool _logEventLicenseTemporary = Regist("TEMP", (l_) => new LogEventLicenseTemporary(l_));
     }
 
     internal class LogEventLicenseTemporary: LogEventBase, ILogEventUserHost, ILogEventProduct
     {
-
-
         //Temporary license creation/removal
         //TEMP[create | remove | restart | expired] product version license-pool user host “isv_def” expdate exptime server_handle mm/dd hh:mm:ss
         //0    1                                    2       3       4            5    6     7          8       9       10            11    12

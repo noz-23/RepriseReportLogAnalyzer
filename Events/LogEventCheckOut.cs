@@ -1,14 +1,12 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Interfaces;
-using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventCheckOut = LogEventBase.Regist("OUT", (l_) => new LogEventCheckOut(l_));
+        private bool _logEventCheckOut = Regist("OUT", (l_) => new LogEventCheckOut(l_));
     }
 
     internal class LogEventCheckOut: LogEventBase, ILogEventUserHost, ILogEventCountCurrent
@@ -105,12 +103,6 @@ namespace RepriseReportLogAnalyzer.Events
         public bool IsFindCheckIn(LogEventCheckIn checkIn_)
         {
             return (checkIn_.HandleServer != HandleServer) ? false : (checkIn_.EventNumber < EventNumber) ? false : true;
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Product,Version,Product Version,User,Host,UserHost,IsvDef,Pool,Count,CountCurrent,ResuseCurrent,HandleServer,HandleShare,ProcessId,Project,RequestedProduct,RequestedVersion"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Product},{Version},{ProductVersion},{User},{Host},{UserHost},{IsvDef},{Pool},{Count},{CountCurrent},{ResuseCurrent},{HandleServer},{HandleShare},{ProcessId},{Project},{RequestedProduct},{RequestedVersion}";
         }
     }
 }

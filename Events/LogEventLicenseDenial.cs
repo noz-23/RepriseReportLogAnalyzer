@@ -3,9 +3,9 @@ using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventLicenseDenial = LogEventBase.Regist("DENY", (l_) => new LogEventLicenseDenial(l_));
+        private bool _logEventLicenseDenial = Regist("DENY", (l_) => new LogEventLicenseDenial(l_));
     }
 
     internal class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, ILogEventProduct
@@ -53,12 +53,6 @@ namespace RepriseReportLogAnalyzer.Events
             ProcessId = list_[9];
 
             EventDateTime = _GetDateTime(list_[10], list_[11]);
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Product,Version,Product Version,User,Host,UserHost,IsvDef,Count,Why,LastAttempt,ProcessId"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Product},{Version},{ProductVersion},{User},{Host},{UserHost},{IsvDef},{Count},{Why},{LastAttempt},{ProcessId}";
         }
     }
 }

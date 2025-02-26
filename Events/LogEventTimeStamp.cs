@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RepriseReportLogAnalyzer.Events
+﻿namespace RepriseReportLogAnalyzer.Events
 {
     internal class LogEventTimeStamp: LogEventBase
     {

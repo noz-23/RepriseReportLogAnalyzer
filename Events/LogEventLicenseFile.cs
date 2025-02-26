@@ -2,9 +2,9 @@
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventLicenseFile = LogEventBase.Regist("LICENSE", (l_) => new LogEventLicenseFile(l_));
+        private bool _logEventLicenseFile = Regist("LICENSE", (l_) => new LogEventLicenseFile(l_));
     }
 
     internal class LogEventLicenseFile : LogEventBase
@@ -18,12 +18,6 @@ namespace RepriseReportLogAnalyzer.Events
         {
             FileName=list_[2];
             EventDateTime =NowDateTime;
-        }
-
-        new public static string HEADER { get => "Number,Date Time,FileName"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{FileName}";
         }
     }
 }

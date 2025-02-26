@@ -3,9 +3,9 @@ using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventProduct = LogEventBase.Regist("PRODUCT", (l_) => new LogEventProduct(l_));
+        private bool _logEventProduct = Regist("PRODUCT", (l_) => new LogEventProduct(l_));
     }
 
     internal class LogEventProduct: LogEventBase, ILogEventProduct

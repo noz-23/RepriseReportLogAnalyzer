@@ -1,10 +1,7 @@
 ﻿using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Windows;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Analyses
@@ -20,7 +17,7 @@ namespace RepriseReportLogAnalyzer.Analyses
 
         public void Analysis(ReportLogAnalysis log_)
         {
-            var listSkipNumber = new List<long>();
+            var listSkipNumber = new SortedSet<long>();
             foreach (var end in log_.ListEnd)
             {
                 // ログのの切り替えの次のスタートはスキップ
@@ -31,38 +28,46 @@ namespace RepriseReportLogAnalyzer.Analyses
                 }
             }
 
-            for (int i =0;i < log_.ListStart.Count;i++)
+            AnalysisStartShutdown? last = null;
+            foreach(var start in log_.ListStart)
             {
-                var start = log_.ListStart[i];
+                LogEventBase? shutdown = log_.ListShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber);
+
+                var startShutdown = new AnalysisStartShutdown(start, shutdown);
+                this.Add(startShutdown);
+                //
                 if (listSkipNumber.Contains(start.EventNumber) == true)
                 {
-                    // スキップ
+                    startShutdown.JoinEvent().SetSkip();
+                    last = startShutdown;
                     continue;
                 }
 
-                var shutdown = log_.ListShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber);
-                if (shutdown != null && (i<(log_.ListStart.Count-1)))
+                if (last != null)
                 {
-                    var nextStart = log_.ListStart[i + 1];
-                    if (shutdown.EventNumber>nextStart.EventNumber)
+                    // スタートが2回続いた場合(シャットダウンログ等がない)
+                    if (shutdown?.EventNumber == last.ShutdownNumber)
                     {
-                        shutdown = new LogEventShutdown(nextStart);
+                        startShutdown.JoinEvent().SetSkip();
                     }
                 }
-
-
-                this.Add(new AnalysisStartShutdown(start, shutdown));
+                last = startShutdown;
             }
-            /*
-            */
-
         }
 
-        public void WriteText(string path_)
+        public IEnumerable<AnalysisStartShutdown> ListWithoutSkip()
+        {
+            return this.Where(x_ => x_.JoinEvent().IsSkip != JoinEventStartShutdown.SKIP);
+        }
+
+        public void WriteText(string path_, bool withoutSkip_ =false)
         {
             var list = new List<string>();
             list.Add(AnalysisStartShutdown.HEADER);
-            list.AddRange(this.Select(x_ => x_.ToString()));
+
+            var listData = (withoutSkip_==false) ? this :ListWithoutSkip();
+
+            list.AddRange(listData.Select(x_ => x_.ToString()));
             File.WriteAllLines(path_, list, Encoding.UTF8);
         }
     }

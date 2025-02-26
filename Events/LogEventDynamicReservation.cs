@@ -1,13 +1,12 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Interfaces;
-using System;
 using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventDynamicReservation = LogEventBase.Regist("DYNRES", (l_) => new LogEventDynamicReservation(l_));
+        private bool _logEventDynamicReservation = Regist("DYNRES", (l_) => new LogEventDynamicReservation(l_));
     }
 
     internal class LogEventDynamicReservation : LogEventBase, ILogEventUserHost
@@ -44,12 +43,6 @@ namespace RepriseReportLogAnalyzer.Events
             //
             StringData = list_[6];
             EventDateTime = _GetDateTime(list_[7], list_[8]);
-        }
-
-        new public static string HEADER { get => "Number,Date Time,User,Host,User@Host,Reservation,LicensePool,Count,StringData"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{User},{Host},{UserHost},{Reservation},{LicensePool},{Count},{StringData}";
         }
     }
 }

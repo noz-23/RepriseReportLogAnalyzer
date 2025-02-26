@@ -2,9 +2,9 @@
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventAuthentication = LogEventBase.Regist("AUTH", (l_) => new LogEventAuthentication(l_));
+        private bool _logEventAuthentication = Regist("AUTH", (l_) => new LogEventAuthentication(l_));
     }
 
     internal class LogEventAuthentication: LogEventBase
@@ -22,12 +22,6 @@ namespace RepriseReportLogAnalyzer.Events
             Signature = list_[2];
 
             EventDateTime =NowDateTime;
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Section,Signature"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Section},{Signature}";
         }
     }
 }

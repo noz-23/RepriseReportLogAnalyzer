@@ -2,9 +2,9 @@
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventRepProcessed = LogEventBase.Regist("REPROCESSED", (l_) => new LogEventRepProcessed(l_));
+        private bool _logEventRepProcessed = Regist("REPROCESSED", (l_) => new LogEventRepProcessed(l_));
     }
 
     internal class LogEventRepProcessed : LogEventBase
@@ -19,12 +19,6 @@ namespace RepriseReportLogAnalyzer.Events
             Version = list_[3];
 
             EventDateTime = NowDateTime;
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Version"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Version}";
         }
     }
 }

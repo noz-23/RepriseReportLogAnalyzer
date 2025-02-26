@@ -1,29 +1,13 @@
-﻿using RepriseReportLogAnalyzer;
-using RepriseReportLogAnalyzer.Events;
+﻿using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Windows;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace RepriseReportLogAnalyzer.Analyses
 {
     internal class ListAnalysisCheckOutIn: List<AnalysisCheckOutIn>
     {
-
-        public ProgressCountDelegate? ProgressCount = null;
-        private const string _ANALYSIS ="[CheckOut - CheckIn]";
-
-
-        private ParallelOptions _option = new ParallelOptions() { MaxDegreeOfParallelism = 4 };
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -37,18 +21,17 @@ namespace RepriseReportLogAnalyzer.Analyses
         /// <param name="list_">グループ集計</param>
         public ListAnalysisCheckOutIn(IEnumerable<AnalysisCheckOutIn> list_)
         {
-            //list_?.ToList().ForEach(item=> ListAnalysisCheckOutInDuplication.Add(item));
             list_?.ToList().ForEach(item => this.Add(item));
         }
-        
-        //private List<AnalysisCheckOutIn> _listAnalysisCheckOutInAll = new List<AnalysisCheckOutIn>();
-        //public List<AnalysisCheckOutIn> ListAnalysisCheckOutInDuplication { get; private set; } =new List<AnalysisCheckOutIn>();
-        //public List<JoinCheckOutIn> ListJoinCheckOutIn { get; private set; } = new List<JoinCheckOutIn>();
 
-        public void Analysis(ReportLogAnalysis log_, ListAnalysisStartShutdown listStartShutdown_)
+        public ProgressCountDelegate? ProgressCount = null;
+
+        private const string _ANALYSIS = "[CheckOut - CheckIn]";
+
+        public void Analysis(ReportLogAnalysis log_, IEnumerable<AnalysisStartShutdown> listStartShutdown_)
         {
             int count = 0;
-            int max = 100;
+            int max = 0;
             var listCheckOutIn = new Dictionary<string, List<AnalysisCheckOutIn>>();
             foreach (var startShutdown in listStartShutdown_)
             {
@@ -74,7 +57,7 @@ namespace RepriseReportLogAnalyzer.Analyses
                     }
                     catch
                     {
-                        data = new AnalysisCheckOutIn(checkOut, startShutdown.EventShutdown());
+                        data = new AnalysisCheckOutIn(checkOut, startShutdown?.EventShutdown());
                         LogFile.Instance.WriteLine($"Not Found");
                     }
 
@@ -118,26 +101,19 @@ namespace RepriseReportLogAnalyzer.Analyses
                         continue;
                     }
 
-                    var list = listKeyData.AsParallel().Where(x_ => data.IsWithInRange(x_.CheckOutNumber())&&(listNoCheck.Contains(x_) == false)).OrderBy(x_ => x_.CheckInNumber());
-                    if(list.Count() > 0)
+                    var list = listKeyData.AsParallel().Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_) == false)).OrderBy(x_ => x_.CheckInNumber());
+                    if (list.Count() > 0)
                     {
                         // 時間を更新して追加
-                        var renew =list.Last();
+                        var renew = list.Last();
                         data.JoinEvent().SetDuplication(renew.CheckIn());
 
-                        //var add = new AnalysisCheckOutIn( data.CheckOut(), renew.CheckIn());
-
-                        //ListAnalysisCheckOutInDuplication.Add(add);
                         listNoCheck.AddRange(list);
 
                         LogFile.Instance.WriteLine($"{data.CheckOutNumber()} : {data.CheckInNumber()} -> {renew.CheckInNumber()}");
                         continue;
                     }
-                    // そのまま追加
-                    //listAddData.Add(data);
-                    //ListAnalysisCheckOutInDuplication.Add(data);
                 }
-
                 ProgressCount?.Invoke(count++, max, _ANALYSIS + "Renew");
             }
         }
@@ -145,16 +121,12 @@ namespace RepriseReportLogAnalyzer.Analyses
 
         public LogEventCheckOut? Find(LogEventCheckIn checkIn_)
         {
-            //return _listAnalysisCheckOutInAll.ToList().Find(x_ => x_.IsSame(checkIn_))?.CheckOut() ?? null;
             return this.ToList().Find(x_ => x_.IsSame(checkIn_))?.CheckOut() ?? null;
         }
 
         private List<string> _listToString(bool duplication_)
         {
             var rtn = new List<string>();
-
-            //var list = (all_ == true) ? _listAnalysisCheckOutInAll : ListAnalysisCheckOutInDuplication;
-
             var list = (duplication_ == false) ? this : ListDuplication();
             foreach (var data in list)
             {

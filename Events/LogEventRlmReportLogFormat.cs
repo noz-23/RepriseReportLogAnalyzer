@@ -2,9 +2,9 @@
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventRlmReportLogFormat = LogEventBase.Regist("RLM", (l_) => new LogEventRlmReportLogFormat(l_));
+        private bool _logEventRlmReportLogFormat = Regist("RLM", (l_) => new LogEventRlmReportLogFormat(l_));
     }
 
     internal class LogEventRlmReportLogFormat : LogEventBase
@@ -19,12 +19,6 @@ namespace RepriseReportLogAnalyzer.Events
             Version = list_[6];
 
             EventDateTime = NowDateTime;
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Version"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Version}";
         }
     }
 }

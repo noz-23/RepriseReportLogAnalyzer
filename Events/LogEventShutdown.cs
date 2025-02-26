@@ -3,9 +3,9 @@ using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventShutdown = LogEventBase.Regist("SHUTDOWN", (l_) => new LogEventShutdown(l_));
+        private bool _logEventShutdown = Regist("SHUTDOWN", (l_) => new LogEventShutdown(l_));
     }
 
     internal class LogEventShutdown: LogEventBase, ILogEventUserHost
@@ -38,17 +38,5 @@ namespace RepriseReportLogAnalyzer.Events
             EventNumber = NowEventNumber;
             EventDateTime = NowDateTime;
         }
-
-        /// <summary>
-        /// コンストラクタ
-        /// スタートの連続
-        /// </summary>
-        /// <param name="start_"></param>
-        public LogEventShutdown(LogEventStart start_)
-        {
-            EventNumber = start_.EventNumber;
-            EventDateTime = start_.EventDateTime.AddSeconds(-1);
-        }
-
     }
 }

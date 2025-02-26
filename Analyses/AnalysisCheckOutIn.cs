@@ -1,60 +1,28 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Files;
-using System;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses
 {
     class AnalysisCheckOutIn
     {
-        //public AnalysisCheckOutIn(AnalysisStartShutdown startShutdown_, LogEventCheckOut checkOut_, LogEventCheckIn? checkIn_)
-
-        public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase checkIn_)
+        public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase? checkIn_)
         {
             _checkOut = checkOut_;
             _checkIn = checkIn_;
 
-            //if (checkIn_ is LogEventCheckIn checkIn)
-            //{
-            //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn);
-            //}
-            //else if (checkIn_ is LogEventShutdown shutdown)
-            //{
-            //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, shutdown);
-            //}
-            //else
-            //{
-            //    LogFile.Instance.WriteLine($"{checkIn_.EventNumber} {checkIn_.GetType()}");
-            //}
-            _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn_);
+            _joinEvent = new JoinEventCheckOutIn(checkOut_, checkIn_);
         }
 
-        //public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventCheckIn checkIn_)
-        //{
-        //    _checkOut = checkOut_;
-        //    _checkIn = checkIn_;
+        public const string HEADER = "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host";
 
-        //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn_);
-        //}
-
-        //public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventShutdown checkIn_)
-        //{
-        //    _checkOut = checkOut_;
-        //    _checkIn = checkIn_;
-
-        //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn_);
-        //}
-
-        //[Sort(101)]
-        //public long StartNumber { get => _startShutdown.StartNumber; }
-        [ColumnSort(102)]
+        [ColumnSort(101)]
         public DateTime CheckOutDateTime { get => _checkOut.EventDateTime; }
 
-        [ColumnSort(103)]
-        public DateTime CheckInDateTime { get => _checkIn.EventDateTime; }
+        [ColumnSort(102)]
+        public DateTime CheckInDateTime { get => _checkIn?.EventDateTime?? LogEventBase.NowDateTime; }
 
-        [ColumnSort(104)]
+        [ColumnSort(103)]
         public TimeSpan Duration { get => CheckInDateTime - CheckOutDateTime; }
 
         //
@@ -73,9 +41,17 @@ namespace RepriseReportLogAnalyzer.Analyses
         public string UserHost { get => _checkOut.UserHost; }
 
         private readonly LogEventCheckOut _checkOut;
-        private readonly LogEventBase _checkIn;
-        private readonly JoinEventCheckOutIn _joinCheckOutIn;
+        private readonly LogEventBase? _checkIn=null;
+        private readonly JoinEventCheckOutIn _joinEvent;
 
+        public LogEventCheckOut CheckOut() => _checkOut;
+        public LogEventBase? CheckIn() => _checkIn;
+        public JoinEventCheckOutIn JoinEvent() => _joinEvent;
+
+        public long CheckOutNumber() => _checkOut.EventNumber;
+        public long CheckInNumber() => _checkIn?.EventNumber ?? LogEventBase.NowEventNumber;
+
+        public DateTime JointDateTime() => _joinEvent.CheckIn()?.EventDateTime ?? LogEventBase.NowDateTime;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsSame(LogEventCheckIn checkIn_)
@@ -89,26 +65,17 @@ namespace RepriseReportLogAnalyzer.Analyses
             return number_ > CheckOutNumber() && number_ < CheckInNumber();
         }
 
-        public LogEventCheckOut CheckOut() => _checkOut;
-        public LogEventBase CheckIn() => _checkIn;
-        public JoinEventCheckOutIn JoinEvent() => _joinCheckOutIn;
-
-        public long CheckOutNumber()  => _checkOut.EventNumber;
-        public long CheckInNumber() => _checkIn.EventNumber;
 
         public TimeSpan DurationDuplication() 
         {
-            return _joinCheckOutIn.CheckIn().EventDateTime - CheckOutDateTime;
+            return JointDateTime() - CheckOutDateTime;
         }
-
-        public static string HEADER { get => "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host"; }
-
 
         public string ToString( bool duplication_)
         {
             if (duplication_ == true)
             {
-                return $"{CheckOutDateTime.ToString()},{_joinCheckOutIn.CheckIn().EventDateTime.ToString()},{DurationDuplication().ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
+                return $"{CheckOutDateTime.ToString()},{JointDateTime().ToString()},{DurationDuplication().ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
             }
 
             return ToString();

@@ -3,9 +3,9 @@ using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventRoamExtend = LogEventBase.Regist("ROAM_EXTEND", (l_) => new LogEventRoamExtend(l_));
+        private bool _logEventRoamExtend = Regist("ROAM_EXTEND", (l_) => new LogEventRoamExtend(l_));
     }
 
     internal class LogEventRoamExtend : LogEventBase, ILogEventUserHost, ILogEventProduct
@@ -52,12 +52,6 @@ namespace RepriseReportLogAnalyzer.Events
             ProcessId = list_[9];
             //
             EventDateTime = _GetDateTime(list_[10], list_[11]);
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Product,Version,Product Version,User,Host,User@Host,Pool,IsvDef,DaysExtended,HandleServer,ProcessId"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Product},{Version},{ProductVersion},{User},{Host},{UserHost},{Pool},{IsvDef},{DaysExtended},{HandleServer},{ProcessId}";
         }
     }
 }

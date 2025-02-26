@@ -3,9 +3,9 @@ using RepriseReportLogAnalyzer.Enums;
 
 namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventSwitch = LogEventBase.Regist("SWITCH", (l_) => new LogEventSwitch(l_));
+        private bool _logEventSwitch = Regist("SWITCH", (l_) => new LogEventSwitch(l_));
     }
 
     internal class LogEventSwitch : LogEventBase
@@ -27,12 +27,6 @@ namespace RepriseReportLogAnalyzer.Events
             Switch =(list_[1] =="to")? SwitchType.TO:SwitchType.FROM;
             OldReportLogName =list_[2];
             EventDateTime =NowDateTime;
-        }
-
-        new public static string HEADER { get => "Number,Date Time,Switch,OldReportLogName"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{Switch},{OldReportLogName}";
         }
     }
 }

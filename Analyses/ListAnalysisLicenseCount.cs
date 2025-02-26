@@ -1,11 +1,7 @@
 ﻿using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Windows;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Analyses
@@ -90,7 +86,7 @@ namespace RepriseReportLogAnalyzer.Analyses
                 //_add(ev);
             }
         }
-        HashSet<string> _listProduct = new HashSet<string>();
+        SortedSet<string> _listProduct = new SortedSet<string>();
 
         // 処理でのカウント
         Dictionary<string, int> _listCount = new Dictionary<string, int>();
@@ -166,7 +162,7 @@ namespace RepriseReportLogAnalyzer.Analyses
                 list.Add("Time");
                 foreach (var product in _listProduct)
                 {
-                    list.Add($"{product}[Use]");
+                    //list.Add($"{product}[Use]");
                     list.Add($"{product}[Have]");
                     list.Add($"{product}[OutIn]");
                 }
@@ -180,14 +176,12 @@ namespace RepriseReportLogAnalyzer.Analyses
             foreach (var d in this)
             {
                 var add = new List<string>();
-                //add.Add(d.eventBase.EventDateTime.Date.ToShortDateString());
-                //add.Add(d.eventBase.EventDateTime.TimeOfDay.ToString());
                 var dateTime = d.eventBase.EventDateTime.ToString().Split(" ");
                 add.Add(dateTime[0]);
                 add.Add(dateTime[1]);
                 foreach (var product in _listProduct)
                 {
-                    add.Add(d.countProduct[product].ToString());
+                    //add.Add(d.countProduct[product].ToString());
                     add.Add(d.maxProduct[product].ToString());
                     add.Add(d.outInProduct[product].ToString());
                 }
@@ -229,7 +223,6 @@ namespace RepriseReportLogAnalyzer.Analyses
                     listNowMax[product] = haveMax;
                 }
 
-                //Debug.WriteLine($"[{typeof(ListAnalysisLicenseCount)} ] [{string.Join(",", add)}]");
                 rtn.Add(string.Join(",", add));
             }
 
@@ -245,21 +238,6 @@ namespace RepriseReportLogAnalyzer.Analyses
 
             LogFile.Instance.WriteLine($"Write:{path_}");
         }
-
-        //public void WriteDateText(string path_, List<DateTime> listDate_)
-        //{
-        //    var list = new List<string>();
-        //    list.Add(Header);
-        //    list.AddRange(ListToDateString(listDate_));
-        //    File.WriteAllLines(path_, list, Encoding.UTF8);
-        //}
-        //public void WriteHourText(string path_, List<DateTime> listHour_)
-        //{
-        //    var list = new List<string>();
-        //    list.Add(Header);
-        //    list.AddRange(ListToHourString(listHour_));
-        //    File.WriteAllLines(path_, list, Encoding.UTF8);
-        //}
 
         public void WriteTimeSpanText(string path_, long timeSpan_)
         {

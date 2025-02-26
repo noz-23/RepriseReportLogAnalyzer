@@ -1,11 +1,8 @@
-﻿using System;
-using RepriseReportLogAnalyzer.Interfaces;
-
-namespace RepriseReportLogAnalyzer.Events
+﻿namespace RepriseReportLogAnalyzer.Events
 {
-    internal partial class EventRegist
+    internal partial class LogEventRegist
     {
-        private bool _logEventLogFileEnd = LogEventBase.Regist("END", (l_) => new LogEventLogFileEnd(l_));
+        private bool _logEventLogFileEnd = Regist("END", (l_) => new LogEventLogFileEnd(l_));
     }
 
     internal class LogEventLogFileEnd: LogEventBase

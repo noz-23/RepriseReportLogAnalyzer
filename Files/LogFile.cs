@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -51,7 +50,7 @@ namespace RepriseReportLogAnalyzer.Files
         /// <param name="member_">関数</param>
         public void WriteLine(string message_, [CallerFilePath] string soruce_ = "", [CallerLineNumber] int line_ = -1, [CallerMemberName] string member_ = "")
         {
-            Trace.WriteLine($"{DateTime.Now.ToString()} [{Path.GetFileName(soruce_)}({line_})][{member_}]\n{message_}");
+            Trace.WriteLine($"{DateTime.Now.ToString()} [{Path.GetFileName(soruce_)}({line_})][{member_}]\n{message_}\n");
             Trace.Flush();
         }
     }

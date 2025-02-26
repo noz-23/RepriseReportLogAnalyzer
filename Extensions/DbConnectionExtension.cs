@@ -1,11 +1,7 @@
 ﻿using Dapper;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 
 namespace RLMLogReader.Extensions
@@ -40,10 +36,10 @@ namespace RLMLogReader.Extensions
         }
 
 
-        private static string _createTabel<T>()
+        private static string _createTabel<T>() 
         {
             var listColunm = new List<string>();
-            var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnSortAttribute)) as ColumnSortAttribute)?.Sort)?.ToList();
+            var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnSortAttribute)) as ColumnSortAttribute)?.Sort);
 
             listPropetyInfo?.ToList().ForEach( prop =>
             {
