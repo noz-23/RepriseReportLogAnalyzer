@@ -1,5 +1,7 @@
 ﻿using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
+using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,11 @@ namespace RepriseReportLogAnalyzer.Controls
         public ResultControl()
         {
             InitializeComponent();
+
+            foreach (ANALYSIS_GROUP group in Enum.GetValues(typeof(ANALYSIS_GROUP)))
+            {
+                _comboBox.Items.Add(group.Description());
+            }
         }
 
 
@@ -32,27 +39,30 @@ namespace RepriseReportLogAnalyzer.Controls
         {
             //if( sender_ is Calendar calendar )
             //{
-                LogFile.Instance.WriteLine($"Selected {_calendar.SelectedDate}");
-                AnalysisManager.Instance.SetDate(_calendar.SelectedDate);
+            _label.Content = "Select:"+(_calendar.SelectedDate.ToString());
+
+            LogFile.Instance.WriteLine($"Selected {_calendar.SelectedDate}");
+                AnalysisManager.Instance.SetDate(_calendar.SelectedDate, _comboBox.SelectedIndex);
             //}
         }
 
-        public void CalendarShow(IEnumerable<DateTime> list_)
-        {
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                _calendar.DisplayDateStart = list_.First();
-                _calendar.DisplayDateEnd = list_.Last();
+        //public void CalendarShow(IEnumerable<DateTime> list_)
+        //{
+        //    App.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        _calendar.DisplayDateStart = list_.First();
+        //        _calendar.DisplayDateEnd = list_.Last();
 
-                //_calendar.SelectedDates.Clear();
-                //list_.ToList().ForEach(date_ => _calendar.SelectedDates.Add(date_));
-            });
+        //        //_calendar.SelectedDates.Clear();
+        //        //list_.ToList().ForEach(date_ => _calendar.SelectedDates.Add(date_));
+        //    });
 
-        }
+        //}
 
         private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
         {
             _calendar.SelectedDate = null;
+            _label.Content = "Select:";
         }
     }
 }

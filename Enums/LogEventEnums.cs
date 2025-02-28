@@ -4,14 +4,14 @@ namespace RepriseReportLogAnalyzer.Enums
 {
     internal enum ANALYSIS_GROUP
     {
+        [Description("None")]
+        NONE =0,
         [Description("User")]
-        NONE,
-        [Description("User")]
-        USER,
+        USER=1,
         [Description("Host")]
-        HOST,
+        HOST=2,
         [Description("User@Host")]
-        USER_HOST
+        USER_HOST=3,
     }
 
     internal enum ReservationType

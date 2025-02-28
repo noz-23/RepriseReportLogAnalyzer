@@ -22,8 +22,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Label
+            x:Name="_label"
             Grid.Column="0" Grid.Row="0"
-            Content="Select"
+            Content="Select:"
          />
         <Calendar
             x:Name="_calendar"
@@ -62,33 +63,29 @@
             </DataGrid.Columns>
         </DataGrid>
         <ComboBox
+            x:Name="_comboBox"
             Grid.Column="2" Grid.Row="0"
             >
-            <ComboBoxItem
-                Content="User"
-            />
-            <ComboBoxItem
-                Content="Host"
-            />
-            <ComboBoxItem
-                Content="User@Host"
-            />
         </ComboBox>
         <DataGrid 
             Grid.Column="2" Grid.Row="1"
+            ItemsSource="{Binding ListResultGroup,Source={x:Static manager:AnalysisManager.Instance},Mode=OneWay}"
             AutoGenerateColumns="False"
+            CanUserAddRows="false"
             >
             <DataGrid.Columns>
                 <DataGridTextColumn
-                                Width="*"
-                                IsReadOnly="True"
-                                Binding="{Binding}"
-                                />
+                    Header="Group"
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding Name}"
+                />
                 <DataGridTextColumn
-                                Width="*"
-                                IsReadOnly="True"
-                                Binding="{Binding}"
-                                />
+                    Header="Duration"
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding Duration}"
+                />
             </DataGrid.Columns>
         </DataGrid>
         <ScottPlot:WpfPlot
