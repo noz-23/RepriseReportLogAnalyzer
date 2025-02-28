@@ -54,6 +54,12 @@ namespace RepriseReportLogAnalyzer.Events
 
         public DateTime EventDate()=> EventDateTimeUnit(TimeSpan.TicksPerDay);
 
+        /// <summary>
+        /// 日時を単位時間に分けた時の時間帯
+        /// 15分単位なら 16:13 →16:00
+        /// </summary>
+        /// <param name="timeSpan_">時間帯</param>
+        /// <returns></returns>
         public DateTime EventDateTimeUnit(long timeSpan_)
         {
             return new DateTime(EventDateTime.Ticks - (EventDateTime.Ticks % timeSpan_));

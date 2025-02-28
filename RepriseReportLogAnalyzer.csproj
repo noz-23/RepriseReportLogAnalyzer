@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Events\" />
     <Folder Include="Databases\" />
   </ItemGroup>
@@ -21,6 +20,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="ScottPlot.WPF" Version="5.0.54" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
   </ItemGroup>
 

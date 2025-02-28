@@ -5,152 +5,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RepriseReportLogAnalyzer.Windows"
+    xmlns:control="clr-namespace:RepriseReportLogAnalyzer.Controls"
     mc:Ignorable="d"
-    Title="MainWindow" Height="500" Width="800"
+    Title="MainWindow" Height="200" Width="800"
     >
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Expander
-            Grid.Row="0"
-            IsExpanded="True">
-            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="50"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition Height="75"/>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition Height="25"/>
-                </Grid.RowDefinitions>
-                <Label
-                    Grid.Row="0" Grid.Column="0"
-                    Content="Open Reprise Report Log Files [as one file from top]"
-                    />
-                <DataGrid
-                    x:Name="_dataGrid"
-                    Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
-                    AutoGenerateColumns="False"
-                    HeadersVisibility="None"
-                    >
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="*"
-                            IsReadOnly="True"
-                            Binding="{Binding}"
-                            />
-                        <DataGridTemplateColumn
-                            Width="50"
-                        >
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button 
-                                        Content="Delete"
-                                        Click="_deleteClick"
-                                        />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-                <Button 
-                    Grid.Row="1" Grid.Column="1"
-                    Content="Open"
-                    Click="_openClick"
-                    />
-                <Label 
-                    Grid.Row="3" Grid.Column="0"
-                    Content="Select Output Folder"
-                    />
-                <TextBox
-                    x:Name="_textBoxFolder"
-                    Grid.Row="4" Grid.Column="0"
-                    Text=""
-                  />
-                <Button 
-                    Grid.Row="4" Grid.Column="1"
-                    Content="Select"
-                    Click="_selectClick"
-                    />
-                <Button 
-                    x:Name="_buttonAnalysis"
-                    Grid.Row="5" Grid.Column="1"
-                    Content="Analysis"
-                    Click="_analysisClick"
-                    />
-                <ProgressBar
-                    x:Name="_progressBar"
-                    Grid.Row="5" Grid.Column="0"
-                    />
-                <TextBlock
-                    x:Name="_textBlock"
-                    Grid.Row="5" Grid.Column="0"
-                    TextAlignment="Center"
-                    />
-            </Grid>
-        </Expander>
-        <Expander 
-            Grid.Row="1"
-            IsExpanded="True"
-            >
-            <StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Label
-                        Grid.Column="0" Grid.Row="0"
-                        Content="Select"
-                        />
-                    <Calendar
-                        x:Name="_calendar"
-                        Grid.Column="0" Grid.Row="1"
-                        SelectedDatesChanged="_calendarSelected"
-                     />
-                    <Label
-                       Grid.Column="1" Grid.Row="0"
-                       Content="Product"
-                       />
-                    <ListView 
-                        Grid.Column="1" Grid.Row="1"
-                        />                    
-                    <Label
-                       Grid.Column="2" Grid.Row="0"
-                       Content="User"
-                       />
-                    <ListView 
-                        Grid.Column="2" Grid.Row="1"
-                        />
-                    <Label
-                       Grid.Column="3" Grid.Row="0"
-                       Content="Host"
-                       />
-                    <ListView 
-                        Grid.Column="3" Grid.Row="1"
-                        />
-                    <Label
-                       Grid.Column="4" Grid.Row="0"
-                       Content="User@Host"
-                       />
-                    <ListView 
-                        Grid.Column="4" Grid.Row="1"
-                        />
-                </Grid>
-            </StackPanel>
-        </Expander>
+        <TabControl
+            TabStripPlacement="Left">
+            <TabItem Header="Analysis">
+                <control:AnalysisControl/>
+            </TabItem>
+            <TabItem Header="Result">
+                <control:ResultControl/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

@@ -27,6 +27,10 @@ Costura.Fody : MIT
 
  https://github.com/Fody/Costura
 
+ScottPlot : MIT
+
+ https://scottplot.net/
+
 Dapper : Apache-2.0
 
  https://github.com/DapperLib/Dapper

@@ -17,7 +17,7 @@ namespace RepriseReportLogAnalyzer.Analyses
             _group = group_;
         }
 
-        public void Analysis( List<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
+        public void Analysis(IEnumerable<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
         {
             switch (_group)
             {
@@ -54,13 +54,14 @@ namespace RepriseReportLogAnalyzer.Analyses
 
             int count = 0;
             int max = this.Keys.Count;
+            ProgressCount?.Invoke(0, max, _ANALYSIS);
             foreach (var key in this.Keys)
             {
                 var list = this[key];
                 var sum = new TimeSpan(list.Sum(x => x.DurationDuplication().Ticks));
                 var days = new HashSet<DateTime>(list.Select(x => x.CheckOutDateTime.Date));
                 rtn.Add($"{key},{sum.ToString(@"d\.hh\:mm\:ss")},{days.Count},{list.Count}");
-                ProgressCount?.Invoke(count++, max, _ANALYSIS);
+                ProgressCount?.Invoke(++count, max);
             }
             return rtn;
         }

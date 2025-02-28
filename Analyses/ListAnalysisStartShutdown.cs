@@ -15,7 +15,7 @@ namespace RepriseReportLogAnalyzer.Analyses
         { 
         }
 
-        public void Analysis(ReportLogAnalysis log_)
+        public void Analysis(AnalysisReportLog log_)
         {
             var listSkipNumber = new SortedSet<long>();
             foreach (var end in log_.ListEnd)

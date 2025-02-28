@@ -28,7 +28,7 @@ namespace RepriseReportLogAnalyzer.Analyses
 
         private const string _ANALYSIS = "[CheckOut - CheckIn]";
 
-        public void Analysis(ReportLogAnalysis log_, IEnumerable<AnalysisStartShutdown> listStartShutdown_)
+        public void Analysis(AnalysisReportLog log_, IEnumerable<AnalysisStartShutdown> listStartShutdown_)
         {
             int count = 0;
             int max = 0;
@@ -42,6 +42,7 @@ namespace RepriseReportLogAnalyzer.Analyses
 
                 count = 0;
                 max = listCheckOut.Count;
+                ProgressCount?.Invoke(0, max, _ANALYSIS + "Join");
                 foreach (var checkOut in listCheckOut)
                 {
                     AnalysisCheckOutIn data;
@@ -70,13 +71,14 @@ namespace RepriseReportLogAnalyzer.Analyses
                     }
                     listCheckOutIn[key].Add(data);
 
-                    ProgressCount?.Invoke(count++, max, _ANALYSIS + "Join");
+                    ProgressCount?.Invoke(++count, max);
                 }
             }
 
             // 重複のチェック
             count = 0;
             max = listCheckOutIn.Keys.Count;
+            ProgressCount?.Invoke(0, max, _ANALYSIS + "Renew");
             foreach (var key in listCheckOutIn.Keys)
             {
                 var listNoCheck = new List<AnalysisCheckOutIn>();
@@ -94,6 +96,7 @@ namespace RepriseReportLogAnalyzer.Analyses
 
                     listNoCheck.AddRange(list);
                 }
+
                 foreach (var data in listKeyData)
                 {
                     if (listNoCheck.Contains(data) == true)
@@ -114,7 +117,7 @@ namespace RepriseReportLogAnalyzer.Analyses
                         continue;
                     }
                 }
-                ProgressCount?.Invoke(count++, max, _ANALYSIS + "Renew");
+                ProgressCount?.Invoke(++count, max);
             }
         }
 

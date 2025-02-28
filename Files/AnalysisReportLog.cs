@@ -6,10 +6,10 @@ using System.Text;
 
 namespace RepriseReportLogAnalyzer.Files
 {
-    internal class ReportLogAnalysis
+    internal class AnalysisReportLog
     {
         //
-        public ReportLogAnalysis()
+        public AnalysisReportLog()
         {
             LogEventBase.Clear();
 
