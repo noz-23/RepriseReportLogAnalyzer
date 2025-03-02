@@ -32,18 +32,17 @@ namespace RepriseReportLogAnalyzer.Controls
             {
                 _comboBox.Items.Add(group.Description());
             }
+            _comboBox.SelectedIndex = 0;
         }
 
 
         private void _calendarSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
         {
+            LogFile.Instance.WriteLine($"Selected [{_calendar.SelectedDate}]");
             //if( sender_ is Calendar calendar )
             //{
-            _label.Content = "Select:"+(_calendar.SelectedDate.ToString());
-
-            LogFile.Instance.WriteLine($"Selected {_calendar.SelectedDate}");
-                AnalysisManager.Instance.SetDate(_calendar.SelectedDate, _comboBox.SelectedIndex);
             //}
+            SetDate();
         }
 
         //public void CalendarShow(IEnumerable<DateTime> list_)
@@ -62,7 +61,29 @@ namespace RepriseReportLogAnalyzer.Controls
         private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
         {
             _calendar.SelectedDate = null;
-            _label.Content = "Select:";
+            _label.Content = "Selected : ";
+
+            SetDate();
+        }
+
+        private void _selectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            LogFile.Instance.WriteLine($"Selected [{_comboBox.SelectedIndex}]");
+            SetDate();
+        }
+
+        public void SetDate()
+        {
+            var date = _calendar.SelectedDate;
+            var index = _comboBox.SelectedIndex;
+
+            LogFile.Instance.WriteLine($"[{date}] [{index}]");
+
+            _label.Content = "Selected : " + date?.ToShortDateString() ?? string.Empty;
+            AnalysisManager.Instance.SetDate(date, index);
+            AnalysisManager.Instance.SetPlot(date, _scottPlot);
+
+
         }
     }
 }

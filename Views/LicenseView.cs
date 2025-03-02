@@ -13,7 +13,7 @@ namespace RepriseReportLogAnalyzer.Views
         }
 
         public DateTime Date { get; set; } = DateTime.Now;
-        public string Product { get; set; } = string.Empty;
+        //public string Product { get; set; } = string.Empty;
 
         public string Name { get; set; } = string.Empty;
         public int Count { get; set; } = 0;

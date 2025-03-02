@@ -17,7 +17,7 @@ namespace RepriseReportLogAnalyzer.Analyses
     /// 　MaxProduct  :プロダクト-最大数
     /// 　OutInProduct:プロダクト-ログの数値
     /// </summary>
-    internal class ListAnalysisLicenseCount : List<(LogEventBase EventBase, Dictionary<string, int> CountProduct, Dictionary<string, int> MaxProduct, Dictionary<string, int> OutInProduct)>
+    internal class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
     {
         public ProgressCountDelegate? ProgressCount = null;
         private const string _ANALYSIS = "[License Count]";
@@ -25,6 +25,22 @@ namespace RepriseReportLogAnalyzer.Analyses
 
         public ListAnalysisLicenseCount()
         { 
+        }
+        public string Header
+        {
+            get
+            {
+                var list = new List<string>();
+                list.Add("Date");
+                list.Add("Time");
+                foreach (var product in _listProduct)
+                {
+                    //list.Add($"{product}[Use]");
+                    list.Add($"{product}[Have]");
+                    list.Add($"{product}[OutIn]");
+                }
+                return string.Join(",", list);
+            }
         }
 
         private SortedSet<string> _listProduct = new SortedSet<string>();
@@ -45,7 +61,7 @@ namespace RepriseReportLogAnalyzer.Analyses
         private Dictionary<string, int> _listCountOutIn = new Dictionary<string, int>();
 
 
-        Dictionary<DateTime, IEnumerable<LicenseView>> _listDayToProduct = new Dictionary<DateTime, IEnumerable<LicenseView>>();
+        private Dictionary<DateTime, IEnumerable<LicenseView>> _listDayToProduct = new Dictionary<DateTime, IEnumerable<LicenseView>>();
 
         public void Analysis(AnalysisReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
         {
@@ -56,7 +72,7 @@ namespace RepriseReportLogAnalyzer.Analyses
             int count = 0;
             int max = log_.ListEvent.Count;
 
-            ProgressCount?.Invoke(0, max, _ANALYSIS);
+            ProgressCount?.Invoke(0, max, _ANALYSIS+"Count");
             foreach (var ev in log_.ListEvent)
             {
                 if (ev is LogEventRlmReportLogFormat)
@@ -125,18 +141,19 @@ namespace RepriseReportLogAnalyzer.Analyses
 
             var minDate = this.Select(x => x.EventBase.EventDate()).Min();
             var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
-            for (var date = minDate; date < maxDate.AddDays(1); date = date.AddTicks(TimeSpan.TicksPerDay))
+
+            count= 0;
+            max = (maxDate - minDate).Days+1;
+
+            ProgressCount?.Invoke(0, max, _ANALYSIS + "Days");
+            for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
             {
                 _listDayToProduct[date] = _getDayToProduct(date);
+                ProgressCount?.Invoke(++count, max);
             }
 
         }
 
-        public void _add(LogEventBase logEventBase_)
-        {
-            // その時の値を入れる
-            this.Add((logEventBase_, new Dictionary<string, int>(_listCount), new Dictionary<string, int>(_listHave), new Dictionary<string, int>(_listCountOutIn)));
-        }
 
         private void _clearCount()
         {
@@ -191,23 +208,11 @@ namespace RepriseReportLogAnalyzer.Analyses
             return true;
         }
 
-        public string Header
+        public void _add(LogEventBase logEventBase_)
         {
-            get
-            {
-                var list = new List<string>();
-                list.Add("Date");
-                list.Add("Time");
-                foreach (var product in _listProduct)
-                {
-                    //list.Add($"{product}[Use]");
-                    list.Add($"{product}[Have]");
-                    list.Add($"{product}[OutIn]");
-                }
-                return string.Join(",", list);
-            }
+            // その時の値を入れる
+            this.Add(new AnalysisLicenseCount(logEventBase_, _listCount, _listHave, _listCountOutIn));
         }
-
         private List<string> _listToString()
         {
             var rtn = new List<string>();
@@ -271,24 +276,25 @@ namespace RepriseReportLogAnalyzer.Analyses
         {
             var rtn = new List<LicenseView>();
 
-            var listSelectDay = this.Where(x_ => x_.EventBase.EventDateTime.Date == date_);
+            var listSelectDay = this.Where(x_ => x_.EventBase.EventDate() == date_);
             foreach (var product in _listProduct)
             {
-                if (listSelectDay.Any() == false)
-                {
-                    continue;
-                }
-                //var minTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Min() ?? DateTime.Now;
-                //var maxTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Max() ?? DateTime.Now;
-
                 var view = new LicenseView()
                 {
                     Name = product,
                     Date = date_,
-                    Count = listSelectDay?.Select(x_ => x_.CountProduct[product]).Max() ?? 0,
-                    Max = listSelectDay?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0,
-                    //Duration = maxTime - minTime
+                    Count =  0,
+                    Max = 0,
                 };
+
+                if (listSelectDay?.Any() == true)
+                {
+                    view.Count = listSelectDay?.Select(x_ => x_.CountProduct[product]).Max() ?? 0;
+                    view.Max = listSelectDay?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
+                }
+                //var minTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Min() ?? DateTime.Now;
+                //var maxTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Max() ?? DateTime.Now;
+
                 rtn.Add(view);
             }
             return rtn;

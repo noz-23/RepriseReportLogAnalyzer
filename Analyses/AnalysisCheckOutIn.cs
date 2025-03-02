@@ -1,6 +1,8 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace RepriseReportLogAnalyzer.Analyses
 {
@@ -71,6 +73,17 @@ namespace RepriseReportLogAnalyzer.Analyses
             return JointDateTime() - CheckOutDateTime;
         }
 
+        public string GroupName(ANALYSIS_GROUP group_)
+        {
+            switch (group_)
+            {
+                case ANALYSIS_GROUP.USER:return User;
+                case ANALYSIS_GROUP.HOST:return Host;
+                case ANALYSIS_GROUP.USER_HOST:return UserHost;
+                default:
+                    break;
+            }return string.Empty;
+        }
         public string ToString( bool duplication_)
         {
             if (duplication_ == true)

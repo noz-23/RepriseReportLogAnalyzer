@@ -1,7 +1,8 @@
 ﻿using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
-using System.ComponentModel;
 using System.IO;
 using System.Text;
 
@@ -9,44 +10,82 @@ namespace RepriseReportLogAnalyzer.Analyses
 {
     internal class ListAnalysisLicenseGroupDuration:Dictionary<string, ListAnalysisCheckOutIn>
     {
-        public ProgressCountDelegate? ProgressCount = null;
-        private const string _ANALYSIS = "[License Group Duration]";
 
         public ListAnalysisLicenseGroupDuration(ANALYSIS_GROUP group_)
         {
             _group = group_;
         }
 
+        public ProgressCountDelegate? ProgressCount = null;
+        private const string _ANALYSIS = "[License Group Duration]";
+        private ANALYSIS_GROUP _group = ANALYSIS_GROUP.NONE;
+
+        public string Header { get => _group.Description() + ",Duration,Days,Count"; }
+
+        Dictionary<DateTime, List< LicenseView>> _listDayToGroup = new Dictionary<DateTime, List<LicenseView>>();
+
+
         public void Analysis(IEnumerable<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
         {
-            switch (_group)
+            var minDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Min();
+            var maxDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Max();
+            for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
             {
-                case ANALYSIS_GROUP.USER:
-                    foreach (var group in listGroup_)
-                    {
-                        this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_=>x_.User ==group));
-                    }
-                    break;
-                case ANALYSIS_GROUP.HOST:
-                    foreach (var group in listGroup_)
-                    {
-                        this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.Host == group));
-                    }
-                    break;
-                case ANALYSIS_GROUP.USER_HOST:
-                    foreach (var group in listGroup_)
-                    {
-                        this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.UserHost == group));
-                    }
-                    break;
-                default:
-                    break;
+                _listDayToGroup[date]= new List<LicenseView>();
+            }
+
+            int count = 0;
+            int max = listGroup_.Count();
+            //    switch (_group)
+            //    {
+            //        case ANALYSIS_GROUP.USER:
+            //            ProgressCount?.Invoke(0, max, _ANALYSIS+ _group.Description());
+            //            foreach (var group in listGroup_)
+            //            {
+            //                var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.User == group));
+            //                this[group] = list;
+
+            //                _addDayToGroup(minDate, maxDate, group, list);
+            //                ProgressCount?.Invoke(++count,max);
+            //            }
+            //            break;
+            //        case ANALYSIS_GROUP.HOST:
+            //            ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
+            //            foreach (var group in listGroup_)
+            //            {
+            //                var list =new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.Host == group));
+            //                this[group] = list;
+
+            //                _addDayToGroup(minDate, maxDate, group, list);
+            //                ProgressCount?.Invoke(++count, max);
+            //            }
+            //            break;
+            //        case ANALYSIS_GROUP.USER_HOST:
+            //            ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
+            //            foreach (var group in listGroup_)
+            //            {
+            //                var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.UserHost == group));
+            //                this[group] = list;
+
+            //                _addDayToGroup(minDate, maxDate, group, list);
+            //                ProgressCount?.Invoke(++count, max);
+            //            }
+            //            break;
+            //        default:
+            //            break;
+            //    }
+
+            ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
+            foreach (var group in listGroup_)
+            {
+                var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.GroupName(_group) == group));
+                this[group] = list;
+
+                _addDayToGroup(minDate, maxDate, group, list);
+                ProgressCount?.Invoke(++count, max);
             }
         }
 
-        private ANALYSIS_GROUP _group = ANALYSIS_GROUP.NONE;
-
-        public string Header { get => GetName(_group) + ",Duration,Days,Count"; }
 
         private List<string> _listToString()
         {
@@ -76,13 +115,41 @@ namespace RepriseReportLogAnalyzer.Analyses
             LogFile.Instance.WriteLine($"Write:{path_}");
         }
 
-        // https://www.sejuku.net/blog/42539
-        private string GetName(ANALYSIS_GROUP src_)
+        private void _addDayToGroup(DateTime minDate_, DateTime maxDate_, string group_,ListAnalysisCheckOutIn list_)
         {
-            var gm = src_.GetType().GetMember(src_.ToString());
-            var attributes = gm[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
-            var description = ((DescriptionAttribute)attributes[0]).Description;
-            return description;
+            for (var date = minDate_; date < maxDate_.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
+            {
+                var listDay = list_.ListDuplication().Where(x_ => x_.CheckOut().EventDate() == date.Date);
+
+                if (listDay.Any() == false)
+                {
+                    continue;
+                }
+
+                var view = new LicenseView()
+                {
+                    Name = group_,
+                    Duration = new TimeSpan(listDay.Sum(x_ => x_.Duration.Ticks)),
+                };
+
+                _listDayToGroup[date].Add(view);
+            }
         }
+
+        public IEnumerable<LicenseView> ListDayToGroup(DateTime date_)
+        {
+            if (_listDayToGroup.TryGetValue(date_, out var rtn) == true)
+            {
+                return rtn;
+            }
+            return new List<LicenseView>();
+        }
+        //private string GetName(ANALYSIS_GROUP src_)
+        //{
+        //    var gm = src_.GetType().GetMember(src_.ToString());
+        //    var attributes = gm[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+        //    var description = ((DescriptionAttribute)attributes[0]).Description;
+        //    return description;
+        //}
     }
 }
