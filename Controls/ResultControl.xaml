@@ -12,36 +12,34 @@
     >
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
-        <Label
-            x:Name="_label"
+        <DatePicker 
+            x:Name="_dataPicker"
             Grid.Column="0" Grid.Row="0"
-            Content="Select:"
-         />
-        <Calendar
-            x:Name="_calendar"
-            Grid.Column="0" Grid.Row="1"
-            SelectedDatesChanged="_calendarSelected"
-            MouseDoubleClick="_mouseDoubleClick"
+            SelectedDateChanged="_datePickerSelected"
             DisplayDateStart="{Binding StartDate,Source={x:Static manager:AnalysisManager.Instance},Mode=OneWay}"
             DisplayDateEnd="{Binding EndDate,Source={x:Static manager:AnalysisManager.Instance},Mode=OneWay}" 
-        />
+            />
         <DataGrid
-            Grid.Column="1" Grid.Row="0"
-             Margin="0,0,0,0" Grid.RowSpan="2" Grid.ColumnSpan="2"
-           ItemsSource="{Binding ListResultProduct,Source={x:Static manager:AnalysisManager.Instance},Mode=OneWay}"
+            Grid.Column="0" Grid.Row="1"
+            Margin="0,0,0,0" Grid.RowSpan="2" Grid.ColumnSpan="2"
+            ItemsSource="{Binding ListResultProduct,Source={x:Static manager:AnalysisManager.Instance},Mode=OneWay}"
             AutoGenerateColumns="False"
             CanUserAddRows="false"
+            SourceUpdated="_sourceUpdated"
             >
             <DataGrid.Columns>
+                <DataGridCheckBoxColumn 
+                    Width="Auto"
+                    Binding="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}"
+                />
                 <DataGridTextColumn
                     Width="Auto"
                     IsReadOnly="True"
@@ -93,7 +91,7 @@
         </DataGrid>
         <ScottPlot:WpfPlot
             x:Name="_scottPlot"
-            Margin="0,0,0,0" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3"
+            Margin="0,0,0,0" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2"
         />
 
     </Grid>

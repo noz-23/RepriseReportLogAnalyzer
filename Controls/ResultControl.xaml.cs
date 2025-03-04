@@ -1,21 +1,9 @@
-﻿using RepriseReportLogAnalyzer.Files;
-using RepriseReportLogAnalyzer.Managers;
-using RepriseReportLogAnalyzer.Enums;
+﻿using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Managers;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RepriseReportLogAnalyzer.Controls
 {
@@ -24,6 +12,9 @@ namespace RepriseReportLogAnalyzer.Controls
     /// </summary>
     public partial class ResultControl : UserControl
     {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public ResultControl()
         {
             InitializeComponent();
@@ -35,55 +26,70 @@ namespace RepriseReportLogAnalyzer.Controls
             _comboBox.SelectedIndex = 0;
         }
 
-
-        private void _calendarSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
+        /// <summary>
+        /// カレンダー選択時
+        /// </summary>
+        /// <param name="sender_"></param>
+        /// <param name="e_"></param>
+        private void _datePickerSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
         {
-            LogFile.Instance.WriteLine($"Selected [{_calendar.SelectedDate}]");
-            //if( sender_ is Calendar calendar )
-            //{
-            //}
+            LogFile.Instance.WriteLine($"Selected [{_dataPicker.SelectedDate}]");
             SetDate();
         }
 
-        //public void CalendarShow(IEnumerable<DateTime> list_)
+        /// <summary>
+        /// カレンダーダブルクリック処理
+        /// </summary>
+        /// <param name="sender_"></param>
+        /// <param name="e_"></param>
+        //private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
         //{
-        //    App.Current.Dispatcher.Invoke(() =>
-        //    {
-        //        _calendar.DisplayDateStart = list_.First();
-        //        _calendar.DisplayDateEnd = list_.Last();
+        //    //_calendar.SelectedDate = null;
+        //    _label.Content = "Selected : ";
 
-        //        //_calendar.SelectedDates.Clear();
-        //        //list_.ToList().ForEach(date_ => _calendar.SelectedDates.Add(date_));
-        //    });
-
+        //    SetDate();
         //}
 
-        private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
-        {
-            _calendar.SelectedDate = null;
-            _label.Content = "Selected : ";
-
-            SetDate();
-        }
-
-        private void _selectionChanged(object sender, SelectionChangedEventArgs e)
+        /// <summary>
+        /// グループ変更処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
         {
             LogFile.Instance.WriteLine($"Selected [{_comboBox.SelectedIndex}]");
             SetDate();
         }
 
+        private void _sourceUpdated(object sender_, System.Windows.Data.DataTransferEventArgs e_)
+        {
+            LogFile.Instance.WriteLine($"DataGrid Updated");
+            SetDate();
+        }
+
+        /// <summary>
+        /// データ表示処理
+        /// </summary>
         public void SetDate()
         {
-            var date = _calendar.SelectedDate;
+            //var date = _calendar.SelectedDate;
+            var date = _dataPicker.SelectedDate;
             var index = _comboBox.SelectedIndex;
 
             LogFile.Instance.WriteLine($"[{date}] [{index}]");
 
-            _label.Content = "Selected : " + date?.ToShortDateString() ?? string.Empty;
             AnalysisManager.Instance.SetDate(date, index);
-            AnalysisManager.Instance.SetPlot(date, _scottPlot);
 
+            if (date == null)
+            {
+                AnalysisManager.Instance.SetAllPlot(_scottPlot);
+            }
+            else
+            {
+                AnalysisManager.Instance.SetDatePlot(_scottPlot, date ?? DateTime.Now, index);
+            }
 
         }
+
     }
 }

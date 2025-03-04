@@ -38,7 +38,7 @@ namespace RepriseReportLogAnalyzer.Files
             ListEvent.Add(end);
         }
         //
-        public List<LogEventBase> ListEvent { get; private set; } = new List<LogEventBase>();
+        public List<LogEventBase> ListEvent { get; private set; } = new ();
 
         public List<LogEventStart> ListStart { get => GetListEvent<LogEventStart>(); }
         public List<LogEventLogFileEnd> ListEnd { get => GetListEvent<LogEventLogFileEnd>(); }
@@ -51,7 +51,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listProduct = _listProduct ?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
+                _listProduct ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
                                                                                                .Where(e_=>string.IsNullOrEmpty(e_.Product) ==false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);
 
                 return _listProduct;
@@ -63,8 +63,8 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listUser = _listUser ?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
-                                                                                .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_);
+                _listUser ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
+                                                                .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_);
                 return _listUser;
             }
         }
@@ -75,7 +75,8 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listHost = _listHost?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_.Host).Distinct().OrderBy(x_ => x_);
+                _listHost ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost)
+                                                                .Select(e_ => e_.Host).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_);
 
                 return _listHost;
             }
@@ -86,7 +87,8 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listUserHost = _listUserHost?? ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct().OrderBy(x_ => x_);
+                _listUserHost ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost)
+                                                                .Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct().OrderBy(x_ => x_);
 
                 return _listUserHost;
             }
@@ -97,7 +99,8 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listDateTime = _listDateTime ?? ListEvent.AsParallel().Where(e_ => (e_ is LogEventRlmReportLogFormat) == false).Select(e_ => e_.EventDateTime).Distinct().OrderBy(e_ => e_);
+                _listDateTime ??= ListEvent.AsParallel().Where(e_ => (e_ is LogEventRlmReportLogFormat) == false)
+                                                                .Select(e_ => e_.EventDateTime).Distinct().OrderBy(e_ => e_);
                 return _listDateTime;
             }
         }
@@ -107,7 +110,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listDate = _listDate ?? ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct().OrderBy(e_ => e_);
+                _listDate ??= ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct().OrderBy(e_ => e_);
                 return _listDate;
             }
         }
@@ -116,7 +119,7 @@ namespace RepriseReportLogAnalyzer.Files
 
         public List<T> GetListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase
         {
-            List<LogEventBase>? rtn = new List<LogEventBase>();
+            List<LogEventBase>? rtn = new ();
             if (ss_ == null)
             {
                 if (_listEvent.TryGetValue(typeof(T), out rtn) == true)
@@ -125,7 +128,7 @@ namespace RepriseReportLogAnalyzer.Files
                 }
                 else
                 {
-                    rtn = new List<LogEventBase>();
+                    rtn = new ();
                     rtn.AddRange(ListEvent.AsParallel().Where(e_=> e_ is T).Select(e_ => e_ as T).OrderBy(x_ => x_.EventNumber));
 
                     _listEvent[typeof(T)] = rtn;
@@ -138,9 +141,8 @@ namespace RepriseReportLogAnalyzer.Files
             LogFile.Instance.WriteLine($"[{typeof(T)}] {rtn.Count}");
 
             return rtn.Select(x_ => x_ as T).ToList();
-            //return rtn;
         }
-        private Dictionary<Type, List<LogEventBase>> _listEvent = new Dictionary<Type, List<LogEventBase>>();
+        private Dictionary<Type, List<LogEventBase>> _listEvent = new ();
 
         public void WriteSummy(string path_)
         {

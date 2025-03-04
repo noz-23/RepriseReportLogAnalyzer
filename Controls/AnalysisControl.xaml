@@ -21,54 +21,40 @@
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Label
-                    Grid.Row="0" Grid.Column="0"
-                    Content="Open Reprise Report Log Files [as one file from top]"
-                    />
+            Grid.Row="0" Grid.Column="0"
+            Content="Open Reprise Report Log Files [as one file from top]"
+            />
         <DataGrid
-                    x:Name="_dataGrid"
-                    Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
-                    AutoGenerateColumns="False"
-                    HeadersVisibility="None"
-                    >
+            x:Name="_dataGrid"
+            Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
+            AutoGenerateColumns="False"
+            HeadersVisibility="None"
+            >
             <DataGrid.Columns>
                 <DataGridTextColumn
-                            Width="*"
-                            IsReadOnly="True"
-                            Binding="{Binding}"
-                            />
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding}"
+                    />
                 <DataGridTemplateColumn
-                            Width="50"
-                        >
+                    Width="50"
+                    >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button 
-                                        Content="Delete"
-                                        Click="_deleteClick"
-                                        />
+                                Content="Delete"
+                                Click="_deleteClick"
+                            />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <Button 
-                    Grid.Row="1" Grid.Column="1"
-                    Content="Open"
-                    Click="_openClick"
-                    />
-        <Label 
-                    Grid.Row="3" Grid.Column="0"
-                    Content="Select Output Folder"
-                    />
-        <TextBox
-                    x:Name="_textBoxFolder"
-                    Grid.Row="4" Grid.Column="0"
-                    Text=""
-                  />
-        <Button 
-                    Grid.Row="4" Grid.Column="1"
-                    Content="Select"
-                    Click="_selectClick"
-                    />
+            Grid.Row="1" Grid.Column="1"
+            Content="Open"
+            Click="_openClick"
+            />
         <Button 
                     x:Name="_buttonAnalysis"
                     Grid.Row="5" Grid.Column="1"

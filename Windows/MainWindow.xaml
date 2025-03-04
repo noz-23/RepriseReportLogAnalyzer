@@ -7,16 +7,24 @@
     xmlns:local="clr-namespace:RepriseReportLogAnalyzer.Windows"
     xmlns:control="clr-namespace:RepriseReportLogAnalyzer.Controls"
     mc:Ignorable="d"
-    Title="MainWindow" Height="200" Width="800"
+    Title="MainWindow" Height="600" Width="800"
     >
     <Grid>
         <TabControl
+            x:Name="_tabControl"
             TabStripPlacement="Left">
             <TabItem Header="Analysis">
                 <control:AnalysisControl/>
             </TabItem>
             <TabItem Header="Result">
-                <control:ResultControl/>
+                <control:ResultControl
+                    x:Name="_resultControl"
+                    />
+            </TabItem>
+            <TabItem Header="Output">
+                <control:OutputControl
+                    x:Name="_outputControl"
+                    />
             </TabItem>
         </TabControl>
     </Grid>

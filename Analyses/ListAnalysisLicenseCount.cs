@@ -3,6 +3,7 @@ using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Documents;
@@ -19,10 +20,10 @@ namespace RepriseReportLogAnalyzer.Analyses
     /// </summary>
     internal class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
     {
-        public ProgressCountDelegate? ProgressCount = null;
-        private const string _ANALYSIS = "[License Count]";
 
-
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public ListAnalysisLicenseCount()
         { 
         }
@@ -42,26 +43,35 @@ namespace RepriseReportLogAnalyzer.Analyses
                 return string.Join(",", list);
             }
         }
+        public ProgressCountDelegate? ProgressCount = null;
+        private const string _ANALYSIS = "[License Count]";
 
-        private SortedSet<string> _listProduct = new SortedSet<string>();
+
+        private SortedSet<string> _listProduct = new ();
 
         /// <summary>
         /// 集計処理でのカウント
         /// </summary>
-        private Dictionary<string, int> _listCount = new Dictionary<string, int>();
+        private Dictionary<string, int> _listCount = new ();
 
         /// <summary>
         /// 最大数
         /// </summary>
-        private Dictionary<string, int> _listHave = new Dictionary<string, int>();
+        private Dictionary<string, int> _listHave = new ();
 
         /// <summary>
         /// ログの数値(=_listCount)
         /// </summary>
-        private Dictionary<string, int> _listCountOutIn = new Dictionary<string, int>();
+        private Dictionary<string, int> _listCountOutIn = new ();
 
+        /// <summary>
+        /// 日付ごとの集計結果
+        /// </summary>
 
-        private Dictionary<DateTime, IEnumerable<LicenseView>> _listDayToProduct = new Dictionary<DateTime, IEnumerable<LicenseView>>();
+        //private Dictionary<DateTime, IEnumerable<LicenseView>> _listDayToProduct = new Dictionary<DateTime, IEnumerable<LicenseView>>();
+
+        //public Dictionary<DateTime, IEnumerable<LicenseView>> ListDayToProduct() => _listDayToProduct;
+
 
         public void Analysis(AnalysisReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
         {
@@ -145,12 +155,12 @@ namespace RepriseReportLogAnalyzer.Analyses
             count= 0;
             max = (maxDate - minDate).Days+1;
 
-            ProgressCount?.Invoke(0, max, _ANALYSIS + "Days");
-            for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
-            {
-                _listDayToProduct[date] = _getDayToProduct(date);
-                ProgressCount?.Invoke(++count, max);
-            }
+            //ProgressCount?.Invoke(0, max, _ANALYSIS + "Days");
+            //for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
+            //{
+            //    _listDayToProduct[date] = _getDayToProduct(date);
+            //    ProgressCount?.Invoke(++count, max);
+            //}
 
         }
 
@@ -272,43 +282,44 @@ namespace RepriseReportLogAnalyzer.Analyses
             return rtn;
         }
 
-        private IEnumerable<LicenseView> _getDayToProduct(DateTime date_)
-        {
-            var rtn = new List<LicenseView>();
+        //private IEnumerable<LicenseView> _getDayToProduct(DateTime date_)
+        //{
+        //    var rtn = new List<LicenseView>();
 
-            var listSelectDay = this.Where(x_ => x_.EventBase.EventDate() == date_);
-            foreach (var product in _listProduct)
-            {
-                var view = new LicenseView()
-                {
-                    Name = product,
-                    Date = date_,
-                    Count =  0,
-                    Max = 0,
-                };
+        //    var listSelectDay = this.Where(x_ => x_.EventBase.EventDate() == date_);
+        //    foreach (var product in _listProduct)
+        //    {
+        //        var view = new LicenseView()
+        //        {
+        //            Name = product,
+        //            Date = date_,
+        //            Count =  0,
+        //            Max = 0,
+        //        };
 
-                if (listSelectDay?.Any() == true)
-                {
-                    view.Count = listSelectDay?.Select(x_ => x_.CountProduct[product]).Max() ?? 0;
-                    view.Max = listSelectDay?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
-                }
-                //var minTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Min() ?? DateTime.Now;
-                //var maxTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Max() ?? DateTime.Now;
+        //        if (listSelectDay?.Any() == true)
+        //        {
+        //            view.Count = listSelectDay?.Select(x_ => x_.CountProduct[product]).Max() ?? 0;
+        //            view.Max = listSelectDay?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
+        //        }
+        //        //var minTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Min() ?? DateTime.Now;
+        //        //var maxTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Max() ?? DateTime.Now;
 
-                rtn.Add(view);
-            }
-            return rtn;
-        }
+        //        rtn.Add(view);
+        //    }
+        //    return rtn;
+        //}
 
 
-        public IEnumerable<LicenseView> ListDayToProduct(DateTime date_)
-        {
-            if (_listDayToProduct.TryGetValue(date_, out var rtn) == true)
-            {
-                return rtn;
-            }
-            return new List<LicenseView>();
-        }
+        //public IEnumerable<LicenseView> ListDayToProduct(DateTime date_)
+        //{
+        //    if (_listDayToProduct.TryGetValue(date_, out var rtn) == true)
+        //    {
+        //        return rtn;
+        //    }
+        //    return new List<LicenseView>();
+        //}
+
         //public List<LicenseView> GetCount(DateTime date_, long timeSpan_, string product_)
         //{
         //    var rtn = new List<LicenseView>();
@@ -329,6 +340,35 @@ namespace RepriseReportLogAnalyzer.Analyses
 
         //    return rtn;
         //}
+
+        public List<LicenseView> ListLicenseProduct(DateTime? date_, long timeSpan_ =-1)
+        {
+            var rtn = new List<LicenseView>();
+
+            var flg = (date_ == null);
+            var list = (timeSpan_ ==-1) ? this.Where(x_ => (x_.EventBase.EventDateTime.Date == date_) || flg): this.Where(x_ => (x_.EventBase.EventDateTimeUnit(timeSpan_) == date_));
+
+            foreach (var product in _listProduct)
+            {
+                var view = new LicenseView()
+                {
+                    Name = product,
+                    Count = 0,
+                    Max = 0,
+                };
+
+                if (list.Count() > 0)
+                {
+                    view.Count = list.Select(x_ => x_.CountProduct[product]).Max();
+                    view.Max = list.Select(x_ => x_.MaxProduct[product]).Max();
+                }
+
+
+                rtn.Add(view);
+            }
+
+            return rtn;
+        }
 
         public void WriteText(string path_)
         {
@@ -357,7 +397,7 @@ namespace RepriseReportLogAnalyzer.Analyses
             var minDate = this.Select(x => x.EventBase.EventDate()).Min();
             var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
 
-            for (var date = minDate; date < maxDate.AddDays(1); date = date.AddTicks(timeSpan_))
+            for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(timeSpan_))
             {
                 rtn.Add(date);
             }

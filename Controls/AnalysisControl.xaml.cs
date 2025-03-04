@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
+using RepriseReportLogAnalyzer.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,23 +50,11 @@ namespace RepriseReportLogAnalyzer.Controls
             }
         }
 
-        private void _selectClick(object sender_, RoutedEventArgs e_)
-        {
-            var dlg = new OpenFolderDialog()
-            {
-                Title = "Please Select Output Folder",
-                Multiselect = false
-            };
-            if (dlg.ShowDialog() == true)
-            {
-                _textBoxFolder.Text = dlg.FolderName;
-            }
-        }
 
         private async void _analysisClick(object sender_, RoutedEventArgs e_)
         {
             _buttonAnalysis.IsEnabled = false;
-            var outFolder = _textBoxFolder.Text;
+            //var outFolder = _textBoxFolder.Text;
             await Task.Run(() =>
             {
                 int count = 0;
@@ -86,6 +75,12 @@ namespace RepriseReportLogAnalyzer.Controls
             });
 
             _buttonAnalysis.IsEnabled = true;
+
+            if(App.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow._resultControl.SetDate();
+                //mainWindow._tabControl._resultControl.SetData();
+            }
         }
 
 
