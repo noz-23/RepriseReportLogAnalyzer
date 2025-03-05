@@ -1,6 +1,7 @@
 ﻿using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -25,6 +26,15 @@ namespace RepriseReportLogAnalyzer.Files
                     if (eventBase != null)
                     {
                         ListEvent.Add(eventBase);
+
+                        //if (eventBase.EventDateTime > DateTime.Now.AddDays(-1))
+                        //{
+                        //    LogFile.Instance.WriteLine($"{eventBase.GetType()} : {eventBase.EventNumber}");
+
+                        //}
+                    //} else
+                    //{
+                    //    Trace.WriteLine($"{s}");
                     }
                 }
                 LogFile.Instance.WriteLine($"Read:{ListEvent.Count}");
@@ -47,74 +57,76 @@ namespace RepriseReportLogAnalyzer.Files
         public List<LogEventCheckIn> ListCheckIn { get => GetListEvent<LogEventCheckIn>(); }
         public List<LogEventCheckOut> ListCheckOut { get => GetListEvent<LogEventCheckOut>(); }
 
-        public IEnumerable<ILogEventProduct> ListProduct
+        public HashSet<ILogEventProduct> ListProduct
         {
             get
             {
-                _listProduct ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
-                                                                                               .Where(e_=>string.IsNullOrEmpty(e_.Product) ==false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);
+                _listProduct ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
+                                                                                               .Where(e_=>string.IsNullOrEmpty(e_.Product) ==false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version));
 
                 return _listProduct;
             }
         }
-        private IEnumerable<ILogEventProduct>? _listProduct = null;
+        private HashSet<ILogEventProduct>? _listProduct = null;
 
-        public IEnumerable<string> ListUser
+        public SortedSet<string> ListUser
         {
             get
             {
-                _listUser ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
-                                                                .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_);
+                _listUser ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
+                                                                .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct());
                 return _listUser;
             }
         }
-        IEnumerable<string>? _listUser = null;
+        SortedSet<string>? _listUser = null;
 
 
-        public IEnumerable<string> ListHost
+        public SortedSet<string> ListHost
         {
             get
             {
-                _listHost ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost)
-                                                                .Select(e_ => e_.Host).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct().OrderBy(x_ => x_);
+                _listHost ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost)
+                                                                .Select(e_ => e_.Host).Where(e_ => string.IsNullOrEmpty(e_) == false));
 
                 return _listHost;
             }
         }
-        IEnumerable<string>? _listHost = null;
+        SortedSet<string>? _listHost = null;
 
-        public IEnumerable<string> ListUserHost
+        public SortedSet<string> ListUserHost
         {
             get
             {
-                _listUserHost ??= ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost)
-                                                                .Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct().OrderBy(x_ => x_);
+                _listUserHost ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost)
+                                                                .Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct());
 
                 return _listUserHost;
             }
         }
-        IEnumerable<string>? _listUserHost = null;
+        SortedSet<string>? _listUserHost = null;
 
-        public IEnumerable<DateTime> ListDateTime
+        public SortedSet<DateTime> ListDateTime
         {
+            
             get
             {
-                _listDateTime ??= ListEvent.AsParallel().Where(e_ => (e_ is LogEventRlmReportLogFormat) == false)
-                                                                .Select(e_ => e_.EventDateTime).Distinct().OrderBy(e_ => e_);
+                //_listDateTime ??=new ( ListEvent.AsParallel().Where(e_ => ( (e_ !=null) || (e_ is LogEventRlmReportLogFormat) == false))
+                //                                                .Select(e_ => e_.EventDateTime));
+                _listDateTime ??= new(ListEvent.AsParallel().Select(e_ => e_.EventDateTime).Where(e_ => e_ != LogEventBase.NotAnalysisEventTime));
                 return _listDateTime;
             }
         }
-        public IEnumerable<DateTime>? _listDateTime = null;
+        public SortedSet<DateTime>? _listDateTime = null;
 
-        public IEnumerable<DateTime> ListDate
+        public SortedSet<DateTime> ListDate
         {
             get
             {
-                _listDate ??= ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct().OrderBy(e_ => e_);
+                _listDate ??=new( ListDateTime.AsParallel().Select(t_ => t_.Date));
                 return _listDate;
             }
         }
-        private IEnumerable<DateTime>? _listDate = null;
+        private SortedSet<DateTime>? _listDate = null;
 
 
         public List<T> GetListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase

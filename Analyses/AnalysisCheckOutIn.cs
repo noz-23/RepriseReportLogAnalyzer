@@ -6,15 +6,15 @@ using System.Runtime.CompilerServices;
 namespace RepriseReportLogAnalyzer.Analyses
 {
     /// <summary>
-    /// CheckOutとCheckInを結合
+    /// チェックアウトとチェックインを結合
     /// </summary>
-    class AnalysisCheckOutIn
+    internal class AnalysisCheckOutIn
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="checkOut_"></param>
-        /// <param name="checkIn_"></param>
+        /// <param name="checkOut_">チェックアウト イベント</param>
+        /// <param name="checkIn_">チェックイン or シャットダウン イベント</param>
         public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase? checkIn_)
         {
             _checkOut = checkOut_;
@@ -24,7 +24,7 @@ namespace RepriseReportLogAnalyzer.Analyses
         }
 
         /// <summary>
-        /// 保存時のヘッダー
+        /// 文字列化のヘッダー
         /// </summary>
         public const string HEADER = "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host";
 
@@ -78,11 +78,11 @@ namespace RepriseReportLogAnalyzer.Analyses
         public string UserHost { get => _checkOut.UserHost; }
 
         /// <summary>
-        /// チェックアウト
+        /// チェックアウト イベント
         /// </summary>
         private readonly LogEventCheckOut _checkOut;
         /// <summary>
-        /// チェックイン(シャットダウン)
+        /// チェックイン(シャットダウン) イベント
         /// </summary>
         private readonly LogEventBase? _checkIn=null;
         /// <summary>
@@ -91,26 +91,26 @@ namespace RepriseReportLogAnalyzer.Analyses
         private readonly JoinEventCheckOutIn _joinEvent;
 
         /// <summary>
-        /// チェックアウト(リファクタリングで呼び出さないため関数化)
+        /// チェックアウト イベント(リフレクションで呼び出さないため関数化)
         /// </summary>
         /// <returns></returns>
         public LogEventCheckOut CheckOut() => _checkOut;
+
         /// <summary>
-        /// チェックイン(リファクタリングで呼び出さないため関数化)
+        /// チェックイン イベント(リフレクションで呼び出さないため関数化)
         /// </summary>
-        /// <returns></returns>
         public LogEventBase? CheckIn() => _checkIn;
+
         /// <summary>
-        /// 結合情報(リファクタリングで呼び出さないため関数化)
+        /// 結合情報(リフレクションで呼び出さないため関数化)
         /// </summary>
-        /// <returns></returns>
         public JoinEventCheckOutIn JoinEvent() => _joinEvent;
 
         /// <summary>
         /// チェックアウトのイベント番号
         /// </summary>
-        /// <returns></returns>
         public long CheckOutNumber() => _checkOut.EventNumber;
+
         /// <summary>
         /// チェックインのイベント番号
         /// </summary>
@@ -120,7 +120,7 @@ namespace RepriseReportLogAnalyzer.Analyses
         /// <summary>
         /// 同一のチェックインのか？
         /// </summary>
-        /// <param name="checkIn_"></param>
+        /// <param name="checkIn_">チェックイン イベント</param>
         /// <returns></returns>
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -132,7 +132,7 @@ namespace RepriseReportLogAnalyzer.Analyses
         /// <summary>
         /// チェックアウトとチェックインの間のイベントか？
         /// </summary>
-        /// <param name="number_"></param>
+        /// <param name="number_">イベント番号</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsWithInRange(long number_)
@@ -140,6 +140,11 @@ namespace RepriseReportLogAnalyzer.Analyses
             return (number_ > CheckOutNumber()) && (number_ < CheckInNumber());
         }
 
+        /// <summary>
+        /// チェックアウトとチェックインの間のイベントか？
+        /// </summary>
+        /// <param name="dateTime_">イベント時間</param>
+        /// <returns></returns>
         public bool IsWithInRange(DateTime dateTime_)
         {
             return (dateTime_ > CheckOutDateTime) && (dateTime_ < CheckInDateTime);

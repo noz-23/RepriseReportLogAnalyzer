@@ -12,15 +12,14 @@
             <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-
-        <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Label 
             Grid.Row="0" Grid.Column="0"
             Content="Select Output Folder"
             />
-
-
         <TextBox
             x:Name="_textBoxFolder"
             Grid.Row="1" Grid.Column="0"
@@ -31,5 +30,11 @@
             Content="Select"
             Click="_selectClick"
             />
+        <Button 
+            Grid.Row="2" Grid.Column="1"
+            Content="Save"
+            Click="_outputClick"
+            />
+
     </Grid>
 </UserControl>

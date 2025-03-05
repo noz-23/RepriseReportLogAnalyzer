@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using RepriseReportLogAnalyzer.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,5 +40,15 @@ namespace RepriseReportLogAnalyzer.Controls
             }
         }
 
+        private void _outputClick(object sender_, RoutedEventArgs e_)
+        {
+            if (string.IsNullOrEmpty(_textBoxFolder.Text) == false)
+            {
+                _textBoxFolder.IsEnabled = false;
+                AnalysisManager.Instance.WriteText(_textBoxFolder.Text);
+                _textBoxFolder.IsEnabled = true;
+            }
+
+        }
     }
 }

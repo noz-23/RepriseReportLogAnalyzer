@@ -1,6 +1,7 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
 using System.Reflection;
+using static RepriseReportLogAnalyzer.Events.LogEventBase;
 
 namespace RepriseReportLogAnalyzer.Events
 {
@@ -30,8 +31,11 @@ namespace RepriseReportLogAnalyzer.Events
 
         public static int ListEventDataCount() => _ListEventData.Count;
 
-        public static DateTime NowDateTime =DateTime.Now;
+        public readonly static DateTime NotAnalysisEventTime = DateTime.Now;
+
+        public static DateTime NowDateTime = NotAnalysisEventTime;
         public static long NowEventNumber = 0;
+
 
         protected static long _NowYear { get => NowDateTime.Year; }
         protected static long _NowMonth { get => NowDateTime.Month; }
@@ -69,17 +73,28 @@ namespace RepriseReportLogAnalyzer.Events
         {
             var list = _splitSpace(str_);
 
-            NewEvent? newEvent =null;
-            if (_ListEventData.TryGetValue(list[0], out newEvent) == false)
+            //NewEvent? newEvent =null;
+            //if (_ListEventData.TryGetValue(list[0], out newEvent) == false)
+            //{
+            //    if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
+            //    {
+            //        return new LogEventTimeStamp(list);
+            //    }
+            //    return null;
+            //}
+
+            //return newEvent(list);
+
+            if (_ListEventData.TryGetValue(list[0], out var newEvent) == true)
             {
-                if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
-                {
-                    return new LogEventTimeStamp(list);
-                }
-                return null;
+                return newEvent?.Invoke(list);
             }
 
-            return newEvent(list);
+            if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
+            {
+                return new LogEventTimeStamp(list);
+            }
+            return null;
         }
 
         public LogEventBase()
@@ -92,7 +107,7 @@ namespace RepriseReportLogAnalyzer.Events
         {
 
             NowEventNumber = 0;
-            NowDateTime = DateTime.Now;
+            NowDateTime = NotAnalysisEventTime;
 
         }
 

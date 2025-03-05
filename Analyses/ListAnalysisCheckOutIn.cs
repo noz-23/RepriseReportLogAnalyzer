@@ -6,6 +6,9 @@ using System.Text;
 
 namespace RepriseReportLogAnalyzer.Analyses
 {
+    /// <summary>
+    /// チェックアウトとチェックイン結合のリスト化 
+    /// </summary>
     internal class ListAnalysisCheckOutIn: List<AnalysisCheckOutIn>
     {
         /// <summary>
@@ -120,7 +123,6 @@ namespace RepriseReportLogAnalyzer.Analyses
                 ProgressCount?.Invoke(++count, max);
             }
         }
-
 
         public LogEventCheckOut? Find(LogEventCheckIn checkIn_)
         {

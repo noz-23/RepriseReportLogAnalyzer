@@ -10,7 +10,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RepriseReportLogAnalyzer.Analyses
 {
-    internal class ListAnalysisLicenseGroupDuration:Dictionary<string, ListAnalysisCheckOutIn>
+    internal class ListAnalysisLicenseGroupDuration : Dictionary<string, ListAnalysisCheckOutIn>
     {
 
         public ListAnalysisLicenseGroupDuration(ANALYSIS_GROUP group_)
@@ -141,7 +141,7 @@ namespace RepriseReportLogAnalyzer.Analyses
         //    return description;
         //}
 
-        public List<LicenseView> ListLicenseGroup(DateTime? date_)
+        public List<LicenseView> ListView(DateTime? date_, long timeSpan_=TimeSpan.TicksPerDay)
         {
             var rtn = new List<LicenseView>();
 
@@ -149,7 +149,7 @@ namespace RepriseReportLogAnalyzer.Analyses
 
             foreach (var group in this.Keys)
             {
-                var list = this[group]?.Where(x_ => ((x_.CheckOut().EventDateTime.Date == date_) && AnalysisManager.Instance.IsChecked(x_.Product) ==true )|| flg);
+                var list = this[group]?.Where(x_ => ((x_.CheckOut().EventDateTimeUnit(timeSpan_) == date_) && AnalysisManager.Instance.IsChecked(x_.Product) == true) || flg);
 
                 if (list?.Count() > 0)
                 {
@@ -160,6 +160,40 @@ namespace RepriseReportLogAnalyzer.Analyses
                         Duration = new TimeSpan(list.Sum(x_ => x_.Duration.Ticks)),
                     };
                     rtn.Add(view);
+                }
+            }
+
+            return rtn.OrderByDescending(x_ => x_.Duration).ToList();
+        }
+
+        public Dictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
+        {
+            var rtn = new Dictionary<string, List<double>>();
+
+            // 期間順にするため
+            var listGroup = AnalysisManager.Instance.ListResultGroup.Select(x_ => x_.Name).Take(20);
+            foreach (var group in listGroup)
+            {
+                rtn[group] = new();
+            }
+            foreach (var time in listX_)
+            {
+                var listView = ListView(time, timeSpan_);
+
+                int count = 1;
+                foreach (var group in listGroup)
+                {
+                    var list = listView.Where(x_ => x_.Name ==group);
+
+                    if (list.Count() > 0)
+                    {
+                        rtn[group].Add(count);
+                    }
+                    else
+                    {
+                        rtn[group].Add(double.NaN);
+                    }
+                    count++;
                 }
             }
 

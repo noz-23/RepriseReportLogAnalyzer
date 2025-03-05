@@ -1,10 +1,4 @@
-﻿using Microsoft.Win32;
-using RepriseReportLogAnalyzer.Analyses;
-using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Files;
-using System.Windows;
-using RepriseReportLogAnalyzer.Managers;
-
+﻿using System.Windows;
 
 namespace RepriseReportLogAnalyzer.Windows
 {
