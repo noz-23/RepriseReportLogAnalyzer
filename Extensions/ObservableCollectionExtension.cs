@@ -1,13 +1,11 @@
 ﻿using RepriseReportLogAnalyzer.Views;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Xml.Linq;
 
 namespace RLMLogReader.Extensions
 {
     internal static class ObservableCollectionExtension
     {
-        internal static void AddRange<T>(this ObservableCollection<T> src_, ICollection<T>collection_)
+        internal static void AddRange<T>(this ObservableCollection<T> src_, ICollection<T> collection_)
         {
             collection_?.ToList().ForEach(item => src_.Add(item));
         }

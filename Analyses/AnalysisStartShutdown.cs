@@ -2,128 +2,124 @@
 using RepriseReportLogAnalyzer.Events;
 using System.Runtime.CompilerServices;
 
-namespace RepriseReportLogAnalyzer.Analyses
+namespace RepriseReportLogAnalyzer.Analyses;
+
+/// <summary>
+/// スタートとシャットダウンの時間帯
+/// (ログ集計の最後はシャットダウンとする)
+/// </summary>
+internal sealed class AnalysisStartShutdown
 {
     /// <summary>
-    /// スタートとシャットダウンの時間帯
-    /// (ログ集計の最後はシャットダウンとする)
+    /// コンストラクタ
     /// </summary>
-    internal class AnalysisStartShutdown
+    /// <param name="start_">スタート イベント</param>
+    /// <param name="shutdown_">シャットダウン イベント</param>
+    public AnalysisStartShutdown(LogEventStart start_, LogEventBase? shutdown_)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="start_">スタート イベント</param>
-        /// <param name="shutdown_">シャットダウン イベント</param>
-        public AnalysisStartShutdown(LogEventStart start_, LogEventBase? shutdown_)
-        {
-            _start = start_;
-            _shutdown = shutdown_;
+        _start = start_;
+        _shutdown = shutdown_;
 
-            _joinEvent = new JoinEventStartShutdown(start_, shutdown_);
-        }
-
-        /// <summary>
-        /// 文字列化のヘッダー
-        /// </summary>
-        public const string HEADER = "Start Date Time,End Date Time,Duration";
-
-        /// <summary>
-        /// スタート イベント番号
-        /// </summary>
-        [ColumnSort(101)]
-        public long StartNumber { get => _start.EventNumber; }
-
-        /// <summary>
-        /// シャットダウン イベント番号
-        /// </summary>
-        [ColumnSort(102)]
-        public long ShutdownNumber { get => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber; }
-
-        /// <summary>
-        /// スタート 時間
-        /// </summary>
-        [ColumnSort(111)]
-        public DateTime StartDateTime { get => _start.EventDateTime; }
-
-        /// <summary>
-        /// シャットダウン 時間
-        /// </summary>
-        [ColumnSort(112)]
-        public DateTime ShutdownDateTime { get => _shutdown?.EventDateTime ?? LogEventBase.NowDateTime; }
-
-        /// <summary>
-        /// 稼働時間
-        /// </summary>
-        [ColumnSort(113)]
-        public TimeSpan Duration { get => (ShutdownDateTime - StartDateTime); }
-
-        /// <summary>
-        /// スタート イベント
-        /// </summary>
-        private readonly LogEventStart _start;
-
-        /// <summary>
-        /// シャットダウン イベント
-        /// </summary>
-        private readonly LogEventBase? _shutdown;
-
-        /// <summary>
-        /// スタートとシャットダウンの結合情報
-        /// </summary>
-        private readonly JoinEventStartShutdown _joinEvent;
-
-        /// <summary>
-        /// スタート イベント(リフレクションで呼び出さないため関数化)
-        /// </summary>
-        /// <returns></returns>
-        public LogEventStart EventStart() => _start;
-
-        /// <summary>
-        /// シャットダウン イベント(リフレクションで呼び出さないため関数化)
-        /// </summary>
-        public LogEventBase? EventShutdown() => _shutdown;
-
-        /// <summary>
-        /// 結合情報 (リフレクションで呼び出さないため関数化)
-        /// </summary>
-        /// <returns></returns>
-        public JoinEventStartShutdown JoinEvent() => _joinEvent;
-
-        /// <summary>
-        /// シャットダウン イベント番号
-        /// </summary>
-        /// <returns></returns>
-        public long ShudownNumber() => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber;
-
-        /// <summary>
-        /// スタートとシャットダウンの間のイベントか？
-        /// </summary>
-        /// <param name="number_"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsWithInRange(long number_)
-        {
-            if (number_ < _start.EventNumber)
-            {
-                return false;
-            }
-
-            if (number_ > ShudownNumber())
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 文字列化
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return $"{StartDateTime.ToString()},{ShutdownDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")}";
-        }
-
+        _joinEvent = new JoinEventStartShutdown(start_, shutdown_);
     }
+
+    /// <summary>
+    /// 文字列化のヘッダー
+    /// </summary>
+    public const string HEADER = "Start Date Time,End Date Time,Duration";
+
+    /// <summary>
+    /// スタート イベント番号
+    /// </summary>
+    [ColumnSort(101)]
+    public long StartNumber { get => _start.EventNumber; }
+
+    /// <summary>
+    /// シャットダウン イベント番号
+    /// </summary>
+    [ColumnSort(102)]
+    public long ShutdownNumber { get => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber; }
+
+    /// <summary>
+    /// スタート 時間
+    /// </summary>
+    [ColumnSort(111)]
+    public DateTime StartDateTime { get => _start.EventDateTime; }
+
+    /// <summary>
+    /// シャットダウン 時間
+    /// </summary>
+    [ColumnSort(112)]
+    public DateTime ShutdownDateTime { get => _shutdown?.EventDateTime ?? LogEventBase.NowDateTime; }
+
+    /// <summary>
+    /// 稼働時間
+    /// </summary>
+    [ColumnSort(113)]
+    public TimeSpan Duration { get => (ShutdownDateTime - StartDateTime); }
+
+    /// <summary>
+    /// スタート イベント
+    /// </summary>
+    private readonly LogEventStart _start;
+
+    /// <summary>
+    /// シャットダウン イベント
+    /// </summary>
+    private readonly LogEventBase? _shutdown;
+
+    /// <summary>
+    /// スタートとシャットダウンの結合情報
+    /// </summary>
+    private readonly JoinEventStartShutdown _joinEvent;
+
+    /// <summary>
+    /// スタート イベント(リフレクションで呼び出さないため関数化)
+    /// </summary>
+    /// <returns></returns>
+    public LogEventStart EventStart() => _start;
+
+    /// <summary>
+    /// シャットダウン イベント(リフレクションで呼び出さないため関数化)
+    /// </summary>
+    public LogEventBase? EventShutdown() => _shutdown;
+
+    /// <summary>
+    /// 結合情報 (リフレクションで呼び出さないため関数化)
+    /// </summary>
+    /// <returns></returns>
+    public JoinEventStartShutdown JoinEvent() => _joinEvent;
+
+    /// <summary>
+    /// シャットダウン イベント番号
+    /// </summary>
+    public long ShudownNumber() => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber;
+
+    /// <summary>
+    /// スタートとシャットダウンの間のイベントか？
+    /// </summary>
+    /// <param name="number_"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsWithInRange(long number_)
+    {
+        if (number_ < _start.EventNumber)
+        {
+            return false;
+        }
+
+        if (number_ > ShudownNumber())
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 文字列化
+    /// </summary>
+    public override string ToString()
+    {
+        return $"{StartDateTime.ToString()},{ShutdownDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")}";
+    }
+
 }

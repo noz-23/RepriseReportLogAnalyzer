@@ -2,7 +2,7 @@
 
 namespace RepriseReportLogAnalyzer.Windows
 {
-    public delegate void ProgressCountDelegate( int count_,int max_, string str_="");
+    public delegate void ProgressCountDelegate(int count_, int max_, string str_ = "");
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml

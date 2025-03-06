@@ -1,7 +1,6 @@
 ﻿using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -19,7 +18,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             if (File.Exists(filePath_) == true)
             {
-                foreach (var s in File.ReadAllLines(filePath_).Where(s_ => string.IsNullOrEmpty(s_)==false))
+                foreach (var s in File.ReadAllLines(filePath_).Where(s_ => string.IsNullOrEmpty(s_) == false))
                 {
                     var eventBase = LogEventBase.EventData(s);
 
@@ -32,9 +31,9 @@ namespace RepriseReportLogAnalyzer.Files
                         //    LogFile.Instance.WriteLine($"{eventBase.GetType()} : {eventBase.EventNumber}");
 
                         //}
-                    //} else
-                    //{
-                    //    Trace.WriteLine($"{s}");
+                        //} else
+                        //{
+                        //    Trace.WriteLine($"{s}");
                     }
                 }
                 LogFile.Instance.WriteLine($"Read:{ListEvent.Count}");
@@ -48,7 +47,7 @@ namespace RepriseReportLogAnalyzer.Files
             ListEvent.Add(end);
         }
         //
-        public List<LogEventBase> ListEvent { get; private set; } = new ();
+        public List<LogEventBase> ListEvent { get; private set; } = new();
 
         public List<LogEventStart> ListStart { get => GetListEvent<LogEventStart>(); }
         public List<LogEventLogFileEnd> ListEnd { get => GetListEvent<LogEventLogFileEnd>(); }
@@ -61,8 +60,8 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listProduct ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
-                                                                                               .Where(e_=>string.IsNullOrEmpty(e_.Product) ==false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version));
+                _listProduct ??= new(ListEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct)
+                                                                                               .Where(e_ => string.IsNullOrEmpty(e_.Product) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version));
 
                 return _listProduct;
             }
@@ -73,7 +72,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listUser ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
+                _listUser ??= new(ListEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser)
                                                                 .Select(e_ => e_.User).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct());
                 return _listUser;
             }
@@ -85,7 +84,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listHost ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost)
+                _listHost ??= new(ListEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost)
                                                                 .Select(e_ => e_.Host).Where(e_ => string.IsNullOrEmpty(e_) == false));
 
                 return _listHost;
@@ -97,8 +96,8 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listUserHost ??=new( ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost)
-                                                                .Select(e_=>e_.UserHost).Where(e_=>e_ !="@").Distinct());
+                _listUserHost ??= new(ListEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost)
+                                                                .Select(e_ => e_.UserHost).Where(e_ => e_ != "@").Distinct());
 
                 return _listUserHost;
             }
@@ -107,7 +106,7 @@ namespace RepriseReportLogAnalyzer.Files
 
         public SortedSet<DateTime> ListDateTime
         {
-            
+
             get
             {
                 //_listDateTime ??=new ( ListEvent.AsParallel().Where(e_ => ( (e_ !=null) || (e_ is LogEventRlmReportLogFormat) == false))
@@ -122,7 +121,7 @@ namespace RepriseReportLogAnalyzer.Files
         {
             get
             {
-                _listDate ??=new( ListDateTime.AsParallel().Select(t_ => t_.Date));
+                _listDate ??= new(ListDateTime.AsParallel().Select(t_ => t_.Date));
                 return _listDate;
             }
         }
@@ -131,7 +130,7 @@ namespace RepriseReportLogAnalyzer.Files
 
         public List<T> GetListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase
         {
-            List<LogEventBase>? rtn = new ();
+            List<LogEventBase>? rtn = new();
             if (ss_ == null)
             {
                 if (_listEvent.TryGetValue(typeof(T), out rtn) == true)
@@ -140,8 +139,8 @@ namespace RepriseReportLogAnalyzer.Files
                 }
                 else
                 {
-                    rtn = new ();
-                    rtn.AddRange(ListEvent.AsParallel().Where(e_=> e_ is T).Select(e_ => e_ as T).OrderBy(x_ => x_.EventNumber));
+                    rtn = new();
+                    rtn.AddRange(ListEvent.AsParallel().Where(e_ => e_ is T).Select(e_ => e_ as T).OrderBy(x_ => x_.EventNumber));
 
                     _listEvent[typeof(T)] = rtn;
                 }
@@ -154,7 +153,7 @@ namespace RepriseReportLogAnalyzer.Files
 
             return rtn.Select(x_ => x_ as T).ToList();
         }
-        private Dictionary<Type, List<LogEventBase>> _listEvent = new ();
+        private Dictionary<Type, List<LogEventBase>> _listEvent = new();
 
         public void WriteSummy(string path_)
         {
