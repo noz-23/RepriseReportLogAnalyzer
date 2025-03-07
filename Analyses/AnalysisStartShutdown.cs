@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Events;
 using System.Runtime.CompilerServices;
 
@@ -31,31 +39,31 @@ internal sealed class AnalysisStartShutdown
     /// <summary>
     /// スタート イベント番号
     /// </summary>
-    [ColumnSort(101)]
+    [Sort(101)]
     public long StartNumber { get => _start.EventNumber; }
 
     /// <summary>
     /// シャットダウン イベント番号
     /// </summary>
-    [ColumnSort(102)]
+    [Sort(102)]
     public long ShutdownNumber { get => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber; }
 
     /// <summary>
     /// スタート 時間
     /// </summary>
-    [ColumnSort(111)]
+    [Sort(111)]
     public DateTime StartDateTime { get => _start.EventDateTime; }
 
     /// <summary>
     /// シャットダウン 時間
     /// </summary>
-    [ColumnSort(112)]
+    [Sort(112)]
     public DateTime ShutdownDateTime { get => _shutdown?.EventDateTime ?? LogEventBase.NowDateTime; }
 
     /// <summary>
     /// 稼働時間
     /// </summary>
-    [ColumnSort(113)]
+    [Sort(113)]
     public TimeSpan Duration { get => (ShutdownDateTime - StartDateTime); }
 
     /// <summary>

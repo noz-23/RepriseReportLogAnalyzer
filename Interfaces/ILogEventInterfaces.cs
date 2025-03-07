@@ -1,28 +1,27 @@
-﻿namespace RepriseReportLogAnalyzer.Interfaces
+﻿namespace RepriseReportLogAnalyzer.Interfaces;
+
+interface ILogEventHost
 {
-    interface ILogEventHost
-    {
-        string Host { get; }
-    }
-    interface ILogEventUser
-    {
-        string User { get; }
-    }
+    string Host { get; }
+}
+interface ILogEventUser
+{
+    string User { get; }
+}
 
-    interface ILogEventUserHost : ILogEventUser, ILogEventHost
-    {
-        string UserHost { get; }
-    }
+interface ILogEventUserHost : ILogEventUser, ILogEventHost
+{
+    string UserHost { get; }
+}
 
-    interface ILogEventProduct
-    {
-        string Product { get; }
-        string Version { get; }
-        string ProductVersion { get; }
-    }
+interface ILogEventProduct
+{
+    string Product { get; }
+    string Version { get; }
+    string ProductVersion { get; }
+}
 
-    interface ILogEventCountCurrent:ILogEventProduct
-    {
-        int CountCurrent { get; }
-    }
+interface ILogEventCountCurrent : ILogEventProduct
+{
+    int CountCurrent { get; }
 }

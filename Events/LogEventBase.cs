@@ -1,13 +1,13 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
+using System.Collections;
 using System.Reflection;
 
 namespace RepriseReportLogAnalyzer.Events;
 
 /// <summary>
-/// 文字列 と イベントの紐づけ登録
+/// 文字列 と イベントの紐づけ登録クラス
 /// </summary>
-
 internal partial class LogEventRegist : LogEventBase
 {
     /// <summary>
@@ -42,8 +42,10 @@ internal partial class LogEventRegist : LogEventBase
 /// <summary>
 /// ログ イベント(ベース)
 /// </summary>
-internal partial class LogEventBase
+[Sort(99)]
+internal partial class LogEventBase: IComparer, IComparable
 {
+
     public delegate LogEventBase NewEvent(string[] list);
     protected static Dictionary<string, NewEvent> _ListEventData = new Dictionary<string, NewEvent>();
 
@@ -59,10 +61,10 @@ internal partial class LogEventBase
     protected static long _NowMonth { get => NowDateTime.Month; }
     protected static string _NowDate { get => NowDateTime.ToString("MM/dd/yyyy"); }
     //
-    [ColumnSort(1)]
+    [Sort(1)]
     public long EventNumber { get; protected set; } = 0;
     //
-    [ColumnSort(2)]
+    [Sort(2)]
     public DateTime EventDateTime
     {
         get => _eventDateTime;
@@ -82,10 +84,8 @@ internal partial class LogEventBase
     /// </summary>
     /// <param name="timeSpan_">時間帯</param>
     /// <returns></returns>
-    public DateTime EventDateTimeUnit(long timeSpan_)
-    {
-        return new DateTime(EventDateTime.Ticks - (EventDateTime.Ticks % timeSpan_));
-    }
+    public DateTime EventDateTimeUnit(long timeSpan_) =>new DateTime(EventDateTime.Ticks - (EventDateTime.Ticks % timeSpan_));
+
 
     public static LogEventBase? EventData(string str_)
     {
@@ -178,10 +178,10 @@ internal partial class LogEventBase
         return DateTime.Parse(date_ + "/" + year + " " + time_);
     }
 
-    public static string Header<T>()
+    public static string Header(Type classType_)
     {
         var listColunm = new List<string>();
-        var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnSortAttribute)) as ColumnSortAttribute)?.Sort);
+        var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
 
         listPropetyInfo?.ToList().ForEach(prop =>
         {
@@ -195,7 +195,7 @@ internal partial class LogEventBase
     {
 
         var listValue = new List<string>();
-        var listPropetyInfo = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnSortAttribute)) as ColumnSortAttribute)?.Sort);
+        var listPropetyInfo = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
 
         listPropetyInfo?.ToList().ForEach(prop =>
         {
@@ -203,5 +203,27 @@ internal partial class LogEventBase
         });
 
         return string.Join(",", listValue);
+    }
+
+    public int Compare(object? a_, object? b_)
+    {
+        if (a_ is LogEventBase a)
+        {
+            if (a_ is LogEventBase b)
+            {
+                return (int)(a.EventNumber - b.EventNumber);
+            }
+        }
+        return -1;
+    }
+
+    public int CompareTo(object? b_)
+    {
+        if (b_ is LogEventBase b)
+        {
+            return (int)(this.EventNumber - b.EventNumber);
+        }
+        return -1;
+
     }
 }

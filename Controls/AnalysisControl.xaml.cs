@@ -1,111 +1,136 @@
-﻿using Microsoft.Win32;
-using RepriseReportLogAnalyzer.Files;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using Microsoft.Win32;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace RepriseReportLogAnalyzer.Controls
+namespace RepriseReportLogAnalyzer.Controls;
+
+/// <summary>
+/// AnalysisControl.xaml の相互作用ロジック
+/// </summary>
+public partial class AnalysisControl : UserControl
 {
     /// <summary>
-    /// AnalysisControl.xaml の相互作用ロジック
+    /// コンストラクタ
     /// </summary>
-    public partial class AnalysisControl : UserControl
+    public AnalysisControl()
     {
-        public AnalysisControl()
-        {
-            InitializeComponent();
+        InitializeComponent();
 
-            AnalysisManager.Instance.SetProgressCount(_progressCount);
+        AnalysisManager.Instance.SetProgressCount(_progressCount);
+    }
+
+    /// <summary>
+    /// 処理内容
+    /// </summary>
+    private string _resultTitle = string.Empty;
+
+    private DateTime _startDateTime =DateTime.Now;
+
+    /// <summary>
+    /// レポートログ を開く
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _openClick(object sender_, RoutedEventArgs e_)
+    {
+        var dlg = new OpenFileDialog()
+        {
+            Title = "Please Select Reprise Report Log Files",
+            Filter = "Reprise Report Log|*.*",
+            Multiselect = true
+        };
+        if (dlg.ShowDialog() == true)
+        {
+            var list = dlg.FileNames.ToList();
+            list.Sort();
+            list.ForEach(path_ => _dataGrid.Items.Add(path_));
         }
-        private const string _ANALYSIS = "[File Read]";
+    }
 
-        private string _resultTitle =string.Empty;
-
-        private void _openClick(object sender_, RoutedEventArgs e_)
+    /// <summary>
+    /// 解析開始
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private async void _analysisClick(object sender_, RoutedEventArgs e_)
+    {
+        _buttonAnalysis.IsEnabled = false;
+        _startDateTime = DateTime.Now;
+        //var outFolder = _textBoxFolder.Text;
+        await Task.Run(() =>
         {
-            var dlg = new OpenFileDialog()
+            //int count = 0;
+            //int max = _dataGrid.Items.Count;
+            //_progressCount(0, max, _ANALYSIS);
+
+            //var analysis = new AnalysisReportLog();
+            //foreach (string path_ in _dataGrid.Items)
+            //{
+            //    LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
+            //    analysis.StartAnalysis(path_);
+            //    _progressCount(++count, max);
+            //}
+            //analysis.EndAnalysis();
+            ////_calendarShow(analysis.ListDate);
+
+            //AnalysisManager.Instance.Analysis(analysis);
+            var list =new List<string>();
+            foreach (string path_ in _dataGrid.Items)
             {
-                Title = "Please Select Reprise Report Log Files",
-                Filter = "Reprise Report Log|*.*",
-                Multiselect = true
-            };
-            if (dlg.ShowDialog() == true)
-            {
-                var list = dlg.FileNames.ToList();
-                list.Sort();
-                list.ForEach(path_ => _dataGrid.Items.Add(path_));
+                list.Add(path_);
             }
-        }
+            AnalysisManager.Instance.Analysis(list);
+        });
 
+        _buttonAnalysis.IsEnabled = true;
 
-        private async void _analysisClick(object sender_, RoutedEventArgs e_)
+        if (App.Current.MainWindow is MainWindow mainWindow)
         {
-            _buttonAnalysis.IsEnabled = false;
-            //var outFolder = _textBoxFolder.Text;
-            await Task.Run(() =>
-            {
-                int count = 0;
-                int max = _dataGrid.Items.Count;
-                _progressCount(0, max, _ANALYSIS);
-
-                var analysis = new AnalysisReportLog();
-                foreach (string path_ in _dataGrid.Items)
-                {
-                    LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
-                    analysis.StartAnalysis(path_);
-                    _progressCount(++count, max);
-                }
-                analysis.EndAnalysis();
-                //_calendarShow(analysis.ListDate);
-
-                AnalysisManager.Instance.Analysis(analysis);
-            });
-
-            _buttonAnalysis.IsEnabled = true;
-
-            if(App.Current.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow._resultControl.SetDate();
-                //mainWindow._tabControl._resultControl.SetData();
-            }
+            mainWindow._resultControl.SetDate();
+            //mainWindow._tabControl._resultControl.SetData();
         }
+    }
 
+    /// <summary>
+    /// ファイル項目の削除
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _deleteClick(object sender_, RoutedEventArgs e_)
+    {
+        var select = _dataGrid.SelectedItem;
 
-        private void _deleteClick(object sender_, RoutedEventArgs e_)
-        {
-            var select = _dataGrid.SelectedItem;
+        _dataGrid.Items.Remove(select);
+    }
 
-            _dataGrid.Items.Remove(select);
-        }
-
-        private void _progressCount(int count_, int max_, string str_ = "")
+    /// <summary>
+    /// プログレスバーの情報更新
+    /// </summary>
+    /// <param name="count_">カウント</param>
+    /// <param name="max_">最大数</param>
+    /// <param name="str_">文字列</param>
+    private void _progressCount(int count_, int max_, string str_ = "")
+    {
+        App.Current.Dispatcher.Invoke(() =>
         {
             if (count_ == 0)
             {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    _resultTitle = str_;
-                    _progressBar.Maximum = max_;
-                });
+                // カウントが0の場合に最大数と文字列を更新
+                _resultTitle = str_;
+                _progressBar.Maximum = max_;
             }
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                _progressBar.Value = count_;
-                _textBlock.Text = $"{count_} / {max_} {_resultTitle}".Trim();
-            });
-        }
+            _progressBar.Value = count_;
+            _textBlock.Text = $"{count_} / {max_} {_resultTitle} [{DateTime.Now- _startDateTime}]".Trim();
+        });
     }
 }

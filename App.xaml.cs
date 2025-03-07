@@ -1,8 +1,6 @@
 ﻿using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 
 namespace RepriseReportLogAnalyzer;

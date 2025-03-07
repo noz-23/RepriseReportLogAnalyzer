@@ -27,7 +27,7 @@ namespace RepriseReportLogAnalyzer.Managers
 
             var config = new SQLiteConnectionStringBuilder()
             {
-                DataSource =path
+                DataSource = path
                 //DataSource = @":memory:"
             };
             _connection = new SQLiteConnection(config.ToString());
@@ -74,7 +74,7 @@ namespace RepriseReportLogAnalyzer.Managers
                 {
                     _connection?.Insert(list_, tran);
                 }
-                catch(Exception ex_)
+                catch (Exception ex_)
                 {
                     LogFile.Instance.WriteLine(ex_.Message);
                 }

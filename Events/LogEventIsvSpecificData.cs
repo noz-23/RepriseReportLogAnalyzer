@@ -1,19 +1,36 @@
 ﻿using RepriseReportLogAnalyzer.Attributes;
 
-namespace RepriseReportLogAnalyzer.Events
-{
-    internal class LogEventIsvSpecificData : LogEventBase
-    {
-        //isv-specific data
-        //log mm/dd hh:mm:ss isv-specific-data-here
-        //0   1     2        3
-        [ColumnSort(101)]
-        public string IsvSpecificData { get; private set; } = string.Empty;
+namespace RepriseReportLogAnalyzer.Events;
 
-        public LogEventIsvSpecificData(string[] list_):base()
-        {
-            EventDateTime = _GetDateTime(list_[1], list_[2]);
-            IsvSpecificData = list_[3];
-        }
+/// <summary>
+/// 文字列 と イベントの紐づけ登録
+/// </summary>
+internal sealed partial class LogEventRegist
+{
+    private bool _logEventIsvSpecificData = Regist("log", (l_) => new LogEventIsvSpecificData(l_));
+}
+
+/// <summary>
+/// isv-specific data
+/// </summary>
+[Sort(83)]
+internal sealed class LogEventIsvSpecificData : LogEventBase
+{
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="list_">スペースで分割した文字列リスト</param>
+
+    public LogEventIsvSpecificData(string[] list_) : base()
+    {
+        EventDateTime = _GetDateTime(list_[1], list_[2]);
+        IsvSpecificData = list_[3];
     }
+
+    //isv-specific data
+    //log mm/dd hh:mm:ss isv-specific-data-here
+    //0   1     2        3
+    [Sort(101)]
+    public string IsvSpecificData { get; private set; } = string.Empty;
+
 }

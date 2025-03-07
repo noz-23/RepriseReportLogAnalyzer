@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using System.Runtime.CompilerServices;
@@ -31,50 +39,50 @@ internal sealed class AnalysisCheckOutIn
     /// <summary>
     /// チェックアウト時間
     /// </summary>
-    [ColumnSort(101)]
+    [Sort(101)]
     public DateTime CheckOutDateTime { get => _checkOut.EventDateTime; }
 
     /// <summary>
     /// チェックイン時間
     /// </summary>
-    [ColumnSort(102)]
+    [Sort(102)]
     public DateTime CheckInDateTime { get => _checkIn?.EventDateTime ?? LogEventBase.NowDateTime; }
 
     /// <summary>
     /// 利用時間
     /// </summary>
-    [ColumnSort(103)]
+    [Sort(103)]
     public TimeSpan Duration { get => CheckInDateTime - CheckOutDateTime; }
 
     /// <summary>
     /// プロダクト
     /// </summary>
-    [ColumnSort(111)]
+    [Sort(111)]
     public string Product { get => _checkOut.Product; }
     /// <summary>
     /// バージョン
     /// </summary>
-    [ColumnSort(112)]
+    [Sort(112)]
     public string Version { get => _checkOut.Version; }
     /// <summary>
     /// プロダクト バージョン
     /// </summary>
-    [ColumnSort(113)]
+    [Sort(113)]
     public string ProductVersion { get => _checkOut.ProductVersion; }
     /// <summary>
     /// ユーザー
     /// </summary>
-    [ColumnSort(121)]
+    [Sort(121)]
     public string User { get => _checkOut.User; }
     /// <summary>
     /// ホスト
     /// </summary>
-    [ColumnSort(121)]
+    [Sort(121)]
     public string Host { get => _checkOut.Host; }
     /// <summary>
     /// ユーザー@ホスト
     /// </summary>
-    [ColumnSort(121)]
+    [Sort(121)]
     public string UserHost { get => _checkOut.UserHost; }
 
     /// <summary>
