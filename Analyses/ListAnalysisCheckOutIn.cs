@@ -1,5 +1,15 @@
-﻿using RepriseReportLogAnalyzer.Events;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.IO;
 using System.Text;
@@ -9,7 +19,8 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックイン結合情報のリスト化 
 /// </summary>
-internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>
+[Sort(1)]
+internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalysisTextWrite
 {
     /// <summary>
     /// コンストラクタ
@@ -37,6 +48,18 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>
     /// </summary>
     private const string _ANALYSIS = "[CheckOut - CheckIn]";
 
+    public string Header { get => JoinEventCheckOutIn.HEADER; }
+
+    /// <summary>
+    /// 重複なしのデータリスト
+    /// </summary>
+    public IEnumerable<AnalysisCheckOutIn> ListNoDuplication() => this.Where(x_ => x_.JoinEvent().DuplicationNumber == JoinEventCheckOutIn.NO_DUPLICATION);
+
+    /// <summary>
+    /// 結合情報リスト
+    /// </summary>
+    public IEnumerable<JoinEventCheckOutIn> ListJointEvetn() => this.Select(x_ => x_.JoinEvent());
+
     /// <summary>
     /// 解析処理
     /// </summary>
@@ -49,34 +72,22 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>
         var listCheckOutIn = new Dictionary<string, List<AnalysisCheckOutIn>>();
         foreach (var startShutdown in listStartShutdown_)
         {
-            var listCheckOut = log_.GetListEvent<LogEventCheckOut>(startShutdown);
-            var listCheckIn = log_.GetListEvent<LogEventCheckIn>(startShutdown);
+            var listCheckOut =log_.GetListEvent<LogEventCheckOut>(startShutdown).ToList();
+            var listCheckIn = new SortedSet<LogEventCheckIn>( log_.GetListEvent<LogEventCheckIn>(startShutdown));
 
-            LogFile.Instance.WriteLine($"{startShutdown.StartDateTime.ToString()} - {startShutdown.ShutdownDateTime.ToString()} : {listCheckOut.Count}");
+            LogFile.Instance.WriteLine($"{startShutdown.StartDateTime.ToString()} - {startShutdown.ShutdownDateTime.ToString()} : {listCheckOut.Count()}");
 
             count = 0;
-            max = listCheckOut.Count;
+            max = listCheckOut.Count();
             ProgressCount?.Invoke(0, max, _ANALYSIS + "Join");
             foreach (var checkOut in listCheckOut)
             {
-                AnalysisCheckOutIn data;
-                try
-                {
-                    // 対応するチェックインを探す
-                    var checkIn = listCheckIn.AsParallel().AsOrdered().First(f_ => checkOut.IsFindCheckIn(f_));
-                    data = new AnalysisCheckOutIn(checkOut, checkIn);
-
-                    if (checkIn != null)
-                    {
-                        listCheckIn.Remove(checkIn);
-                    }
-                }
-                catch
-                {
-                    data = new AnalysisCheckOutIn(checkOut, startShutdown?.EventShutdown());
-                    LogFile.Instance.WriteLine($"Check In Not Found");
-                }
+                // 対応するチェックインを探す
+                var checkIn = listCheckIn.AsParallel().AsOrdered().FirstOrDefault(f_ => checkOut.IsFindCheckIn(f_));
+                var data = new AnalysisCheckOutIn(checkOut, checkIn);
                 this.Add(data);
+                listCheckIn.Remove(checkIn);
+
 
                 // 重複のチェック(同一のプロダクト ユーザー ホスト)一覧
                 var key = $"{data.Product} {data.UserHost}";
@@ -145,20 +156,9 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>
     /// <returns></returns>
     public LogEventCheckOut? Find(LogEventCheckIn checkIn_)=> this.ToList().Find(x_ => x_.IsSame(checkIn_))?.CheckOut() ?? null;
 
-    /// <summary>
-    /// 文字列リスト化
-    /// </summary>
-    /// <param name="duplication_">ture:重複なし</param>
-    private List<string> _listToString(bool duplication_)
+    public IEnumerable<KeyValuePair<string,long>> ListSelect
     {
-        var rtn = new List<string>();
-        var list = (duplication_ == false) ? this : ListDuplication();
-        foreach (var data in list)
-        {
-            rtn.Add(data.ToString(duplication_));
-        }
-
-        return rtn;
+        get => new KeyValuePair<string, long>[] { new( "重複なし", JoinEventCheckOutIn.NO_DUPLICATION), new ("重複あり", JoinEventCheckOutIn.HAVE_DUPLICATION ) }; 
     }
 
     /// <summary>
@@ -166,24 +166,14 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>
     /// </summary>
     /// <param name="path_">パス</param>
     /// <param name="duplication_">ture:重複なし</param>
-    public void WriteText(string path_, bool duplication_ = false)
+    public void WriteText(string path_, long duplication_ = 0)
     {
         var list = new List<string>();
         list.Add(AnalysisCheckOutIn.HEADER);
-        list.AddRange(_listToString(duplication_));
+        list.AddRange(_listToString(duplication_!=0));
         File.WriteAllLines(path_, list, Encoding.UTF8);
     }
 
-    /// <summary>
-    /// 重複なしのデータリスト
-    /// </summary>
-    public IEnumerable<AnalysisCheckOutIn> ListDuplication() => this.Where(x_ => x_.JoinEvent().DuplicationNumber != JoinEventCheckOutIn.DUPLICATION);
-
-    /// <summary>
-    /// 結合情報リスト
-    /// </summary>
-
-    public IEnumerable<JoinEventCheckOutIn> ListJointEvetn() => this.Select(x_ => x_.JoinEvent());
 
     /// <summary>
     /// ファイル保存(結合情報)
@@ -195,6 +185,22 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>
         list.Add(JoinEventCheckOutIn.HEADER);
         list.AddRange(ListJointEvetn().Select(x_ => x_.ToString()));
         File.WriteAllLines(path_, list, Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// 文字列リスト化
+    /// </summary>
+    /// <param name="duplication_">ture:重複なし</param>
+    private List<string> _listToString(bool duplication_)
+    {
+        var rtn = new List<string>();
+        var list = (duplication_ == false) ? this : ListNoDuplication();
+        foreach (var data in list)
+        {
+            rtn.Add(data.ToString(duplication_));
+        }
+
+        return rtn;
     }
 
 

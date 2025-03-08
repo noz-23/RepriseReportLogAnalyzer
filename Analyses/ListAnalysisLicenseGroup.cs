@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Enums;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
@@ -14,17 +22,21 @@ namespace RepriseReportLogAnalyzer.Analyses;
 ///  Key:対応グループ
 ///  Value:一致するチェックアウト チェックイン結合情報リスト
 /// </summary>
-internal sealed class ListAnalysisLicenseGroupDuration : Dictionary<string, ListAnalysisCheckOutIn>
+internal sealed class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOutIn>
 {
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="group_"></param>
-    public ListAnalysisLicenseGroupDuration(ANALYSIS_GROUP group_)
+    public ListAnalysisLicenseGroup(ANALYSIS_GROUP group_)
     {
         _group = group_;
     }
+    /// <summary>
+    /// プロット表示数
+    /// </summary>
+    public const int TOP_PLOT_USE =25;
 
     /// <summary>
     /// プロット用の文字列
@@ -73,7 +85,7 @@ internal sealed class ListAnalysisLicenseGroupDuration : Dictionary<string, List
         ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
         foreach (var group in listGroup_)
         {
-            var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListDuplication().Where(x_ => x_.GroupName(_group) == group));
+            var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
             this[group] = list;
 
             //_addDayToGroup(minDate, maxDate, group, list);
@@ -184,7 +196,7 @@ internal sealed class ListAnalysisLicenseGroupDuration : Dictionary<string, List
 
 
         // 期間順にするため
-        var listGroup = AnalysisManager.Instance.ListResultGroup.Select(x_ => x_.Name).Take(25);
+        var listGroup = AnalysisManager.Instance.ListResultGroup.Select(x_ => x_.Name).Take(TOP_PLOT_USE);
         int count = 1;
         foreach (var group in listGroup)
         {

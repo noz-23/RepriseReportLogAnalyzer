@@ -13,7 +13,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -29,23 +30,52 @@
             />
         <TextBox
             x:Name="_textBoxFolder"
-            Grid.Row="1" Grid.Column="0"
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
             Text=""
             />
         <Button 
-            Grid.Row="1" Grid.Column="1"
+            Grid.Row="1" Grid.Column="2"
             Content="Select"
             Click="_selectClick"
             />
         <Button 
-            Grid.Row="3" Grid.Column="1"
-            Content="Save"
-            Click="_outputClick"
+            Grid.Row="3" Grid.Column="2"
+            Content="Save To Csv"
+            Click="_saveCsvClick"
+            />
+        <Button 
+            Grid.Row="4" Grid.Column="2"
+            Content="Save To SQLite"
+            Click="_saveSqliteClick"
             />
         <ListView 
             Grid.Row="3" Grid.Column="0" Grid.RowSpan="3"
             MaxHeight="150"
             ItemsSource="{Binding ListEvent,ElementName=_userControl, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="225" VerticalAlignment="Top"
+            >
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Width="150" Height="25"
+                        >
+                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding Name,Mode=OneWay}"/>
+                    </StackPanel>
+                </DataTemplate>
+
+            </ListView.ItemTemplate>
+        </ListView>
+        <ListView 
+            Grid.Row="3" Grid.Column="1" Grid.RowSpan="3"
+            MaxHeight="150"
+            ItemsSource="{Binding ListAnalysis,ElementName=_userControl, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="225" VerticalAlignment="Top"
             >
             <ListView.ItemsPanel>
