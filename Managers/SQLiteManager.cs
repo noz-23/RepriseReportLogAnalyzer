@@ -1,4 +1,12 @@
-﻿using Dapper;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using Dapper;
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Databases;
 using RepriseReportLogAnalyzer.Events;

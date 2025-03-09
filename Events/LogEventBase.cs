@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
 using System.Reflection;
@@ -23,7 +31,7 @@ internal partial class LogEventRegist : LogEventBase
     /// </summary>
     public void Create()
     {
-        LogFile.Instance.WriteLine($"{LogEventBase.ListEventDataCount()}");
+        LogFile.Instance.WriteLine($"{_ListEventData.Count()}");
     }
 
     /// <summary>
@@ -45,13 +53,30 @@ internal partial class LogEventRegist : LogEventBase
 [Sort(99)]
 internal partial class LogEventBase: IComparer, IComparable
 {
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public LogEventBase()
+    {
+        //
+        EventNumber = ++NowEventNumber;
+    }
 
+    /// <summary>
+    /// 各イベントのコンストラクタ(new)を登録するためのデリゲート
+    /// </summary>
+    /// <param name="list"></param>
+    /// <returns></returns>
     public delegate LogEventBase NewEvent(string[] list);
-    protected static Dictionary<string, NewEvent> _ListEventData = new Dictionary<string, NewEvent>();
 
-    public static int ListEventDataCount() => _ListEventData.Count;
+    /// <summary>
+    /// 各イベントの文字とデリゲートを紐づけるリスト
+    /// </summary>
+    protected static SortedDictionary<string, NewEvent> _ListEventData = new ();
+
 
     public readonly static DateTime NotAnalysisEventTime = DateTime.Now;
+
 
     public static DateTime NowDateTime = NotAnalysisEventTime;
     public static long NowEventNumber = 0;
@@ -86,50 +111,45 @@ internal partial class LogEventBase: IComparer, IComparable
     /// <returns></returns>
     public DateTime EventDateTimeUnit(long timeSpan_) =>new DateTime(EventDateTime.Ticks - (EventDateTime.Ticks % timeSpan_));
 
-
+    /// <summary>
+    /// 登録してある
+    /// </summary>
+    /// <param name="str_"></param>
+    /// <returns></returns>
     public static LogEventBase? EventData(string str_)
     {
+        // スペース区切りの文字列を配列に分割("hoge hoge"にも考慮)
         var list = _splitSpace(str_);
-
-        //NewEvent? newEvent =null;
-        //if (_ListEventData.TryGetValue(list[0], out newEvent) == false)
-        //{
-        //    if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
-        //    {
-        //        return new LogEventTimeStamp(list);
-        //    }
-        //    return null;
-        //}
-
-        //return newEvent(list);
 
         if (_ListEventData.TryGetValue(list[0], out var newEvent) == true)
         {
+            // 一致している場合
             return newEvent?.Invoke(list);
         }
 
         if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
         {
+            // タイムスタンプ
             return new LogEventTimeStamp(list);
         }
         return null;
     }
 
-    public LogEventBase()
-    {
-        //
-        EventNumber = ++NowEventNumber;
-    }
-
+    /// <summary>
+    /// 初期化
+    /// </summary>
     public static void Clear()
     {
-
         NowEventNumber = 0;
         NowDateTime = NotAnalysisEventTime;
-
     }
 
-    // ｢a "b c" d｣→｢a,"b c",d｣
+    /// <summary>
+    /// スペースで分割するが "" で括られている場合はしない
+    /// ｢a "b c" d｣→｢a,"b c",d｣ 
+    /// </summary>
+    /// <param name="str_"></param>
+    /// <returns></returns>
     private static string[] _splitSpace(string str_)
     {
         var list = str_.Split(' ');// ｢a "b c" d｣→｢a,"b,c",d｣
@@ -169,6 +189,12 @@ internal partial class LogEventBase: IComparer, IComparable
         return rtn.ToArray();
     }
 
+    /// <summary>
+    /// 月日だけの場合は年を追加する(翌年1/1を考慮)
+    /// </summary>
+    /// <param name="date_"></param>
+    /// <param name="time_"></param>
+    /// <returns></returns>
     protected static DateTime _GetDateTime(string date_, string time_)
     {
         var listDate = date_.Split('/');
@@ -178,6 +204,11 @@ internal partial class LogEventBase: IComparer, IComparable
         return DateTime.Parse(date_ + "/" + year + " " + time_);
     }
 
+    /// <summary>
+    /// 文字列化のヘッダー
+    /// </summary>
+    /// <param name="classType_">子のクラス</param>
+    /// <returns></returns>
     public static string Header(Type classType_)
     {
         var listColunm = new List<string>();

@@ -1,4 +1,12 @@
-﻿using System.ComponentModel;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using System.ComponentModel;
 
 namespace RepriseReportLogAnalyzer.Enums;
 

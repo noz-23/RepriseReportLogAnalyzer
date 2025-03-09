@@ -87,10 +87,17 @@
                 <DataTemplate>
                     <StackPanel
                         Orientation="Horizontal"
-                        Width="150" Height="25"
+                        Width="250" Height="25"
                         >
                         <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="{Binding Name,Mode=OneWay}"/>
+                        <TextBlock Text="{Binding Name,Mode=OneWay}" Width="100"/>
+                        <ComboBox
+                            Width="100"
+                            ItemsSource="{Binding ListSelect}" 
+                            SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                            SelectedValue="{Binding SelectedValue, Mode=TwoWay}"
+                            DisplayMemberPath="Key" SelectedValuePath="Value" 
+                            />
                     </StackPanel>
                 </DataTemplate>
 

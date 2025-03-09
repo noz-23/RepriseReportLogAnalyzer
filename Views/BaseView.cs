@@ -1,13 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RepriseReportLogAnalyzer.Views
 {
+    /// <summary>
+    /// INotifyPropertyChangedの処理をまとめたクラス
+    /// </summary>
     public class BaseView : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;

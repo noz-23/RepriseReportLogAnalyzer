@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -15,18 +23,17 @@ internal sealed partial class LogEventRegist
 /// check-in
 /// </summary>
 [Sort(12)]
-internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEventCountCurrent
+internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEventCountCurrent, ILogEventWhy
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="list_">スペースで分割した文字列リスト</param>
-
     public LogEventCheckIn(string[] list_) : base()
     {
         if (list_.Count() < 4)
         {
-            Why = list_[1];
+            Why = int.Parse(list_[1]);
             Count = int.Parse(list_[2]);
             HandleServer = list_[3];
             //
@@ -34,7 +41,7 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
         }
         else
         {
-            Why = list_[1];
+            Why = int.Parse(list_[1]);
             Product = list_[2];
             Version = list_[3];
             User = list_[4];
@@ -72,7 +79,7 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     public string UserHost { get => User + "@" + Host; }
     //
     [Sort(101)]
-    public string Why { get; private set; } = string.Empty;
+    public int Why { get; private set; } = 0;
     [Sort(102)]
     public string IsvDef { get; private set; } = string.Empty;
     //

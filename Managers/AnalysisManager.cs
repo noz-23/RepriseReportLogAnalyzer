@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Analyses;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
@@ -71,7 +79,7 @@ class AnalysisManager : INotifyPropertyChanged
     public SortedSet<DateTime> ListDate { get; private set; } = new();
 
     public DateTime? StartDate { get => (ListDate.Count() == 0) ? null : ListDate.FirstOrDefault(); }
-    public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.FirstOrDefault(); }
+    public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.LastOrDefault(); }
 
     public void SetProgressCount(ProgressCountDelegate progressCount_)
     {
@@ -176,7 +184,7 @@ class AnalysisManager : INotifyPropertyChanged
         _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdownAll.csv");
         //
         _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutIn.csv");
-        _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutInDuplication.csv", true);
+        _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutInDuplication.csv", JoinEventCheckOutIn.NO_DUPLICATION);
         _listCheckOutIn.WriteDuplicationText(outFolder_ + @"\ListJoinEventCheckOutIn.csv");
         //
         _listLicenseCount.WriteText(outFolder_ + @"\ListAnalysisLicenseCount.csv");

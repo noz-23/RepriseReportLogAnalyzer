@@ -50,12 +50,12 @@ internal sealed class JoinEventCheckOutIn
     /// <summary>
     /// 重複なし(AnalysisCheckOutInのデータそのまま)
     /// </summary>
-    public const long NO_DUPLICATION_ = 0;
+    public const long NO_DUPLICATION = 0;
 
     /// <summary>
     /// 重複あり(利用しない)
     /// </summary>
-    public const long DUPLICATION = -1;
+    public const long HAVE_DUPLICATION = -1;
 
     /// <summary>
     /// チェックアウト イベント番号
@@ -83,7 +83,7 @@ internal sealed class JoinEventCheckOutIn
     /// >0  : Use DuplicationNumber
     /// </summary>
     [Sort(104)]
-    public long DuplicationNumber { get; private set; } = NO_DUPLICATION_;
+    public long DuplicationNumber { get; private set; } = NO_DUPLICATION;
 
     /// <summary>
     /// 重複取り除いた場合のイベント
@@ -103,12 +103,12 @@ internal sealed class JoinEventCheckOutIn
     {
         if (checkIn_ == null)
         {
-            DuplicationNumber = DUPLICATION;
+            DuplicationNumber = HAVE_DUPLICATION;
         }
         else
         {
             _checkIn = checkIn_;
-            DuplicationNumber = _checkIn?.EventNumber ?? NO_DUPLICATION_;
+            DuplicationNumber = _checkIn?.EventNumber ?? NO_DUPLICATION;
         }
     }
 

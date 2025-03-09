@@ -6,8 +6,10 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
@@ -23,7 +25,8 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// 　MaxProduct  :プロダクト-最大数
 /// 　OutInProduct:プロダクト-ログの数値
 /// </summary>
-internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
+[Sort(2)]
+internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAnalysisTextWrite
 {
 
     /// <summary>
@@ -32,6 +35,18 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
     public ListAnalysisLicenseCount()
     {
     }
+
+    public static ListKeyPair ListSelect
+    {
+        get => new ()
+        {
+            new("基本イベント間隔", _NO_TIME_STAMP),
+            new("1日間隔", TimeSpan.TicksPerDay),
+            new("1時間間隔", TimeSpan.TicksPerHour),
+            new("30分間隔", 30*TimeSpan.TicksPerMinute),
+        };
+    }
+
 
     /// <summary>
     /// 文字列化のヘッダー
@@ -73,6 +88,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
     /// </summary>
     private const string _PLOT_MAX = "[ Max ]";
 
+    private const long _NO_TIME_STAMP = -1; // 基本的な ログ イベント
     /// <summary>
     /// プロダクト リスト
     /// </summary>
@@ -178,20 +194,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
             }
             ProgressCount?.Invoke(++count, max);
         }
-
-        //var minDate = this.Select(x => x.EventBase.EventDate()).Min();
-        //var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
-
-        //count = 0;
-        //max = (maxDate - minDate).Days + 1;
-
-        //ProgressCount?.Invoke(0, max, _ANALYSIS + "Days");
-        //for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
-        //{
-        //    _listDayToProduct[date] = _getDayToProduct(date);
-        //    ProgressCount?.Invoke(++count, max);
-        //}
-
     }
 
     /// <summary>
@@ -274,65 +276,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
     /// <param name="logEventBase_">ログ イベント</param>
     public void _add(LogEventBase logEventBase_) => this.Add(new AnalysisLicenseCount(logEventBase_, _listCount, _listHave, _listCountOutIn));
 
-    //private IEnumerable<LicenseView> _getDayToProduct(DateTime date_)
-    //{
-    //    var rtn = new List<LicenseView>();
-
-    //    var listSelectDay = this.Where(x_ => x_.EventBase.EventDate() == date_);
-    //    foreach (var product in _listProduct)
-    //    {
-    //        var view = new LicenseView()
-    //        {
-    //            Name = product,
-    //            Date = date_,
-    //            Count =  0,
-    //            Max = 0,
-    //        };
-
-    //        if (listSelectDay?.Any() == true)
-    //        {
-    //            view.Count = listSelectDay?.Select(x_ => x_.CountProduct[product]).Max() ?? 0;
-    //            view.Max = listSelectDay?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
-    //        }
-    //        //var minTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Min() ?? DateTime.Now;
-    //        //var maxTime = listSelectDay?.Select(x_ => x_.EventBase.EventDateTime).Max() ?? DateTime.Now;
-
-    //        rtn.Add(view);
-    //    }
-    //    return rtn;
-    //}
-
-
-    //public IEnumerable<LicenseView> ListDayToProduct(DateTime date_)
-    //{
-    //    if (_listDayToProduct.TryGetValue(date_, out var rtn) == true)
-    //    {
-    //        return rtn;
-    //    }
-    //    return new List<LicenseView>();
-    //}
-
-    //public List<LicenseView> GetCount(DateTime date_, long timeSpan_, string product_)
-    //{
-    //    var rtn = new List<LicenseView>();
-
-    //    //TimeSpan.TicksPerDay
-    //    var listSelectDay = this.Where(x_ => x_.EventBase.EventDateTime.Date == date_);
-    //    for(var time = date_;time<date_.AddDays(1); time = time.AddTicks(timeSpan_))
-    //    {
-    //        var view = new LicenseView()
-    //        {
-    //            Date = time,
-    //            Count = listSelectDay?.Select(x_ => x_.CountProduct[product_]).Max() ?? 0,
-    //            Max = listSelectDay?.Select(x_ => x_.MaxProduct[product_]).Max() ?? 0
-    //        };
-
-    //        rtn.Add(view);
-    //    }
-
-    //    return rtn;
-    //}
-
     /// <summary>
     /// リスト表示するライセンス数
     /// </summary>
@@ -344,7 +287,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
         var rtn = new List<LicenseView>();
 
         var flg = (date_ == null);
-        //var list = (timeSpan_ ==-1) ? this.Where(x_ => (x_.EventBase.EventDateTime.Date == date_) || flg): this.Where(x_ => (x_.EventBase.EventDateTimeUnit(timeSpan_) == date_));
         var list = this.Where(x_ => (x_.EventBase.EventDateTimeUnit(timeSpan_) == date_) || flg);
 
         foreach (var product in _listProduct)
@@ -419,6 +361,41 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
         return rtn;
     }
 
+    /// <summary>
+    /// ファイル保存
+    /// </summary>
+    /// <param name="path_">パス</param>
+    /// <param name="timeSpan_">間隔時間</param>
+    public void WriteText(string path_, long timeSpan_= _NO_TIME_STAMP)
+    {
+        var list = new List<string>();
+        list.Add(Header);
+        list.AddRange((timeSpan_ == _NO_TIME_STAMP) ?_listToString(): _listTimeSpanString(timeSpan_));
+        File.WriteAllLines(path_, list, Encoding.UTF8);
+
+        LogFile.Instance.WriteLine($"Write:{path_}");
+    }
+
+    /// <summary>
+    /// 時間分割
+    /// </summary>
+    /// <param name="timeSpan_">間隔時間</param>
+    /// <returns></returns>
+    private List<DateTime> _getListTimeSpan(long timeSpan_)
+    {
+        var rtn = new List<DateTime>();
+
+        var minDate = this.Select(x => x.EventBase.EventDate()).Min();
+        var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
+
+        for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(timeSpan_))
+        {
+            rtn.Add(date);
+        }
+
+        return rtn;
+    }
+
 
     /// <summary>
     /// 文字列のリスト化
@@ -488,38 +465,4 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>
         return rtn;
     }
 
-    /// <summary>
-    /// ファイル保存
-    /// </summary>
-    /// <param name="path_">パス</param>
-    /// <param name="timeSpan_">間隔時間</param>
-    public void WriteText(string path_, long timeSpan_=-1)
-    {
-        var list = new List<string>();
-        list.Add(Header);
-        list.AddRange((timeSpan_ ==-1) ?_listToString(): _listTimeSpanString(timeSpan_));
-        File.WriteAllLines(path_, list, Encoding.UTF8);
-
-        LogFile.Instance.WriteLine($"Write:{path_}");
-    }
-
-    /// <summary>
-    /// 時間分割
-    /// </summary>
-    /// <param name="timeSpan_">間隔時間</param>
-    /// <returns></returns>
-    private List<DateTime> _getListTimeSpan(long timeSpan_)
-    {
-        var rtn = new List<DateTime>();
-
-        var minDate = this.Select(x => x.EventBase.EventDate()).Min();
-        var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
-
-        for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(timeSpan_))
-        {
-            rtn.Add(date);
-        }
-
-        return rtn;
-    }
 }

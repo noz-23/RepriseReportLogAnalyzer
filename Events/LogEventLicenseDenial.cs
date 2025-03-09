@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -15,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// license denial
 /// </summary>
 [Sort(13)]
-internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, ILogEventProduct
+internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, ILogEventProduct, ILogEventWhy
 {
     /// <summary>
     /// コンストラクタ
@@ -30,7 +38,7 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
         IsvDef = list_[5];
         //
         Count = int.Parse(list_[6]);
-        Why = list_[7];
+        Why = int.Parse(list_[7]);
         LastAttempt = list_[8];
         ProcessId = list_[9];
 
@@ -60,7 +68,7 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
     [Sort(102)]
     public int Count { get; private set; } = -1;
     [Sort(103)]
-    public string Why { get; private set; } = string.Empty;
+    public int Why { get; private set; } = -1;
     [Sort(104)]
     public string LastAttempt { get; private set; } = string.Empty;
     [Sort(105)]

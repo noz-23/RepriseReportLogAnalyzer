@@ -48,6 +48,16 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     /// </summary>
     private const string _ANALYSIS = "[CheckOut - CheckIn]";
 
+    public static ListKeyPair ListSelect
+    {
+        get => new()
+        {
+            new( "重複なし", JoinEventCheckOutIn.NO_DUPLICATION),
+            new ("重複あり", JoinEventCheckOutIn.HAVE_DUPLICATION )
+        };
+    }
+
+
     public string Header { get => JoinEventCheckOutIn.HEADER; }
 
     /// <summary>
@@ -155,11 +165,6 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     /// <param name="checkIn_">チェックイン</param>
     /// <returns></returns>
     public LogEventCheckOut? Find(LogEventCheckIn checkIn_)=> this.ToList().Find(x_ => x_.IsSame(checkIn_))?.CheckOut() ?? null;
-
-    public IEnumerable<KeyValuePair<string,long>> ListSelect
-    {
-        get => new KeyValuePair<string, long>[] { new( "重複なし", JoinEventCheckOutIn.NO_DUPLICATION), new ("重複あり", JoinEventCheckOutIn.HAVE_DUPLICATION ) }; 
-    }
 
     /// <summary>
     /// ファイル保存(チェックアウト-チェックイン)

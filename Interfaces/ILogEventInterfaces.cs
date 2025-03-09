@@ -1,4 +1,15 @@
-﻿namespace RepriseReportLogAnalyzer.Interfaces;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+namespace RepriseReportLogAnalyzer.Interfaces;
+
+
+public class ListKeyPair : List<KeyValuePair<string, long>>;
 
 interface ILogEventHost
 {
@@ -24,4 +35,17 @@ interface ILogEventProduct
 interface ILogEventCountCurrent : ILogEventProduct
 {
     int CountCurrent { get; }
+}
+
+interface ILogEventWhy
+{
+    int Why { get; }
+}
+
+interface IAnalysisTextWrite
+{
+    string Header { get; }
+    void WriteText(string path_, long select_);
+
+    //IEnumerable<KeyValuePair<string, long>> ListSelect { get; }
 }

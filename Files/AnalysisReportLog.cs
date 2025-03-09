@@ -1,4 +1,12 @@
-﻿using RepriseReportLogAnalyzer.Analyses;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Interfaces;

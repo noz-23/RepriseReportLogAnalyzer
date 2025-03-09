@@ -130,7 +130,7 @@ public partial class AnalysisControl : UserControl
                 _progressBar.Maximum = max_;
             }
             _progressBar.Value = count_;
-            _textBlock.Text = $"{count_} / {max_} {_resultTitle} [{DateTime.Now- _startDateTime}]".Trim();
+            _textBlock.Text = $"{count_} / {max_} {_resultTitle} [{(DateTime.Now- _startDateTime):hh\\:mm\\:ss}]".Trim();
         });
     }
 }
