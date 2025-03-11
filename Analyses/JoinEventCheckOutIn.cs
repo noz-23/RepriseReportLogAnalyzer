@@ -7,6 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using System.Runtime.CompilerServices;
@@ -42,20 +43,16 @@ internal sealed class JoinEventCheckOutIn
         _checkIn = checkIn_;
     }
 
-    /// <summary>
-    /// 文字列化のヘッダー
-    /// </summary>
-    public const string HEADER = "CheckOut,CheckIn,Shutdown,Duplication";
 
     /// <summary>
     /// 重複なし(AnalysisCheckOutInのデータそのまま)
     /// </summary>
-    public const long NO_DUPLICATION = 0;
+    //public const long NO_DUPLICATION = 0;
 
     /// <summary>
     /// 重複あり(利用しない)
     /// </summary>
-    public const long HAVE_DUPLICATION = -1;
+    //public const long HAVE_DUPLICATION = -1;
 
     /// <summary>
     /// チェックアウト イベント番号
@@ -83,7 +80,8 @@ internal sealed class JoinEventCheckOutIn
     /// >0  : Use DuplicationNumber
     /// </summary>
     [Sort(104)]
-    public long DuplicationNumber { get; private set; } = NO_DUPLICATION;
+    //public long DuplicationNumber { get; private set; } = NO_DUPLICATION;
+    public long DuplicationNumber { get; private set; } = (long)SelectData.ALL;
 
     /// <summary>
     /// 重複取り除いた場合のイベント
@@ -103,12 +101,14 @@ internal sealed class JoinEventCheckOutIn
     {
         if (checkIn_ == null)
         {
-            DuplicationNumber = HAVE_DUPLICATION;
+            //DuplicationNumber = HAVE_DUPLICATION;
+            DuplicationNumber = (long)SelectData.ECLUSION;
         }
         else
         {
             _checkIn = checkIn_;
-            DuplicationNumber = _checkIn?.EventNumber ?? NO_DUPLICATION;
+            //DuplicationNumber = _checkIn?.EventNumber ?? NO_DUPLICATION;
+            DuplicationNumber = _checkIn?.EventNumber ?? (long)SelectData.ALL;
         }
     }
 

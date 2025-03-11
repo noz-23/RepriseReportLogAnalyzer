@@ -14,68 +14,114 @@ using RepriseReportLogAnalyzer.Files;
 using RLMLogReader.Extensions;
 using System.Data.SQLite;
 using System.IO;
+using System.Windows;
 
 namespace RepriseReportLogAnalyzer.Managers
 {
-    public class SQLiteManager
+    internal class SQLiteManager
     {
-        public static SQLiteManager Instance = new SQLiteManager();
-        private SQLiteManager()
-        {
+        //public static SQLiteManager Instance = new SQLiteManager();
+        //private SQLiteManager()
+        //{
 
-        }
+        //}
 
-        public void Create()
+        //public void Create()
+        //{
+        //    var path = @"report.db";
+        //    if (File.Exists(path) == true)
+        //    {
+        //        File.Delete(path);
+        //    }
+
+        //    var config = new SQLiteConnectionStringBuilder()
+        //    {
+        //        DataSource = path
+        //        //DataSource = @":memory:"
+        //    };
+        //    _connection = new SQLiteConnection(config.ToString());
+        //    _connection.Open();
+        //    //
+        //    _connection.CreateTable<LogEventStart>();
+        //    _connection.CreateTable<LogEventShutdown>();
+        //    _connection.CreateTable<LogEventCheckOut>();
+        //    _connection.CreateTable<LogEventCheckIn>();
+        //    _connection.CreateTable<LogEventLicenseDenial>();
+        //    _connection.CreateTable<LogEventLicenseInUse>();
+        //    //
+        //    _connection.CreateTable<LogEventProduct>();
+        //    _connection.CreateTable<LogEventLicenseReread>();
+        //    _connection.CreateTable<LogEventLicenseFile>();
+        //    //
+        //    _connection.CreateTable<LogEventQueue>();
+        //    _connection.CreateTable<LogEventRoamExtend>();
+        //    _connection.CreateTable<LogEventMeterDecrement>();
+        //    _connection.CreateTable<LogEventDynamicReservation>();
+        //    _connection.CreateTable<LogEventAuthentication>();
+        //    //
+        //    _connection.CreateTable<AnalysisStartShutdown>();
+        //    _connection.CreateTable<AnalysisCheckOutIn>();
+        //    //
+        //    SqlMapper.AddTypeHandler(DateTimeHandler.Default);
+
+        //    LogFile.Instance.WriteLine("Create");
+        //}
+
+        //~SQLiteManager()
+        //{
+        //    //_connection?.Close();
+        //    //_connection?.Dispose();
+        //}
+
+        public SQLiteManager(string path_)
         {
-            var path = @"report.db";
-            if (File.Exists(path) == true)
+            if (File.Exists(path_) == true)
             {
-                File.Delete(path);
+                MessageBox.Show("Sqlite Data Override!", "Attention");
+                LogFile.Instance.WriteLine($"Delete [{path_}]");
+
+                File.Delete(path_);
             }
-
-            var config = new SQLiteConnectionStringBuilder()
-            {
-                DataSource = path
-                //DataSource = @":memory:"
-            };
-            _connection = new SQLiteConnection(config.ToString());
-            _connection.Open();
-            //
-            _connection.CreateTable<LogEventStart>();
-            _connection.CreateTable<LogEventShutdown>();
-            _connection.CreateTable<LogEventCheckOut>();
-            _connection.CreateTable<LogEventCheckIn>();
-            _connection.CreateTable<LogEventLicenseDenial>();
-            _connection.CreateTable<LogEventLicenseInUse>();
-            //
-            _connection.CreateTable<LogEventProduct>();
-            _connection.CreateTable<LogEventLicenseReread>();
-            _connection.CreateTable<LogEventLicenseFile>();
-            //
-            _connection.CreateTable<LogEventQueue>();
-            _connection.CreateTable<LogEventRoamExtend>();
-            _connection.CreateTable<LogEventMeterDecrement>();
-            _connection.CreateTable<LogEventDynamicReservation>();
-            _connection.CreateTable<LogEventAuthentication>();
-            //
-            _connection.CreateTable<AnalysisStartShutdown>();
-            _connection.CreateTable<AnalysisCheckOutIn>();
-            //
-            SqlMapper.AddTypeHandler(DateTimeHandler.Default);
-
-            LogFile.Instance.WriteLine("Create");
-        }
-
-        ~SQLiteManager()
-        {
-            //_connection?.Close();
-            //_connection?.Dispose();
+            Open(path_);
         }
 
         private SQLiteConnection? _connection = null;
 
+        public void Close()
+        {
+            _connection?.Close();
+            _connection?.Dispose();
+        }
+
+        public void Open(string path_)
+        {
+            var config = new SQLiteConnectionStringBuilder()
+            {
+                DataSource = path_
+                //DataSource = @":memory:"
+            };
+
+            _connection = new SQLiteConnection(config.ToString());
+            _connection.Open();
+        }
+
+
+        public void Create(Type classType_)=>_connection?.CreateTable(classType_);
+        
+
+        //public void Insert(Type classType_,ICollection<LogEventBase> list_)
+        //{
+        //    var methods = this.GetType().GetMethods();
+        //    var method = methods.FirstOrDefault(x_=>x_.Name==nameof(Insert) && x_.IsGenericMethod ==true);
+        //    method?.MakeGenericMethod(classType_);
+        //    method?.Invoke(this, new object[]{ list_});
+        //    LogFile.Instance.WriteLine($"Insert [{classType_}] [{list_.Count}]");
+        //}
+
         public void Insert<T>(ICollection<T> list_)
         {
+            LogFile.Instance.WriteLine($"Insert [{typeof(T)}] [{list_.Count}]");
+
             using (var tran = _connection?.BeginTransaction())
             {
                 try

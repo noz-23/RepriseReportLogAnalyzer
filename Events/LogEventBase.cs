@@ -10,13 +10,14 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
 using System.Reflection;
+using static RepriseReportLogAnalyzer.Events.LogEventBase;
 
 namespace RepriseReportLogAnalyzer.Events;
 
 /// <summary>
 /// 文字列 と イベントの紐づけ登録クラス
 /// </summary>
-internal partial class LogEventRegist : LogEventBase
+internal sealed partial class LogEventRegist 
 {
     /// <summary>
     /// コンストラクタ
@@ -31,20 +32,12 @@ internal partial class LogEventRegist : LogEventBase
     /// </summary>
     public void Create()
     {
-        LogFile.Instance.WriteLine($"{_ListEventData.Count()}");
+        LogFile.Instance.WriteLine($"Create {typeof(LogEventRegist)}");
     }
 
-    /// <summary>
-    /// 登録関数
-    /// </summary>
-    /// <param name="key_">ログの先頭文字列</param>
-    /// <param name="event_">登録関数デリゲート</param>
-    /// <returns></returns>
-    public static bool Regist(string key_, NewEvent event_)
-    {
-        _ListEventData.Add(key_, event_);
-        return true;
-    }
+    public static bool Regist(string key_, NewLogEvent event_)=> LogEventBase.Regist(key_, event_);
+
+    public static bool Regist<T>(NewListLogEvent<object> event_ ) =>LogEventBase.Regist(typeof(T), event_);
 }
 
 /// <summary>
@@ -67,12 +60,36 @@ internal partial class LogEventBase: IComparer, IComparable
     /// </summary>
     /// <param name="list"></param>
     /// <returns></returns>
-    public delegate LogEventBase NewEvent(string[] list);
+    public delegate LogEventBase NewLogEvent(string[] list);
+
+
+    public delegate List<LogEventBase> NewListLogEvent<T>();
 
     /// <summary>
     /// 各イベントの文字とデリゲートを紐づけるリスト
     /// </summary>
-    protected static SortedDictionary<string, NewEvent> _ListEventData = new ();
+    private static SortedDictionary<string, NewLogEvent> _listEventData = new ();
+
+    private static SortedDictionary<Type, NewListLogEvent<object>> _listEventList = new();
+
+
+    /// <summary>
+    /// 登録関数
+    /// </summary>
+    /// <param name="key_">ログの先頭文字列</param>
+    /// <param name="event_">登録関数デリゲート</param>
+    /// <returns></returns>
+    public static bool Regist(string key_, NewLogEvent event_)
+    {
+        _listEventData.Add(key_, event_);
+        return true;
+    }
+
+    public static bool Regist(Type classType_, NewListLogEvent<object> event_)
+    {
+        _listEventList.Add(classType_, event_);
+        return true;
+    }
 
 
     public readonly static DateTime NotAnalysisEventTime = DateTime.Now;
@@ -121,7 +138,7 @@ internal partial class LogEventBase: IComparer, IComparable
         // スペース区切りの文字列を配列に分割("hoge hoge"にも考慮)
         var list = _splitSpace(str_);
 
-        if (_ListEventData.TryGetValue(list[0], out var newEvent) == true)
+        if (_listEventData.TryGetValue(list[0], out var newEvent) == true)
         {
             // 一致している場合
             return newEvent?.Invoke(list);
@@ -134,6 +151,16 @@ internal partial class LogEventBase: IComparer, IComparable
         }
         return null;
     }
+
+    //public static List<LogEventBase> ListLogEvent(Type classType_)
+    //{
+    //    if (_listEventList.TryGetValue(classType_, out var list) == true)
+    //    {
+    //        return list?.Invoke();
+    //    }
+
+    //    return new List<LogEventBase>();
+    //}
 
     /// <summary>
     /// 初期化

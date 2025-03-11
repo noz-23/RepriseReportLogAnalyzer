@@ -16,6 +16,7 @@ namespace RepriseReportLogAnalyzer.Events;
 internal sealed partial class LogEventRegist
 {
     private bool _logEventAuthentication = Regist("AUTH", (l_) => new LogEventAuthentication(l_));
+    //private bool _listEventAuthentication = Regist<LogEventAuthentication>(() =>new List<LogEventAuthentication>());
 }
 
 /// <summary>

@@ -13,11 +13,9 @@ using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
-using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Linq;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -90,6 +88,19 @@ public partial class OutputControl : UserControl
                 AnalysisManager.Instance.WriteText(output, view.ClassType);
             }
 
+            foreach (var view in ListAnalysis)
+            {
+                if (view.IsChecked == false)
+                {
+                    continue;
+                }
+
+                string output = _textBoxFolder.Text + @"\" + view.Name + @".csv";
+                LogFile.Instance.WriteLine($"Write : {output}");
+
+                AnalysisManager.Instance.WriteText(output, view.ClassType, view.SelectedValue);
+            }
+
             _textBoxFolder.IsEnabled = true;
         }
 
@@ -98,6 +109,38 @@ public partial class OutputControl : UserControl
     private void _saveSqliteClick(object sender_, RoutedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Write : {sender_}");
+
+        if (string.IsNullOrEmpty(_textBoxFolder.Text) == false)
+        {
+            _textBoxFolder.IsEnabled = false;
+            string output = _textBoxFolder.Text + @"\ReportLog.db";
+            LogFile.Instance.WriteLine($"Write : {output}");
+
+            var sql = new SQLiteManager(output);
+
+            foreach (var view in ListEvent)
+            {
+                if (view.IsChecked == false)
+                {
+                    continue;
+                }
+                sql.Create(view.ClassType);
+                //sql.Insert(view.ClassType,AnalysisManager.Instance.ListEvent(view.ClassType).ToList());
+                sql.Insert(AnalysisManager.Instance.ListEvent(view.ClassType).ToList());
+            }
+            foreach (var view in ListAnalysis)
+            {
+                if (view.IsChecked == false)
+                {
+                    continue;
+                }
+                sql.Create(view.ClassType);
+            }
+            sql.Close();
+
+            _textBoxFolder.IsEnabled = true;
+        }
+
 
     }
     void _init()
@@ -132,7 +175,7 @@ public partial class OutputControl : UserControl
                     var find = ListAnalysis.Where(x_ => x_.ClassType.Name == t.Name);
                     if (find.Count() == 0)
                     {
-                        var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
+                        var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static |BindingFlags.DeclaredOnly);
 
                         foreach (var p in listPropetyInfo)
                         {
@@ -141,7 +184,6 @@ public partial class OutputControl : UserControl
                                 ListAnalysis.Add(new(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty),list));
                                 LogFile.Instance.WriteLine($"{t.Name}");
                                 break;
-
                             }
                         }
                     }

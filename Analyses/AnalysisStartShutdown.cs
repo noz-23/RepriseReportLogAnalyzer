@@ -8,6 +8,7 @@
  */
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Events;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -31,10 +32,6 @@ internal sealed class AnalysisStartShutdown
         _joinEvent = new JoinEventStartShutdown(start_, shutdown_);
     }
 
-    /// <summary>
-    /// 文字列化のヘッダー
-    /// </summary>
-    public const string HEADER = "Start Date Time,End Date Time,Duration";
 
     /// <summary>
     /// スタート イベント番号

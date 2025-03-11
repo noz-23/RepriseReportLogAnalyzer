@@ -9,6 +9,7 @@
 using Microsoft.Win32;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
+using System.Diagnostics.Metrics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -98,6 +99,7 @@ public partial class AnalysisControl : UserControl
         {
             mainWindow._resultControl.SetDate();
             //mainWindow._tabControl._resultControl.SetData();
+            _textBlock.Text = $"[{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
     }
 

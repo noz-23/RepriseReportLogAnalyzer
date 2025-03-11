@@ -125,9 +125,14 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     /// <param name="checkIn_"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsFindCheckIn(LogEventCheckIn checkIn_)
-    {
-        // ハンドルが一致する最初のチェックイン イベント(Findで探す)
-        return (checkIn_.HandleServer != HandleServer) ? false : (checkIn_.EventNumber < EventNumber) ? false : true;
-    }
+    public bool IsFindCheckIn(LogEventCheckIn checkIn_)=> (checkIn_.HandleServer == HandleServer) && (checkIn_.EventNumber > EventNumber);
+    //{
+    //    // ハンドルが一致する最初のチェックイン イベント(Findで探す)
+    //    //return (checkIn_.HandleServer != HandleServer) ? false : (checkIn_.EventNumber < EventNumber) ? false : true;
+    //    return (checkIn_.HandleServer == HandleServer)&&(checkIn_.EventNumber > EventNumber) ;
+
+    //}
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsFindCheckIn(string hande_,long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
 }

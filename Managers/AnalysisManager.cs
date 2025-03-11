@@ -8,31 +8,45 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
 using RLMLogReader.Extensions;
 using ScottPlot;
-using ScottPlot.Panels;
 using ScottPlot.WPF;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace RepriseReportLogAnalyzer.Managers;
 
+/// <summary>
+/// 解析処理管理
+/// </summary>
 class AnalysisManager : INotifyPropertyChanged
 {
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public static AnalysisManager Instance = new AnalysisManager();
     private AnalysisManager()
     {
+        _listAnalysis.Add(_listCheckOutIn);
+        _listAnalysis.Add(_listLicenseCount);
+        _listAnalysis.Add(_listStartShutdown);
+        _listAnalysis.Add(_listUserDuration);
+        _listAnalysis.Add(_listHostDuration);
+        _listAnalysis.Add(_listUserHostDuration);     
     }
 
     public void Create()
     {
         LogFile.Instance.WriteLine("Create");
-
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -41,24 +55,22 @@ class AnalysisManager : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName_));
     }
 
-    /// <summary>
-    /// 解析内容
-    /// </summary>
-    private const string _ANALYSIS = "[File Read]";
-
     public ObservableCollection<LicenseView> ListResultProduct { get; private set; } = new();
 
     public ObservableCollection<LicenseView> ListResultGroup { get; private set; } = new();
+
+    private List<IAnalysisTextWrite> _listAnalysis = new();
 
     private readonly ListAnalysisStartShutdown _listStartShutdown = new();
     private readonly ListAnalysisCheckOutIn _listCheckOutIn = new();
     private readonly ListAnalysisLicenseCount _listLicenseCount = new();
     //
-    private readonly ListAnalysisLicenseGroup _listUserDuration = new(ANALYSIS_GROUP.USER);
-    private readonly ListAnalysisLicenseGroup _listHostDuration = new(ANALYSIS_GROUP.HOST);
-    private readonly ListAnalysisLicenseGroup _listUserHostDuration = new(ANALYSIS_GROUP.USER_HOST);
+    private readonly ListAnalysisLicenseUser _listUserDuration = new();
+    private readonly ListAnalysisLicenseHost _listHostDuration = new();
+    private readonly ListAnalysisLicenseUserHost _listUserHostDuration = new();
 
-    private AnalysisReportLog _analysisReortLog =new AnalysisReportLog();
+    private ConvertReportLog _convertReportLog =new ();
+    private List<string> _listFile = new();
 
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
@@ -71,8 +83,11 @@ class AnalysisManager : INotifyPropertyChanged
     //private readonly Dictionary<string, bool> _listProductChecked = new ();
 
 
-    // _analysisReortLog があるが確実にデータがはいっているタイミングで更新する
+    // _convertReportLog があるが確実にデータがはいっているタイミングで更新する
     public SortedSet<string> ListProduct { get; private set; } = new();
+
+    public SortedSet<(string Product,string Version)> ListProductVersion { get; private set; } = new();
+
     public SortedSet<string> ListUser { get; private set; } = new();
     public SortedSet<string> ListHost { get; private set; } = new();
     public SortedSet<string> ListUserHost { get; private set; } = new();
@@ -81,9 +96,13 @@ class AnalysisManager : INotifyPropertyChanged
     public DateTime? StartDate { get => (ListDate.Count() == 0) ? null : ListDate.FirstOrDefault(); }
     public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.LastOrDefault(); }
 
+
+    private DateTime? _startTime =null ;
+    private DateTime? _endTime = null;
     public void SetProgressCount(ProgressCountDelegate progressCount_)
     {
         _progressCount = progressCount_;
+        _convertReportLog.ProgressCount = progressCount_;
         _listStartShutdown.ProgressCount = progressCount_;
         _listCheckOutIn.ProgressCount = progressCount_;
         _listLicenseCount.ProgressCount = progressCount_;
@@ -96,6 +115,7 @@ class AnalysisManager : INotifyPropertyChanged
     public void Clear()
     {
         ListProduct.Clear();
+        ListProductVersion.Clear();
         ListUser.Clear();
         ListHost.Clear();
         ListUserHost.Clear();
@@ -110,51 +130,66 @@ class AnalysisManager : INotifyPropertyChanged
         _listUserDuration.Clear();
         _listHostDuration.Clear();
         _listUserHostDuration.Clear();
+
+        _startTime = null;
+        _endTime = null;
     }
 
     public void Analysis(IEnumerable<string> listFile)
     {
-        int count = 0;
-        int max = listFile.Count();
-        _progressCount?.Invoke(0, max, _ANALYSIS);
+        _startTime??= DateTime.MinValue;
 
-        //var analysis = new AnalysisReportLog();
-        foreach (string path_ in listFile)
-        {
-            LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
-            _analysisReortLog.StartAnalysis(path_);
-            _progressCount?.Invoke(++count, max);
-        }
-        _analysisReortLog.EndAnalysis();
+        _listFile.AddRange(listFile);
+
+        _convert();
         //_calendarShow(analysis.ListDate);
 
         //AnalysisManager.Instance.Analysis(analysis);
         _analysis();
+
+        _endTime ??= DateTime.MinValue;
+
     }
 
+    private void _convert() 
+    {
+        //int count = 0;
+        int max = _listFile.Count();
+        //_progressCount?.Invoke(0, max, _ANALYSIS);
+
+        //var analysis = new AnalysisReportLog();
+        foreach (string path_ in _listFile)
+        {
+            LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
+            _convertReportLog.Start(path_);
+            //_progressCount?.Invoke(++count, max);
+        }
+        _convertReportLog.End();
+    }
     //public void Analysis(AnalysisReportLog analysis_)
     private void _analysis()
-
     {
         //_analysis = analysis_;
 
         Clear();
         //
-        //ListProduct.AddRange(_analysisReortLog.ListProductEvent.Select(x_ => x_.Product));
-        ListProduct.AddRange(_analysisReortLog.ListProduct);
-        ListUser.AddRange(_analysisReortLog.ListUser);
-        ListHost.AddRange(_analysisReortLog.ListHost);
-        ListUserHost.AddRange(_analysisReortLog.ListUserHost);
-        ListDate.AddRange(_analysisReortLog.ListDate);
+        //ListProduct.AddRange(_convertReportLog.ListProductEvent.Select(x_ => x_.Product));
+        ListProduct.AddRange(_convertReportLog.ListProduct);
+        ListProductVersion.AddRange(_convertReportLog.ListProductEvent.Select(x_=>(x_.Product,x_.Version)));
+
+        ListUser.AddRange(_convertReportLog.ListUser);
+        ListHost.AddRange(_convertReportLog.ListHost);
+        ListUserHost.AddRange(_convertReportLog.ListUserHost);
+        ListDate.AddRange(_convertReportLog.ListDate);
         //
         //foreach (var product in ListProduct)
         //{
         //    _listProductChecked[product]=true;
         //}
         //
-        _listStartShutdown.Analysis(_analysisReortLog);
-        _listCheckOutIn.Analysis(_analysisReortLog, _listStartShutdown.ListWithoutSkip());
-        _listLicenseCount.Analysis(_analysisReortLog, _listCheckOutIn);
+        _listStartShutdown.Analysis(_convertReportLog);
+        _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListWithoutSkip());
+        _listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
         //
         _listUserDuration.Analysis(ListUser, _listCheckOutIn);
         _listHostDuration.Analysis(ListHost, _listCheckOutIn);
@@ -170,35 +205,85 @@ class AnalysisManager : INotifyPropertyChanged
         _notifyPropertyChanged("StartDate");
         _notifyPropertyChanged("EndDate");
     }
+    public void WriteSummy(string path_)
+    {
+        var list = new List<string>();
+
+        list.Add($"Analsis File Count:{_listFile.Count}");
+        list.AddRange(_listFile.Select(x_ => Path.GetFileName(x_)));
+        list.Add("\n");
+
+        list.Add($"Analsis Time : {_endTime - _startTime}");
+        list.Add($"Start   Time : {_startTime}");
+        list.Add($"End     Time : {_endTime}");
+        list.Add("\n");
+
+
+        list.Add($"License Count : {ListProduct.Count()}");
+        list.AddRange(ListProductVersion.Select(x_ => $"{x_.Product},{x_.Version}"));
+        list.Add("\n");
+        LogFile.Instance.WriteLine($"ListProduct:{ListProduct.Count()}");
+
+        list.Add($"User Count : {ListUser.Count()}");
+        list.AddRange(ListUser);
+        list.Add("\n");
+        LogFile.Instance.WriteLine($"ListUser:{ListUser.Count()}");
+
+        list.Add($"Host Count : {ListHost.Count()}");
+        list.AddRange(ListHost);
+        list.Add("\n");
+        LogFile.Instance.WriteLine($"ListHost:{ListHost.Count()}");
+
+        list.Add($"User@Host Count : {ListUserHost.Count()}");
+        list.AddRange(ListUserHost);
+        list.Add("\n");
+        LogFile.Instance.WriteLine($"ListUserHost:{ListUserHost.Count()}");
+
+        File.WriteAllLines(path_, list, Encoding.UTF8);
+        LogFile.Instance.WriteLine($"Write:{path_}");
+    }
 
     public void WriteText(string path_, Type classType_)
     {
-        _analysisReortLog.WriteEventText(path_, classType_);
+        _convertReportLog.WriteEventText(path_, classType_);
     }
-
-    public void WriteText(string outFolder_)
+    public void WriteText(string path_, Type classType_, long selected_)
     {
-        _analysisReortLog.WriteSummy(outFolder_ + @"\Analysis.txt");
-
-        _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdown.csv", true);
-        _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdownAll.csv");
-        //
-        _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutIn.csv");
-        _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutInDuplication.csv", JoinEventCheckOutIn.NO_DUPLICATION);
-        _listCheckOutIn.WriteDuplicationText(outFolder_ + @"\ListJoinEventCheckOutIn.csv");
-        //
-        _listLicenseCount.WriteText(outFolder_ + @"\ListAnalysisLicenseCount.csv");
-        _listLicenseCount.WriteText(outFolder_ + @"\LicenseCountDate.csv", TimeSpan.TicksPerDay);
-        _listLicenseCount.WriteText(outFolder_ + @"\LicenseCountHour.csv", TimeSpan.TicksPerHour);
-        _listLicenseCount.WriteText(outFolder_ + @"\LicenseCount30Minute.csv", TimeSpan.TicksPerMinute * 30);
-        //
-        _listUserDuration.WriteText(outFolder_ + @"\DurationUser.csv");
-        _listHostDuration.WriteText(outFolder_ + @"\DurationHost.csv");
-        _listUserHostDuration.WriteText(outFolder_ + @"\DurationUserHost.csv");
+        var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
+        find?.WriteText(path_, selected_);
 
     }
 
-    public bool IsChecked(string product_) => ListResultProduct.Where(x_ => x_.Name == product_).Select(x_ => x_.IsChecked).FirstOrDefault();
+
+    public IEnumerable<T> ListEvent<T>() where T : LogEventBase => _convertReportLog.ListEvent<T>();
+    public IEnumerable<object> ListEvent(Type classType_)=>
+    //{ 
+        _convertReportLog.ListEvent(classType_);
+    //}
+
+    //public void WriteText(string outFolder_)
+    //{
+    //    WriteSummy(outFolder_ + @"\Analysis.txt");
+
+    //    _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdown.csv", (long)SelectData.ECLUSION);
+    //    _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdownAll.csv");
+    //    //
+    //    _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutIn.csv");
+    //    _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutInDuplication.csv", (long)SelectData.ECLUSION);
+    //    _listCheckOutIn.WriteDuplicationText(outFolder_ + @"\ListJoinEventCheckOutIn.csv");
+    //    //
+    //    _listLicenseCount.WriteText(outFolder_ + @"\ListAnalysisLicenseCount.csv");
+    //    _listLicenseCount.WriteText(outFolder_ + @"\LicenseCountDate.csv", TimeSpan.TicksPerDay);
+    //    _listLicenseCount.WriteText(outFolder_ + @"\LicenseCountHour.csv", TimeSpan.TicksPerHour);
+    //    _listLicenseCount.WriteText(outFolder_ + @"\LicenseCount30Minute.csv", TimeSpan.TicksPerMinute * 30);
+    //    //
+    //    _listUserDuration.WriteText(outFolder_ + @"\DurationUser.csv",(long) SelectData.ALL);
+    //    _listHostDuration.WriteText(outFolder_ + @"\DurationHost.csv", (long)SelectData.ALL);
+    //    _listUserHostDuration.WriteText(outFolder_ + @"\DurationUserHost.csv", (long)SelectData.ALL);
+
+    //}
+
+    public bool IsProductChecked(string product_) => ListResultProduct.Where(x_ => x_.Name == product_).Select(x_ => x_.IsChecked).FirstOrDefault();
     //{
     //foreach (var view in ListResultProduct)
     //{
@@ -211,9 +296,9 @@ class AnalysisManager : INotifyPropertyChanged
     //}
 
 
-    public void SetData(DateTime? date_, ANALYSIS_GROUP group_)
+    public void SetData(DateTime? date_, AnalysisGroup group_)
     {
-        //if (_analysisReortLog.ListEvent.Count() == 0)
+        //if (_convertReportLog.ListEvent.Count() == 0)
         //{
         //    return;
         //}
@@ -228,9 +313,9 @@ class AnalysisManager : INotifyPropertyChanged
         ListResultGroup.Clear();
         switch (group_)
         {
-            case ANALYSIS_GROUP.USER: ListResultGroup.AddRange(_listUserDuration.ListView(date_)); break;
-            case ANALYSIS_GROUP.HOST: ListResultGroup.AddRange(_listHostDuration.ListView(date_)); break;
-            case ANALYSIS_GROUP.USER_HOST: ListResultGroup.AddRange(_listUserHostDuration.ListView(date_)); break;
+            case AnalysisGroup.USER: ListResultGroup.AddRange(_listUserDuration.ListView(date_)); break;
+            case AnalysisGroup.HOST: ListResultGroup.AddRange(_listHostDuration.ListView(date_)); break;
+            case AnalysisGroup.USER_HOST: ListResultGroup.AddRange(_listUserHostDuration.ListView(date_)); break;
             default: break;
         }
         //
@@ -324,10 +409,10 @@ class AnalysisManager : INotifyPropertyChanged
 
     //}
 
-    public void SetPlot(WpfPlot plot_, DateTime? date_, ANALYSIS_GROUP group_)
+    public void SetPlot(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
     {
         plot_.Plot.Clear();
-        //if (_analysisReortLog.ListEvent.Count() == 0)
+        //if (_convertReportLog.ListEvent.Count() == 0)
         //{
         //    return;
         //}
@@ -337,16 +422,16 @@ class AnalysisManager : INotifyPropertyChanged
         var pos = Alignment.LowerRight;
         switch (group_)
         {
-            case ANALYSIS_GROUP.USER: 
-            case ANALYSIS_GROUP.HOST: 
-            case ANALYSIS_GROUP.USER_HOST:
+            case AnalysisGroup.USER: 
+            case AnalysisGroup.HOST: 
+            case AnalysisGroup.USER_HOST:
                 title = (date_ == null) ? $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
                 ylabel = $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
                 plot_.Plot.Axes.SetLimitsY(bottom: ListAnalysisLicenseGroup.TOP_PLOT_USE, top: 1);
                 pos = Alignment.LowerLeft;
                 break;
             default:
-            case ANALYSIS_GROUP.NONE:
+            case AnalysisGroup.NONE:
                 title = (date_ == null) ? $"Product - License Count": $"[{ date_.GetValueOrDefault().ToShortDateString()}] Product - License Count";
                 ylabel = $"Count";
                 pos = Alignment.UpperLeft;
@@ -378,13 +463,13 @@ class AnalysisManager : INotifyPropertyChanged
         }
 
         var listY = new Dictionary<string, List<double>>();
-        switch ((ANALYSIS_GROUP)group_)
+        switch ((AnalysisGroup)group_)
         {
-            case ANALYSIS_GROUP.USER: listY = _listUserDuration.ListPlot(listX, timeSpan); break;
-            case ANALYSIS_GROUP.HOST: listY = _listHostDuration.ListPlot(listX, timeSpan); break;
-            case ANALYSIS_GROUP.USER_HOST: listY = _listUserHostDuration.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.USER: listY = _listUserDuration.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.HOST: listY = _listHostDuration.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.USER_HOST: listY = _listUserHostDuration.ListPlot(listX, timeSpan); break;
             default:
-            case ANALYSIS_GROUP.NONE: listY = _listLicenseCount.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.NONE: listY = _listLicenseCount.ListPlot(listX, timeSpan); break;
         }
 
         foreach (var key in listY.Keys)

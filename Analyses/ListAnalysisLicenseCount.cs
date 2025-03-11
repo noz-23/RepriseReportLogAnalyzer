@@ -115,17 +115,20 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="log_">イベント ログ情報</param>
     /// <param name="listCheckOutIn_">チェックアウト チェックイン 結合情報</param>
-    public void Analysis(AnalysisReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
+    public void Analysis(ConvertReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
     {
+        // プロダクトのコピー
         _listProduct.UnionWith(log_.ListProduct);
 
         _clearCount();
 
+        var listBase = log_.ListEvent<LogEventBase>();
+
         int count = 0;
-        int max = log_.ListEvent.Count;
+        int max = listBase.Count();
 
         ProgressCount?.Invoke(0, max, _ANALYSIS);
-        foreach (var ev in log_.ListEvent)
+        foreach (var ev in listBase)
         {
             if (ev.EventDateTime ==LogEventBase.NotAnalysisEventTime)
             {
@@ -324,7 +327,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         // 初期化
         foreach (var product in _listProduct)
         {
-            if (AnalysisManager.Instance.IsChecked(product) == false)
+            if (AnalysisManager.Instance.IsProductChecked(product) == false)
             {
                 continue;
             }
@@ -339,7 +342,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
 
             foreach (var product in _listProduct)
             {
-                if (AnalysisManager.Instance.IsChecked(product) == false)
+                if (AnalysisManager.Instance.IsProductChecked(product) == false)
                 {
                     continue;
                 }

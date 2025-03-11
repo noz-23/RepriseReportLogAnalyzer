@@ -170,13 +170,13 @@ internal sealed class AnalysisCheckOutIn
     /// グループ集計する名称
     /// </summary>
     /// <param name="group_"></param>
-    public string GroupName(ANALYSIS_GROUP group_)
+    public string GroupName(AnalysisGroup group_)
     {
         switch (group_)
         {
-            case ANALYSIS_GROUP.USER: return User;
-            case ANALYSIS_GROUP.HOST: return Host;
-            case ANALYSIS_GROUP.USER_HOST: return UserHost;
+            case AnalysisGroup.USER: return User;
+            case AnalysisGroup.HOST: return Host;
+            case AnalysisGroup.USER_HOST: return UserHost;
             default:
                 break;
         }

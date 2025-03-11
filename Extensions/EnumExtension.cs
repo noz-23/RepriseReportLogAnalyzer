@@ -18,6 +18,11 @@ public static class EnumExtension
         string rtn = string.Empty;
 
         var fieldInfo = typeof(T).GetField(src_.ToString());
+        if (fieldInfo == null)
+        {
+            return src_.ToString();
+        }
+
         var attr = Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute));
         if (attr != null)
         {

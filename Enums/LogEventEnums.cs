@@ -10,7 +10,13 @@ using System.ComponentModel;
 
 namespace RepriseReportLogAnalyzer.Enums;
 
-internal enum ANALYSIS_GROUP
+internal enum SelectData:long
+{ 
+    ECLUSION =-1,
+    ALL = 0,
+}
+
+internal enum AnalysisGroup
 {
     [Description("None")]
     NONE = 0,

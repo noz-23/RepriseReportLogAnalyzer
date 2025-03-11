@@ -19,17 +19,31 @@ namespace RLMLogReader.Extensions;
 /// </summary>
 public static class DbConnectionExtension
 {
-    public static void CreateTable<T>(this DbConnection src_)
+    public static void CreateTable<T>(this DbConnection src_) => CreateTable(src_, typeof(T));
+    //{
+    //    try
+    //    {
+    //        src_.Query(_createTabel<T>());
+    //    }
+    //    catch (Exception ex_)
+    //    {
+    //        LogFile.Instance.WriteLine(ex_.Message);
+    //    }
+    //}
+
+    public static void CreateTable(this DbConnection src_, Type classType_)
     {
         try
         {
-            src_.Query(_createTabel<T>());
+            src_.Query(_createTabel(classType_));
         }
         catch (Exception ex_)
         {
             LogFile.Instance.WriteLine(ex_.Message);
         }
     }
+
+
 
     public static void Insert<T>(this DbConnection src_, ICollection<T> list_, DbTransaction? tran_ = null)
     {
@@ -47,17 +61,19 @@ public static class DbConnectionExtension
     }
 
 
-    private static string _createTabel<T>()
+    //private static string _createTabel<T>()=> _createTabel(typeof(T));
+
+    private static string _createTabel(Type classType_)
     {
         var listColunm = new List<string>();
-        var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+        var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
 
         listPropetyInfo?.ToList().ForEach(prop =>
         {
             listColunm.Add($"{prop.Name} {_getType(prop.PropertyType)}");
         });
         //
-        var rtn = $"CREATE TABLE {typeof(T).Name} ({string.Join(",", listColunm)});";
+        var rtn = $"CREATE TABLE {classType_.Name} ({string.Join(",", listColunm)});";
         LogFile.Instance.WriteLine(rtn);
 
         return rtn;
@@ -68,6 +84,10 @@ public static class DbConnectionExtension
         if (type_ == typeof(string))
         {
             return "TEXT";
+        }
+        if (type_ == typeof(Enum))
+        {
+            return "INTEGER";
         }
         if (type_ == typeof(int))
         {
@@ -88,11 +108,29 @@ public static class DbConnectionExtension
         return "TEXT";
     }
 
-    private static string _insert<T>()
+    private static string _insert<T>() => _insert(typeof(T));
+    //{
+    //    var listColunm = new List<string>();
+    //    var listValue = new List<string>();
+    //    var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+
+    //    listPropetyInfo?.ToList().ForEach(prop =>
+    //    {
+    //        listColunm.Add($"{prop.Name}");
+    //        listValue.Add($"@{prop.Name}");
+    //    });
+
+    //    var rtn = $"INSERT INTO {typeof(T).Name} ({string.Join(",", listColunm)}) VALUES({string.Join(",", listValue)});";
+    //    LogFile.Instance.WriteLine(rtn);
+    //    return rtn;
+    //}
+
+    private static string _insert(Type classType_)
     {
         var listColunm = new List<string>();
         var listValue = new List<string>();
-        var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
 
         listPropetyInfo?.ToList().ForEach(prop =>
@@ -101,9 +139,8 @@ public static class DbConnectionExtension
             listValue.Add($"@{prop.Name}");
         });
 
-        var rtn = $"INSERT INTO {typeof(T).Name} ({string.Join(",", listColunm)}) VALUES({string.Join(",", listValue)});";
+        var rtn = $"INSERT INTO {classType_.Name} ({string.Join(",", listColunm)}) VALUES({string.Join(",", listValue)});";
         LogFile.Instance.WriteLine(rtn);
         return rtn;
     }
-
 }

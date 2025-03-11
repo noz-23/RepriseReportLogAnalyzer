@@ -26,7 +26,7 @@ public partial class ResultControl : UserControl
     {
         InitializeComponent();
 
-        foreach (ANALYSIS_GROUP group in Enum.GetValues(typeof(ANALYSIS_GROUP)))
+        foreach (AnalysisGroup group in Enum.GetValues(typeof(AnalysisGroup)))
         {
             _comboBox.Items.Add(group.Description());
         }
@@ -90,7 +90,7 @@ public partial class ResultControl : UserControl
 
         LogFile.Instance.WriteLine($"[{date}] [{index}]");
 
-        AnalysisManager.Instance.SetData(date, (ANALYSIS_GROUP)index);
+        AnalysisManager.Instance.SetData(date, (AnalysisGroup)index);
 
         //if (date == null)
         //{
@@ -100,7 +100,7 @@ public partial class ResultControl : UserControl
         //{
         //    AnalysisManager.Instance.SetDatePlot(_scottPlot, date ?? DateTime.Now, index);
         //}
-        AnalysisManager.Instance.SetPlot(_scottPlot, date, (ANALYSIS_GROUP)index);
+        AnalysisManager.Instance.SetPlot(_scottPlot, date, (AnalysisGroup)index);
 
     }
 
