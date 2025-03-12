@@ -27,6 +27,9 @@ internal sealed class LogEventLogFileEnd : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventLogFileEnd(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         EventDateTime = DateTime.Parse(list_[1] + " " + list_[2]);
     }
 

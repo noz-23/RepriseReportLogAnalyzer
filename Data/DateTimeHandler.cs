@@ -13,6 +13,7 @@ namespace RepriseReportLogAnalyzer.Data;
 
 /// <summary>
 /// 文字列 → 時間変更
+/// https://stackoverflow.com/questions/12510299/get-datetime-as-utc-with-dapper
 /// </summary>
 internal sealed class DateTimeHandler : SqlMapper.TypeHandler<DateTimeOffset>
 {

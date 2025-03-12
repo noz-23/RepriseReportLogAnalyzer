@@ -31,6 +31,9 @@ internal sealed class LogEventIsvSpecificData : LogEventBase
 
     public LogEventIsvSpecificData(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         EventDateTime = _GetDateTime(list_[1], list_[2]);
         IsvSpecificData = list_[3];
     }

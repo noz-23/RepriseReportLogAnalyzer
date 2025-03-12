@@ -31,6 +31,9 @@ internal sealed class LogEventLicenseFile : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventLicenseFile(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         FileName = list_[2];
         EventDateTime = NowDateTime;
     }

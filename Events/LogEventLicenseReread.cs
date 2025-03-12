@@ -31,6 +31,9 @@ internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventLicenseReread(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         User = list_[1];
         Host = list_[2];
 

@@ -14,10 +14,8 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
-using System;
 using System.IO;
 using System.Text;
-using System.Windows.Documents;
 
 namespace RepriseReportLogAnalyzer.Analyses;
 
@@ -39,42 +37,19 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     {
     }
 
+    /// <summary>
+    /// コンボボックスの項目
+    /// </summary>
     public static ListStringLongPair ListSelect
     {
         get => new ()
         {
-            new("基本イベント間隔", _NO_TIME_STAMP),
-            new("1日間隔", TimeSpan.TicksPerDay),
-            new("1時間間隔", TimeSpan.TicksPerHour),
-            new("30分間隔", 30*TimeSpan.TicksPerMinute),
+            new("Interval Event", _NO_TIME_STAMP),
+            new("Interval 1 Day", TimeSpan.TicksPerDay),
+            new("Interval 1 Hour", TimeSpan.TicksPerHour),
+            new("Interval 30 Minute", 30*TimeSpan.TicksPerMinute),
         };
     }
-
-
-    /// <summary>
-    /// 文字列化のヘッダー
-    /// </summary>
-    //public string Header
-    //{
-    //    get
-    //    {
-    //        var list = new List<string>();
-    //        list.Add("Date");
-    //        list.Add("Time");
-    //        foreach (var product in _listProduct)
-    //        {
-    //            list.Add($"{product}[Use]");
-    //            list.Add($"{product}[Have]");
-    //            //list.Add($"{product}[OutIn]");
-    //        }
-    //        return string.Join(",", list);
-    //    }
-    //}
-
-    /// <summary>
-    /// プログレスバー 解析処理 更新デリゲート
-    /// </summary>
-    public ProgressCountDelegate? ProgressCount = null;
 
     /// <summary>
     /// 解析内容
@@ -91,7 +66,16 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     private const string _PLOT_MAX = "[ Max ]";
 
-    private const long _NO_TIME_STAMP = -1; // 基本的な ログ イベント
+    /// <summary>
+    /// 基本的な ログ イベント
+    /// </summary>
+    private const long _NO_TIME_STAMP = -1;
+
+    /// <summary>
+    /// プログレスバー 解析処理 更新デリゲート
+    /// </summary>
+    public ProgressCountDelegate? ProgressCount = null;
+
     /// <summary>
     /// プロダクト リスト
     /// </summary>
@@ -350,17 +334,8 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                     continue;
                 }
 
-                if (listView.Count > 0)
-                {
-                    rtn[product + _PLOT_MAX].Add(listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Max).Max());
-                    rtn[product + _PLOT_COUNT].Add(listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count).Max());
-                }
-                else
-                {
-                    /// ない場合は非表示
-                    rtn[product + _PLOT_MAX].Add(double.NaN);
-                    rtn[product + _PLOT_COUNT].Add(double.NaN);
-                }
+                rtn[product + _PLOT_MAX].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Max).Max());
+                rtn[product + _PLOT_COUNT].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count).Max());
             }
         }
 
@@ -375,8 +350,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     public void WriteText(string path_, long timeSpan_= _NO_TIME_STAMP)
     {
         var list = new List<string>();
+        // ヘッダー
         list.Add(Header(timeSpan_));
-        //list.AddRange((timeSpan_ == _NO_TIME_STAMP) ?_listToString(): _listTimeSpanString(timeSpan_));
+        // データ
         list.AddRange(ListValue(timeSpan_).Select(x_=>string.Join(",",x_)));
         File.WriteAllLines(path_, list, Encoding.UTF8);
 
@@ -403,77 +379,19 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         return rtn;
     }
 
-
     /// <summary>
-    /// 文字列のリスト化
-    /// </summary>
-    //private List<string> _listToString()
-    //{
-    //    var rtn = new List<string>();
-    //    foreach (var d in this)
-    //    {
-    //        var add = new List<string>();
-    //        var dateTime = d.EventBase.EventDateTime.ToString().Split(" ");
-    //        add.Add(dateTime[0]);
-    //        add.Add(dateTime[1]);
-    //        foreach (var product in _listProduct)
-    //        {
-    //            add.Add(d.CountProduct[product].ToString());
-    //            add.Add(d.MaxProduct[product].ToString());
-    //            //add.Add(d.OutInProduct[product].ToString());
-    //        }
-    //        rtn.Add(string.Join(",", add));
-    //    }
-    //    return rtn;
-    //}
-
-    /// <summary>
-    /// 指定間隔での結果リスト
+    /// ヘッダー
     /// </summary>
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
-    //private List<string> _listTimeSpanString(long timeSpan_ = TimeSpan.TicksPerDay)
-    //{
-    //    var rtn = new List<string>();
-
-    //    var listNowMax = new Dictionary<string, int>();
-    //    _listProduct.ToList().ForEach(product => listNowMax[product] = 0);
-
-    //    var listTimeSpan = _getListTimeSpan(timeSpan_);
-    //    foreach (var dateTimeSpan in listTimeSpan)
-    //    {
-    //        var add = new List<string>();
-    //        add.Add(dateTimeSpan.Date.ToShortDateString());
-    //        add.Add(dateTimeSpan.TimeOfDay.ToString());
-    //        //
-    //        var listData = this.Where(d_ => d_.EventBase.EventDateTimeUnit(timeSpan_) == dateTimeSpan);
-    //        foreach (var product in _listProduct)
-    //        {
-    //            if ((listData?.Count() ?? 0) == 0)
-    //            {
-    //                add.Add("0");
-    //                add.Add(listNowMax[product].ToString());
-    //                continue;
-    //            }
-    //            var countMax = listData?.Select(x_ => x_.CountProduct[product]).Max() ?? 0;
-    //            var haveMax = listData?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
-    //            var outIn = listData?.Select(x_ => x_.OutInProduct[product]).Max() ?? 0;
-
-    //            add.Add(countMax.ToString());
-    //            add.Add(haveMax.ToString());
-    //            //add.Add(outIn.ToString());
-
-    //            listNowMax[product] = haveMax;
-    //        }
-
-    //        rtn.Add(string.Join(",", add));
-    //    }
-
-    //    return rtn;
-    //}
 
     public string Header(long timeSpan_ ) => string.Join(",", ListHeader(timeSpan_).Select(x_=>x_.Key));
 
+    /// <summary>
+    /// リスト化したヘッダー
+    /// </summary>
+    /// <param name="timeSpan_"></param>
+    /// <returns></returns>
     public ListStringStringPair ListHeader(long timeSpan_)
     {
         var rtn = new ListStringStringPair();
@@ -489,10 +407,16 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         return rtn;
     }
 
+    /// <summary>
+    /// リスト化したデータ
+    /// </summary>
+    /// <param name="timeSpan_"></param>
+    /// <returns></returns>
     public IEnumerable<List<string>> ListValue(long timeSpan_) 
     {
         if (timeSpan_ == _NO_TIME_STAMP)
         {
+            // 集計なしに出力
             return this.Select(x_ =>x_.ListValue());
         }
 

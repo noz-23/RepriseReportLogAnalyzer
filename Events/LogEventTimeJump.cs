@@ -30,6 +30,9 @@ internal sealed class LogEventTimeJump : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventTimeJump(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Minutes = list_[1];
         EventDateTime = DateTime.Parse(list_[2] + " " + list_[3]);
     }

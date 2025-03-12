@@ -30,6 +30,9 @@ internal sealed class LogEventRlmReportLogFormat : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventRlmReportLogFormat(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Version = list_[6];
 
         EventDateTime = NowDateTime;

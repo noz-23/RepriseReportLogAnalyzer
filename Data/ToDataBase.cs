@@ -1,37 +1,35 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.Reflection;
 
 namespace RepriseReportLogAnalyzer.Data
 {
+
+    /// <summary>
+    /// 保存する関係ベース
+    /// </summary>
     internal class ToDataBase
     {
         /// <summary>
-        /// 文字列化のヘッダー
+        /// ヘッダー
         /// </summary>
         /// <param name="classType_">子のクラス</param>
         /// <returns></returns>
-        //public static string Header(Type classType_ ) =>string.Join(",", ListHeader(classType_));
         public static string Header(Type classType_) => string.Join(",", ListHeader(classType_).Select(x_=>x_.Key));
 
         /// <summary>
-        /// リスト化したヘッダーの文字列
+        /// リスト化したヘッダー
         /// </summary>
         /// <param name="classType_"></param>
         /// <returns></returns>
-        //public static List<string> ListHeader(Type classType_)
-        //{
-        //    var rtn = new List<string>();
-        //    var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-        //    listPropetyInfo?.ToList().ForEach(prop =>
-        //    {
-        //        rtn.Add($"{prop.Name}");
-        //    });
-
-        //    return rtn;
-        //}
-
         public static ListStringStringPair ListHeader(Type classType_)
         {
             var rtn = new ListStringStringPair();
@@ -78,6 +76,11 @@ namespace RepriseReportLogAnalyzer.Data
             return rtn;
         }
 
+        /// <summary>
+        /// データベース(SQL)に変換する場合のデータ型
+        /// </summary>
+        /// <param name="type_"></param>
+        /// <returns></returns>
         public static string GetDatabaseType(Type type_)
         {
             if (type_ == typeof(string))

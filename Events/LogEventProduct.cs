@@ -32,6 +32,9 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct
 
     public LogEventProduct(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Product = list_[1];
         Version = list_[2];
         Pool = list_[3];

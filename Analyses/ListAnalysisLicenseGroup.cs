@@ -15,11 +15,15 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Analyses;
+
+/// <summary>
+/// 出力のためグループを分けクラス化(User)
+/// </summary>
+[Sort(11)]
 
 internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
@@ -27,22 +31,39 @@ internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnaly
     { 
     }
 
+    /// <summary>
+    /// コンボボックスの項目(リフレクションのため別だし)
+    /// </summary>
     public static ListStringLongPair ListSelect { get => _ListSelect; }
 }
 
+/// <summary>
+/// 出力のためグループを分けクラス化(Host)
+/// </summary>
+[Sort(12)]
 internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseHost() : base(AnalysisGroup.HOST)
     {
     }
+    /// <summary>
+    /// コンボボックスの項目(リフレクションのため別だし)
+    /// </summary>
     public static ListStringLongPair ListSelect { get => _ListSelect; }
 }
 
+/// <summary>
+/// 出力のためグループを分けクラス化(User@Host)
+/// </summary>
+[Sort(13)]
 internal sealed class ListAnalysisLicenseUserHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseUserHost() : base(AnalysisGroup.USER_HOST)
     {
     }
+    /// <summary>
+    /// コンボボックスの項目(リフレクションのため別だし)
+    /// </summary>
     public static ListStringLongPair ListSelect { get => _ListSelect; }
 }
 
@@ -53,7 +74,7 @@ internal sealed class ListAnalysisLicenseUserHost : ListAnalysisLicenseGroup, IA
 ///  Key:対応グループ
 ///  Value:一致するチェックアウト チェックイン結合情報リスト
 /// </summary>
-[Sort(3)]
+[Sort(10)]
 internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOutIn>
 {
     /// <summary>
@@ -87,8 +108,8 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     {
         get => new()
         {
-            new("全てまとめて", (long)SelectData.ALL),
-            new("プロダクト毎",(long)SelectData.ECLUSION),
+            new("All In One", (long)SelectData.ALL),
+            new("By Product",(long)SelectData.ECLUSION),
         };
     }
 
@@ -121,10 +142,6 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
 
         var minDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Min();
         var maxDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Max();
-        //for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(TimeSpan.TicksPerDay))
-        //{
-        //    _listDayToGroup[date]= new List<LicenseView>();
-        //}
 
         int count = 0;
         int max = listGroup_.Count();
@@ -135,7 +152,6 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
             var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
             this[group] = list;
 
-            //_addDayToGroup(minDate, maxDate, group, list);
             ProgressCount?.Invoke(++count, max);
         }
     }
@@ -217,56 +233,15 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
 
 
     /// <summary>
-    /// 文字列化のリスト
-    /// </summary>
-    //private List<string> _listToString(long product_)
-    //{
-    //    var rtn = new List<string>();
-
-    //    int count = 0;
-    //    int max = this.Keys.Count;
-    //    ProgressCount?.Invoke(0, max, _ANALYSIS);
-    //    foreach (var key in this.Keys)
-    //    {
-    //        var listCount = this[key];
-
-    //        if (product_ == (long)SelectData.ECLUSION)
-    //        {
-    //            var sum = new TimeSpan(listCount.Sum(x => x.DurationDuplication().Ticks));
-    //            var days = new HashSet<DateTime>(listCount.Select(x => x.CheckOutDateTime.Date));
-
-    //            rtn.Add($"{key},{sum.ToString(@"d\.hh\:mm\:ss")},{days.Count},{listCount.Count}");
-    //        }
-    //        else
-    //        {
-    //            foreach (var product in _listProduct)
-    //            {
-    //                var list = new List<string>();
-    //                var listProduct = listCount.Where(x_ => x_.Product == product);
-    //                var sum = new TimeSpan(listProduct.Sum(x => x.DurationDuplication().Ticks));
-    //                var days = new HashSet<DateTime>(listProduct.Select(x => x.CheckOutDateTime.Date));
-
-    //                list.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
-    //                list.Add($"{days.Count}");
-    //                list.Add($"{listProduct.Count()}");
-    //                rtn.Add($"{key},{sum.ToString(@"d\.hh\:mm\:ss")},{string.Join(",", list)}");
-    //            }
-    //        }
-
-    //        ProgressCount?.Invoke(++count, max);
-    //    }
-    //    return rtn;
-    //}
-
-    /// <summary>
     /// ファイル保存
     /// </summary>
     /// <param name="path_">パス</param>
     public void WriteText(string path_, long product_)
     {
         var list = new List<string>();
+        // ヘッダー
         list.Add(Header(product_));
-        //list.AddRange(_listToString( product_));
+        // データ
         list.AddRange(ListValue(product_).Select(x_=>string.Join(",",x_)));
         File.WriteAllLines(path_, list, Encoding.UTF8);
 
@@ -274,17 +249,24 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     }
 
     /// <summary>
-    /// 文字列化のヘッダー
+    /// ヘッダー
     /// </summary>
-    public string Header(long timeSpan_) => string.Join(",", ListHeader(timeSpan_).Select(x_ => x_.Key));
+    public string Header(long product_) => string.Join(",", ListHeader(product_).Select(x_ => x_.Key));
 
+    /// <summary>
+    /// リスト化したヘッダー
+    /// </summary>
+    /// <param name="product_"></param>
+    /// <returns></returns>
+    
     public ListStringStringPair ListHeader(long product_)
     {
         var rtn = new ListStringStringPair();
+        rtn.Add(new(_group.Description(), ToDataBase.GetDatabaseType(typeof(string))));
+
         if (product_ == (long)SelectData.ECLUSION)
         {
-            //return _group.Description() + ",Duration,Days,Count";
-            rtn.Add(new(_group.Description(), ToDataBase.GetDatabaseType(typeof(string))));
+            // 全て
             rtn.Add(new("Duration", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
             rtn.Add(new("Days", ToDataBase.GetDatabaseType(typeof(long))));
             rtn.Add(new("Count", ToDataBase.GetDatabaseType(typeof(long))));
@@ -292,7 +274,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
             return rtn;
         }
 
-        rtn.Add(new(_group.Description(),ToDataBase.GetDatabaseType(typeof(string))));
+        // プロダクト毎
         foreach (var product in _listProduct)
         {
             rtn.Add(new($"{product}_Duration", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
@@ -301,6 +283,12 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         }
         return rtn;
     }
+
+    /// <summary>
+    /// リストしたデータ
+    /// </summary>
+    /// <param name="product_"></param>
+    /// <returns></returns>
     public IEnumerable<List<string>> ListValue(long product_)
     {
         var rtn = new List<List<string>>();
@@ -310,36 +298,34 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
             var listCount = this[key];
 
             var add = new List<string>();
-
             add.Add($"{key}");
             if (product_ == (long)SelectData.ECLUSION)
             {
+                // 全て
                 var sum = new TimeSpan(listCount.Sum(x => x.DurationDuplication().Ticks));
                 var days = new HashSet<DateTime>(listCount.Select(x => x.CheckOutDateTime.Date));
 
                 add.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
                 add.Add($"{days.Count}");
                 add.Add($"{listCount.Count}");
+                rtn.Add(add);
+
+                continue;
             }
-            else
+            // プロダクト毎
+            foreach (var product in _listProduct)
             {
-                foreach (var product in _listProduct)
-                {
-                    var listProduct = listCount.Where(x_ => x_.Product == product);
-                    var sum = new TimeSpan(listProduct.Sum(x => x.DurationDuplication().Ticks));
-                    var days = new HashSet<DateTime>(listProduct.Select(x => x.CheckOutDateTime.Date));
+                var listProduct = listCount.Where(x_ => x_.Product == product);
+                var sum = new TimeSpan(listProduct.Sum(x => x.DurationDuplication().Ticks));
+                var days = new HashSet<DateTime>(listProduct.Select(x => x.CheckOutDateTime.Date));
 
-                    add.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
-                    add.Add($"{days.Count}");
-                    add.Add($"{listProduct.Count()}");
-                }
+                add.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
+                add.Add($"{days.Count}");
+                add.Add($"{listProduct.Count()}");
             }
-
             rtn.Add(add);
 
         }
         return rtn;
-
     }
-
 }

@@ -34,6 +34,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     {
         if (list_.Count() < 10)
         {
+            // smail
             Product = list_[1];
             Version = list_[2];
             User = list_[3];
@@ -48,6 +49,8 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
         }
         else
         {
+            // std
+            // detailed
             Product = list_[1];
             Version = list_[2];
             Pool = list_[3];
@@ -72,7 +75,6 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
         }
     }
 
-    //public const LogEventType LogType = LogEventType.CheckOut;
     //checkout
     //OUT product version pool# user  host      “isv_def” count         cur_use      cur_resuse server_handle share_handle process_id “project” “requested product” “requested version” mm/dd hh:mm:ss
     //OUT product version pool# user  host      “isv_def” count         cur_use      cur_resuse server_handle share_handle process_id “project” “requested product” “requested version” mm/dd hh:mm:ss.tenths_of_msec “client_machine_os_info” “application argv0” roam_days roam_handle client-ip-address
@@ -125,13 +127,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     /// <param name="checkIn_"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsFindCheckIn(LogEventCheckIn checkIn_)=> (checkIn_.HandleServer == HandleServer) && (checkIn_.EventNumber > EventNumber);
-    //{
-    //    // ハンドルが一致する最初のチェックイン イベント(Findで探す)
-    //    //return (checkIn_.HandleServer != HandleServer) ? false : (checkIn_.EventNumber < EventNumber) ? false : true;
-    //    return (checkIn_.HandleServer == HandleServer)&&(checkIn_.EventNumber > EventNumber) ;
-
-    //}
+    public bool IsFindCheckIn(LogEventCheckIn checkIn_)=> IsFindCheckIn(checkIn_.HandleServer, checkIn_.EventNumber);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsFindCheckIn(string hande_,long number_) => (hande_ == HandleServer) && (number_ > EventNumber);

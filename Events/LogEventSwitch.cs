@@ -32,6 +32,9 @@ internal sealed class LogEventSwitch : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventSwitch(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Switch = (list_[1] == "to") ? SwitchType.TO : SwitchType.FROM;
         OldReportLogName = list_[2];
         EventDateTime = NowDateTime;

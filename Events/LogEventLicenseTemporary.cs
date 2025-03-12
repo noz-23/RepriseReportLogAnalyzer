@@ -32,6 +32,9 @@ internal sealed class LogEventLicenseTemporary : LogEventBase, ILogEventUserHost
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventLicenseTemporary(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         switch (list_[1])
         {
             default:

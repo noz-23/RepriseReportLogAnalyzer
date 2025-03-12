@@ -30,6 +30,9 @@ internal sealed class LogEventRepProcessed : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventRepProcessed(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Version = list_[3];
 
         EventDateTime = NowDateTime;

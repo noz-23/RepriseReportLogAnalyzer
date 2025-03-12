@@ -45,11 +45,29 @@ interface ILogEventWhy
 
 interface IAnalysisOutputFile
 {
+    /// <summary>
+    /// 書き出しヘッダー
+    /// </summary>
+    /// <param name="select_"></param>
+    /// <returns></returns>
     string Header(long select_);
+    /// <summary>
+    /// テキストの書き出し
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <param name="select_"></param>
     void WriteText(string path_, long select_);
-
+    /// <summary>
+    /// リスト化したヘッダー
+    /// </summary>
+    /// <param name="select_"></param>
+    /// <returns></returns>
     ListStringStringPair ListHeader(long select_);
+    /// <summary>
+    /// リスト化したデータ
+    /// </summary>
+    /// <param name="select_"></param>
+    /// <returns></returns>
     IEnumerable<List<string>> ListValue(long select_);
 
-    //IEnumerable<KeyValuePair<string, long>> ListSelect { get; }
 }

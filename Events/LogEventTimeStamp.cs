@@ -22,6 +22,9 @@ internal sealed class LogEventTimeStamp : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventTimeStamp(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         EventDateTime = DateTime.Parse(list_[0] + " " + list_[1]);
     }
 

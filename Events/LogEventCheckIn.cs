@@ -33,6 +33,7 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     {
         if (list_.Count() < 4)
         {
+            // small
             Why = int.Parse(list_[1]);
             Count = int.Parse(list_[2]);
             HandleServer = list_[3];
@@ -41,6 +42,8 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
         }
         else
         {
+            // std
+            // detailed
             Why = int.Parse(list_[1]);
             Product = list_[2];
             Version = list_[3];

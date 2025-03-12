@@ -51,8 +51,15 @@ internal sealed class AnalysisLicenseCount:ToDataBase
     /// </summary>
     public SortedDictionary<string, int> OutInProduct { get; private set; }
 
-
+    /// <summary>
+    /// 文字列化
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => string.Join(",", ListValue());
+    /// <summary>
+    /// リスト化したデータ
+    /// </summary>
+    /// <returns></returns>
     public List<string> ListValue()
     {
         var rtn =new List<string>();

@@ -33,7 +33,6 @@ internal sealed class AnalysisStartShutdown:ToDataBase
         _joinEvent = new JoinEventStartShutdown(start_, shutdown_);
     }
 
-
     /// <summary>
     /// スタート イベント番号
     /// </summary>
@@ -121,14 +120,14 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     }
 
     /// <summary>
-    /// 文字列化
+    /// ヘッダー
     /// </summary>
-    //public override string ToString()
-    //{
-    //    return $"{StartDateTime.ToString()},{ShutdownDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")}";
-    //}
     public static string Header() => ToDataBase.Header(typeof(AnalysisStartShutdown));
 
+    /// <summary>
+    /// リスト化したヘッダー項目
+    /// </summary>
+    /// <returns></returns>
     public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisStartShutdown));
 
 

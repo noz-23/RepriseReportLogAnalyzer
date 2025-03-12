@@ -31,6 +31,9 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventShutdown(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         User = list_[1];
         Host = list_[2];
         //

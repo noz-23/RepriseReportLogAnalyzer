@@ -30,6 +30,9 @@ internal sealed class LogEventTimeZone : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventTimeZone(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         MinutesWestOfUTC = list_[1];
         DayLight = list_[2];
         Rules = list_[3];

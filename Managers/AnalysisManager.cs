@@ -55,12 +55,37 @@ class AnalysisManager : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName_));
     }
 
+    /// <summary>
+    /// プロダクトの画面表示
+    /// </summary>
     public ObservableCollection<LicenseView> ListResultProduct { get; private set; } = new();
+
+    /// <summary>
+    /// グループのデータ表示
+    /// </summary>
 
     public ObservableCollection<LicenseView> ListResultGroup { get; private set; } = new();
 
+    /// <summary>
+    /// カレンダーの開始
+    /// </summary>
+    public DateTime? StartDate { get => (ListDate.Count() == 0) ? null : ListDate.FirstOrDefault(); }
+
+    /// <summary>
+    /// カレンダーの終了
+    /// </summary>
+    public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.LastOrDefault(); }
+
+
+    /// <summary>
+    /// 出力用の管理
+    /// </summary>
     private List<IAnalysisOutputFile> _listAnalysis = new();
 
+    /// <summary>
+    /// 解析利用
+    /// </summary>
+    private ConvertReportLog _convertReportLog = new();
     private readonly ListAnalysisStartShutdown _listStartShutdown = new();
     private readonly ListAnalysisCheckOutIn _listCheckOutIn = new();
     private readonly ListAnalysisLicenseCount _listLicenseCount = new();
@@ -69,7 +94,9 @@ class AnalysisManager : INotifyPropertyChanged
     private readonly ListAnalysisLicenseHost _listHostDuration = new();
     private readonly ListAnalysisLicenseUserHost _listUserHostDuration = new();
 
-    private ConvertReportLog _convertReportLog =new ();
+    /// <summary>
+    /// 読み込んだファイル
+    /// </summary>
     private List<string> _listFile = new();
 
     /// <summary>
@@ -77,28 +104,27 @@ class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     private ProgressCountDelegate? _progressCount = null;
     //
-    //private readonly Dictionary<DateTime, IEnumerable<LicenseView>> _listDateToView = new Dictionary<DateTime, IEnumerable<LicenseView>>();
-    //private Dictionary<DateTime, IEnumerable<LicenseView>> ListDayToProduct() => _listLicenseCount.ListDayToProduct();
-
-    //private readonly Dictionary<string, bool> _listProductChecked = new ();
-
-
     // _convertReportLog があるが確実にデータがはいっているタイミングで更新する
     public SortedSet<string> ListProduct { get; private set; } = new();
-
     public SortedSet<(string Product,string Version)> ListProductVersion { get; private set; } = new();
-
     public SortedSet<string> ListUser { get; private set; } = new();
     public SortedSet<string> ListHost { get; private set; } = new();
     public SortedSet<string> ListUserHost { get; private set; } = new();
     public SortedSet<DateTime> ListDate { get; private set; } = new();
 
-    public DateTime? StartDate { get => (ListDate.Count() == 0) ? null : ListDate.FirstOrDefault(); }
-    public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.LastOrDefault(); }
+    /// <summary>
+    /// 解析処理開始時間
+    /// </summary>
+    private DateTime? _runStartTime =null ;
+    /// <summary>
+    /// 解析処理終了時間
+    /// </summary>
+    private DateTime? _runEndTime = null;
 
-
-    private DateTime? _startTime =null ;
-    private DateTime? _endTime = null;
+    /// <summary>
+    /// 各処理のプログレスバー設定
+    /// </summary>
+    /// <param name="progressCount_"></param>
     public void SetProgressCount(ProgressCountDelegate progressCount_)
     {
         _progressCount = progressCount_;
@@ -112,7 +138,10 @@ class AnalysisManager : INotifyPropertyChanged
 
     }
 
-    public void Clear()
+    /// <summary>
+    /// 処理クリア
+    /// </summary>
+    private void _clear()
     {
         ListProduct.Clear();
         ListProductVersion.Clear();
@@ -121,59 +150,55 @@ class AnalysisManager : INotifyPropertyChanged
         ListUserHost.Clear();
         ListDate.Clear();
         //
-        //_listProductChecked.Clear();
-
-        //
         _listStartShutdown.Clear();
         _listCheckOutIn.Clear();
         _listLicenseCount.Clear();
         _listUserDuration.Clear();
         _listHostDuration.Clear();
         _listUserHostDuration.Clear();
-
-        _startTime = null;
-        _endTime = null;
+        //
+        _runStartTime = null;
+        _runEndTime = null;
     }
 
+    /// <summary>
+    /// ファイルの変換解析
+    /// </summary>
+    /// <param name="listFile"></param>
     public void Analysis(IEnumerable<string> listFile)
     {
-        _startTime??= DateTime.MinValue;
+        _runStartTime ??= DateTime.MinValue;
 
         _listFile.AddRange(listFile);
+        //
+        _clear();
+        //
+        _convert(); // 変換
+        _analysis(); // 解析
 
-        _convert();
-        //_calendarShow(analysis.ListDate);
-
-        //AnalysisManager.Instance.Analysis(analysis);
-        _analysis();
-
-        _endTime ??= DateTime.MinValue;
+        _runEndTime ??= DateTime.MinValue;
 
     }
 
+    /// <summary>
+    /// 変換処理
+    /// </summary>
     private void _convert() 
     {
-        //int count = 0;
         int max = _listFile.Count();
-        //_progressCount?.Invoke(0, max, _ANALYSIS);
-
-        //var analysis = new AnalysisReportLog();
         foreach (string path_ in _listFile)
         {
             LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
             _convertReportLog.Start(path_);
-            //_progressCount?.Invoke(++count, max);
         }
         _convertReportLog.End();
     }
-    //public void Analysis(AnalysisReportLog analysis_)
+
+    /// <summary>
+    /// 解析処理
+    /// </summary>
     private void _analysis()
     {
-        //_analysis = analysis_;
-
-        Clear();
-        //
-        //ListProduct.AddRange(_convertReportLog.ListProductEvent.Select(x_ => x_.Product));
         ListProduct.AddRange(_convertReportLog.ListProduct);
         ListProductVersion.AddRange(_convertReportLog.ListProductEvent.Select(x_=>(x_.Product,x_.Version)));
 
@@ -182,13 +207,8 @@ class AnalysisManager : INotifyPropertyChanged
         ListUserHost.AddRange(_convertReportLog.ListUserHost);
         ListDate.AddRange(_convertReportLog.ListDate);
         //
-        //foreach (var product in ListProduct)
-        //{
-        //    _listProductChecked[product]=true;
-        //}
-        //
         _listStartShutdown.Analysis(_convertReportLog);
-        _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListWithoutSkip());
+        _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListNoIncludeSkip());
         _listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
         //
         _listUserDuration.Analysis(ListUser, _listCheckOutIn);
@@ -196,15 +216,14 @@ class AnalysisManager : INotifyPropertyChanged
         _listUserHostDuration.Analysis(ListUserHost, _listCheckOutIn);
 
         //
-        //foreach (var date in ListDate)
-        //{
-        //    _listDateToView[date] = _listLicenseCount.ListDayToProduct(date);
-        //}
-
-        //
         _notifyPropertyChanged("StartDate");
         _notifyPropertyChanged("EndDate");
     }
+
+    /// <summary>
+    /// 総合データの書き出し
+    /// </summary>
+    /// <param name="path_"></param>
     public void WriteSummy(string path_)
     {
         var list = new List<string>();
@@ -213,12 +232,11 @@ class AnalysisManager : INotifyPropertyChanged
         list.AddRange(_listFile.Select(x_ => Path.GetFileName(x_)));
         list.Add("\n");
 
-        list.Add($"Analsis Time : {_endTime - _startTime}");
-        list.Add($"Start   Time : {_startTime}");
-        list.Add($"End     Time : {_endTime}");
+        list.Add($"Analsis Time : {_runEndTime - _runStartTime}");
+        list.Add($"Start   Time : {_runStartTime}");
+        list.Add($"End     Time : {_runEndTime}");
         list.Add("\n");
-
-
+        //
         list.Add($"License Count : {ListProduct.Count()}");
         list.AddRange(ListProductVersion.Select(x_ => $"{x_.Product},{x_.Version}"));
         list.Add("\n");
@@ -243,10 +261,22 @@ class AnalysisManager : INotifyPropertyChanged
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
 
+    /// <summary>
+    /// 変換系のテキストファイル出力
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <param name="classType_"></param>
+
     public void WriteText(string path_, Type classType_)
     {
         _convertReportLog.WriteEventText(path_, classType_);
     }
+    /// <summary>
+    /// 解析系のテキストファイル出力
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <param name="classType_"></param>
+    /// <param name="selected_"></param>
     public void WriteText(string path_, Type classType_, long selected_)
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
@@ -254,75 +284,57 @@ class AnalysisManager : INotifyPropertyChanged
 
     }
 
-
-
+    /// <summary>
+    /// 変換系のリスト化したデータ
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <returns></returns>
     public IEnumerable<List<string>> ListEventValue(Type classType_)=> _convertReportLog.ListEvent(classType_).Select(x => x.ListValue(classType_));
 
+    /// <summary>
+    /// 解析系のヘッダー
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <param name="selected_"></param>
+    /// <returns></returns>
     public string EventHeader(Type classType_, long selected_) => _listAnalysis.Find(f_ => f_.GetType() == classType_)?.Header(selected_) ?? default;
 
+    /// <summary>
+    /// 解析系のリスト化したヘッダー
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <param name="selected_"></param>
+    /// <returns></returns>
     public ListStringStringPair ListEventHeader(Type classType_, long selected_)=> _listAnalysis.Find(f_ => f_.GetType() == classType_)?.ListHeader(selected_) ?? default;
 
 
+    /// <summary>
+    /// 解析系のリスト化したデータ
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <param name="selected_"></param>
+    /// <returns></returns>
     public IEnumerable<List<string>> ListEventValue(Type classType_, long selected_)
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
-
         return find?.ListValue(selected_) ?? default;
-
     }
-    public IEnumerable<T> ListEvent<T>() where T : LogEventBase => _convertReportLog.ListEvent<T>();
 
-    //public List<LogEventBase> ListStart() 
-    //{
-    //    return new(ListEvent<LogEventStart>());
-    // }
-    //public IEnumerable<object> ListEvent(Type classType_)=>
-    //{ 
-    //_convertReportLog.ListEvent(classType_);
-    //}
-
-    //public void WriteText(string outFolder_)
-    //{
-    //    WriteSummy(outFolder_ + @"\Analysis.txt");
-
-    //    _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdown.csv", (long)SelectData.ECLUSION);
-    //    _listStartShutdown.WriteText(outFolder_ + @"\ListAnalysisStartShutdownAll.csv");
-    //    //
-    //    _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutIn.csv");
-    //    _listCheckOutIn.WriteText(outFolder_ + @"\ListAnalysisCheckOutInDuplication.csv", (long)SelectData.ECLUSION);
-    //    _listCheckOutIn.WriteDuplicationText(outFolder_ + @"\ListJoinEventCheckOutIn.csv");
-    //    //
-    //    _listLicenseCount.WriteText(outFolder_ + @"\ListAnalysisLicenseCount.csv");
-    //    _listLicenseCount.WriteText(outFolder_ + @"\LicenseCountDate.csv", TimeSpan.TicksPerDay);
-    //    _listLicenseCount.WriteText(outFolder_ + @"\LicenseCountHour.csv", TimeSpan.TicksPerHour);
-    //    _listLicenseCount.WriteText(outFolder_ + @"\LicenseCount30Minute.csv", TimeSpan.TicksPerMinute * 30);
-    //    //
-    //    _listUserDuration.WriteText(outFolder_ + @"\DurationUser.csv",(long) SelectData.ALL);
-    //    _listHostDuration.WriteText(outFolder_ + @"\DurationHost.csv", (long)SelectData.ALL);
-    //    _listUserHostDuration.WriteText(outFolder_ + @"\DurationUserHost.csv", (long)SelectData.ALL);
-
-    //}
-
+    /// <summary>
+    /// 画面のプロダクト表示のチェック状態
+    /// </summary>
+    /// <param name="product_"></param>
+    /// <returns></returns>
     public bool IsProductChecked(string product_) => ListResultProduct.Where(x_ => x_.Name == product_).Select(x_ => x_.IsChecked).FirstOrDefault();
-    //{
-    //foreach (var view in ListResultProduct)
-    //{
-    //    if (view.Name == product_)
-    //    {
-    //        return view.IsChecked;
-    //    }
-    //}
-    //return true;
-    //}
 
+    /// <summary>
+    /// 画面のデータ表示更新
+    /// </summary>
+    /// <param name="date_"></param>
+    /// <param name="group_"></param>
 
     public void SetData(DateTime? date_, AnalysisGroup group_)
     {
-        //if (_convertReportLog.ListEvent.Count() == 0)
-        //{
-        //    return;
-        //}
-
         // Product は使いまわし(チェックのため)
         foreach (var view in _listLicenseCount.ListView(date_))
         {
@@ -343,99 +355,16 @@ class AnalysisManager : INotifyPropertyChanged
         _notifyPropertyChanged("ListResultGroup");
     }
 
-    //public void SetAllPlot(WpfPlot plot_)
-    //{
-    //    plot_.Plot.Clear();
-    //    plot_.Plot.Title("Product Date - Count");
-    //    plot_.Plot.XLabel("Date");
-    //    plot_.Plot.YLabel("Count");
-    //    //var listX = new List<double>();
-    //    var listYProduct = new List<LicenseView>();
-
-    //    foreach (var date in ListDate) 
-    //    {
-    //        listYProduct.AddRange(_listLicenseCount.ListLicenseProduct(date));
-    //    }
-
-    //    foreach (var product in ListProduct)
-    //    {
-    //        if (IsChecked(product) == false)
-    //        {
-    //            continue;
-    //        }
-
-    //        var listYCount = listYProduct.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count);
-    //        var listYMax = listYProduct.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Max);
-
-    //        var plotCount = plot_.Plot.Add.Scatter(ListDate.ToArray(), listYCount.ToArray());
-    //        plotCount.LegendText= product + " Count";
-    //        var plotMax = plot_.Plot.Add.Scatter(ListDate.ToArray(), listYMax.ToArray());
-    //        plotMax.LegendText = product + " Max";
-    //    }
-
-    //    plot_.Plot.Axes.DateTimeTicksBottom();
-    //    plot_.Refresh();
-    //}
-
-    //public void SetDatePlot(WpfPlot plot_, DateTime date_, int group_)
-    //{
-    //    plot_.Plot.Clear();
-    //    plot_.Plot.Title($"Product {date_.ToShortDateString()} - Count");
-    //    plot_.Plot.XLabel("Time(30 Minitue)");
-    //    plot_.Plot.YLabel("Count");
-
-    //    long timeSpan = 30 * TimeSpan.TicksPerMinute;
-
-    //    var listX = new List<DateTime>();
-    //    var listYProduct = new List<LicenseView>();
-
-    //    for (var time = date_; time < date_.AddTicks(TimeSpan.TicksPerDay); time = time.AddTicks(timeSpan))
-    //    {
-    //        listX.Add(time);
-
-    //        switch ((ANALYSIS_GROUP)group_)
-    //        {
-    //            case ANALYSIS_GROUP.USER:
-    //                break;
-    //            case ANALYSIS_GROUP.HOST:
-    //                break;
-    //            case ANALYSIS_GROUP.USER_HOST:
-    //                break;
-    //            case ANALYSIS_GROUP.NONE:
-    //            default:
-    //                listYProduct.AddRange(_listLicenseCount.ListLicenseProduct(time, timeSpan));
-    //                break;
-    //        }
-    //    }
-
-    //    foreach (var product in ListProduct)
-    //    {
-    //        if (IsChecked(product) == false)
-    //        {
-    //            continue;
-    //        }
-
-    //        var listYCount = listYProduct.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count);
-    //        var listYMax = listYProduct.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Max);
-
-    //        var plotCount = plot_.Plot.Add.Scatter(listX.ToArray(), listYCount.ToArray());
-    //        plotCount.LegendText = product + " Count";
-    //        var plotMax = plot_.Plot.Add.Scatter(listX.ToArray(), listYMax.ToArray());
-    //        plotMax.LegendText = product + " Max";
-    //    }
-
-    //    plot_.Plot.Axes.DateTimeTicksBottom();
-    //    plot_.Refresh();
-
-    //}
-
+    /// <summary>
+    /// 表の表示更新
+    /// </summary>
+    /// <param name="plot_"></param>
+    /// <param name="date_"></param>
+    /// <param name="group_"></param>
     public void SetPlot(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
     {
         plot_.Plot.Clear();
-        //if (_convertReportLog.ListEvent.Count() == 0)
-        //{
-        //    return;
-        //}
+
         var title = string.Empty;
         var xlabel = (date_ ==null) ? $"Date":$"[{date_.GetValueOrDefault().ToShortDateString()}] Time (30 Minute)";
         var ylabel = string.Empty;
@@ -483,7 +412,7 @@ class AnalysisManager : INotifyPropertyChanged
         }
 
         var listY = new Dictionary<string, List<double>>();
-        switch ((AnalysisGroup)group_)
+        switch (group_)
         {
             case AnalysisGroup.USER: listY = _listUserDuration.ListPlot(listX, timeSpan); break;
             case AnalysisGroup.HOST: listY = _listHostDuration.ListPlot(listX, timeSpan); break;

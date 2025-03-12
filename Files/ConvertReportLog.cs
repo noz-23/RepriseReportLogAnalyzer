@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.IO;
@@ -33,7 +32,6 @@ internal sealed class ConvertReportLog
     /// 変換内容
     /// </summary>
     private const string _CONVERT = "[File Read]";
-
 
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
@@ -63,12 +61,9 @@ internal sealed class ConvertReportLog
                 {
                     _listEvent.Add(eventBase);
                 }
-                //ProgressCount?.Invoke(++count, max, $"{_CONVERT}[{Path.GetFileName(filePath_)}]");
             }
             ProgressCount?.Invoke(max, max, $"{_CONVERT}[{Path.GetFileName(filePath_)}]");
             //
-
-            //ListEvent?.AddRange(File.ReadAllLines(filePath_).Where(s_ => string.IsNullOrEmpty(s_) == false).Select(s_ => LogEventBase.EventData(s_)).Where(x_=>x_!=null));
             LogFile.Instance.WriteLine($"Read:{_listEvent.Count()}");
         }
     }
@@ -81,12 +76,7 @@ internal sealed class ConvertReportLog
         // ログの収量はシャットダウンとして扱う
         var end = new LogEventShutdown();
         _listEvent.Add(end);
-
-        //_endTime ??= DateTime.Now;
     }
-
-    //private DateTime? _startTime =null ;
-    //private DateTime? _endTime = null;
 
     /// <summary>
     /// ログ イベント一覧
@@ -94,61 +84,84 @@ internal sealed class ConvertReportLog
     private List<LogEventBase> _listEvent = new();
 
     /// <summary>
-    /// 
+    /// スタート イベント
     /// </summary>
     public IEnumerable<LogEventStart> ListStart { get => ListEvent<LogEventStart>(); }
 
     /// <summary>
-    /// 
-    /// </summary>
-    public IEnumerable<LogEventLogFileEnd> ListEnd { get => ListEvent<LogEventLogFileEnd>(); }
-
-    /// <summary>
-    /// 
+    /// シャットダウン イベント
     /// </summary>
     public IEnumerable<LogEventShutdown> ListShutdown { get => ListEvent<LogEventShutdown>(); }
 
-
+    /// <summary>
+    /// プロダクト
+    /// </summary>
     public IEnumerable<string> ListProduct
     {
         get => ListProductEvent.Select(x_ => x_.Product).Distinct();
     }
 
+    /// <summary>
+    /// プロダクトを持ってる イベント
+    /// </summary>
     public IEnumerable<ILogEventProduct> ListProductEvent
     {
         get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct).Where(e_ => string.IsNullOrEmpty(e_?.Product ??string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);
     }
 
+    /// <summary>
+    /// ユーザー
+    /// </summary>
     public IEnumerable<string> ListUser
     {
         get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser).Select(e_ => e_?.User ??string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();
     }
 
-
+    /// <summary>
+    /// ホスト
+    /// </summary>
     public IEnumerable<string> ListHost
     {
         get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();
     }
 
+    /// <summary>
+    /// ユーザーホスト
+    /// </summary>
     public IEnumerable<string> ListUserHost
     {
         get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct();
     }
 
+    /// <summary>
+    /// 時間
+    /// </summary>
     public IEnumerable<DateTime> ListDateTime
     {
         get => _listEvent.AsParallel().Select(e_ => e_.EventDateTime).Where(e_ => e_ != LogEventBase.NotAnalysisEventTime).Distinct().OrderBy(x_ => x_);
     }
 
+    /// <summary>
+    /// 日付
+    /// </summary>
     public IEnumerable<DateTime> ListDate
     {
         get => ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct();
     }
 
+    /// <summary>
+    /// イベント リスト抽出(出力系で利用)
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <returns></returns>
     public IEnumerable<LogEventBase> ListEvent(Type classType_)=> _listEvent.AsParallel().AsOrdered().Where(e_ => e_.GetType() == classType_);
-    //{
-    //    return _listEvent.AsParallel().AsOrdered().Where(e_ => e_.GetType() == classType_);
-    //}
+
+    /// <summary>
+    /// イベント リスト抽出
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="ss_"></param>
+    /// <returns></returns>
     public IEnumerable<T> ListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase
     {
         if (ss_ == null)
@@ -157,50 +170,22 @@ internal sealed class ConvertReportLog
         }
         return _listEvent.AsParallel().Where(e_ => (e_ is T) && (ss_.IsWithInRange(e_.EventNumber) == true)).Select(e_ => e_ as T);
     }
-    //private Dictionary<Type, List<LogEventBase>> _listEvent = new();
 
+    /// <summary>
+    /// データ文字列変換
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <returns></returns>
+    private IEnumerable<string> _listToString(Type classType_) => ListEvent(classType_).Select(e_ => e_.ToString());
 
-
-    private List<string> _listToString(Type classType_)
-    {
-        //var rtn = new List<string>();
-
-        //var method = this.GetType().GetMethods().FirstOrDefault(x_ => x_.Name == nameof(_listToString) && x_.IsGenericMethod == true);
-        //method?.MakeGenericMethod(classType_);
-        ////
-        //List<string> list = method?.Invoke(this, null) as List<string>;
-        //LogFile.Instance.WriteLine($"_listToString [{classType_}] [{list.Count}]");
-        var list = ListEvent(classType_).Select(e_=>e_.ToString());
-
-        //foreach (var data in list)
-        //{
-        //    rtn.Add(data.ToString());
-        //}
-
-        //return rtn;
-
-        return ListEvent(classType_).Select(e_ => e_.ToString()).ToList();
-    }
-
-    private List<string> _listToString<T>() where T : LogEventBase
-    {
-        var rtn = new List<string>();
-        var list = ListEvent<T>();
-
-        foreach (var data in list)
-        {
-            rtn.Add(data.ToString());
-        }
-
-        return rtn;
-    }
+    private IEnumerable<string> _listToString<T>() where T : LogEventBase=> ListEvent<T>().Select(e_ => e_.ToString());
 
     public void WriteEventText(string path_, Type classType_)
     {
         var list = new List<string>();
-
-        //list.Add(_getHeader<T>());
+        // ヘッダー
         list.Add(LogEventBase.Header(classType_));
+        // データ
         list.AddRange(_listToString(classType_));
         File.WriteAllLines(path_, list, Encoding.UTF8);
 
@@ -210,28 +195,18 @@ internal sealed class ConvertReportLog
     public void WriteEventText<T>(string path_) where T : LogEventBase
     {
         var list = new List<string>();
-
-        //list.Add(_getHeader<T>());
+        // ヘッダー
         list.Add(LogEventBase.Header(typeof(T)));
+        // データ
         list.AddRange(_listToString<T>());
         File.WriteAllLines(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
 
-    //private string _getHeader<T>()
-    //{
-    //    var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Static | BindingFlags.Public);
-    //    foreach (var prop in listPropetyInfo)
-    //    {
-    //        if (prop.Name == "HEADER")
-    //        {
-    //            return prop?.GetValue(null).ToString();
-    //        }
-    //    }
-    //    return string.Empty;
-    //}
-
+    /// <summary>
+    /// プロダクトの比較
+    /// </summary>
     private class CompareProduct : IEqualityComparer<ILogEventProduct>
     {
         public bool Equals(ILogEventProduct? a_, ILogEventProduct? b_)

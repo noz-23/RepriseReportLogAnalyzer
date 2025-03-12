@@ -49,38 +49,21 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     /// </summary>
     private const string _ANALYSIS = "[CheckOut - CheckIn]";
 
+    /// <summary>
+    /// コンボボックスの項目
+    /// </summary>
     public static ListStringLongPair ListSelect
     {
         get => new()
         {
-            //new( "重複なし", JoinEventCheckOutIn.NO_DUPLICATION),
-            //new ("重複あり", JoinEventCheckOutIn.HAVE_DUPLICATION )
-            new( "重複なし", (long)SelectData.ECLUSION),
-            new ("重複あり", (long)SelectData.ALL)
+            new( "No Duplicate", (long)SelectData.ECLUSION),
+            new ("Have Duplicate", (long)SelectData.ALL)
         };
     }
-
-
-    //public string Header
-    //{
-    //    get
-    //    {
-    //        var listColunm = new List<string>();
-    //        var listPropetyInfo = typeof(AnalysisCheckOutIn).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-    //        listPropetyInfo?.ToList().ForEach(prop =>
-    //        {
-    //            listColunm.Add($"{prop.Name}");
-    //        });
-
-    //        return string.Join(",", listColunm);
-    //    }
-    //}
 
     /// <summary>
     /// 重複なしのデータリスト
     /// </summary>
-    //public IEnumerable<AnalysisCheckOutIn> ListNoDuplication() => this.Where(x_ => x_.JoinEvent().DuplicationNumber == JoinEventCheckOutIn.NO_DUPLICATION);
     public IEnumerable<AnalysisCheckOutIn> ListNoDuplication() => this.Where(x_ => x_.JoinEvent().DuplicationNumber != (long)SelectData.ECLUSION);
 
     /// <summary>
@@ -97,7 +80,7 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     {
         int count = 0;
         int max = 0;
-        int div = 0;
+        int div = 1;
         var listCheckOutIn = new Dictionary<string, List<AnalysisCheckOutIn>>();
         foreach (var startShutdown in listStartShutdown_)
         {
@@ -111,17 +94,15 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
 
             count = 0;
             max = listCheckOut.Count();
-            div = (max / 1000)+1;
+            div = (max / 100) + 1;
+
             //ProgressCount?.Invoke(0, max, _ANALYSIS + "Join");
             foreach (var checkOut in listCheckOut)
             //Parallel.ForEach(listCheckOut,async checkOut =>
             {
                 // 対応するチェックインを探す
                 var checkIn = listCheckIn.FirstOrDefault(f_ => listEnd.Contains(f_.EventNumber) == false && checkOut.IsFindCheckIn(f_.HandleServer, f_.EventNumber));
-                //var checkIn = listCheckIn.FirstOrDefault(f_ => list.Contains(f_.EventNumber) == false && checkOut.IsFindCheckIn(f_.HandleServer, f_.EventNumber));
-                //var checkIn = listCheckIn.AsParallel().AsOrdered().WithDegreeOfParallelism(4).FirstOrDefault(f_ => list.Contains(f_.EventNumber) == false && checkOut.IsFindCheckIn(f_.HandleServer, f_.EventNumber));
-                //var checkIn = listCheckIn.AsParallel().AsOrdered().WithDegreeOfParallelism(4).FirstOrDefault(f_ => list.Contains(f_.EventNumber)==false&& checkOut.IsFindCheckIn(f_));
-                //var checkIn = listCheckIn.AsParallel().AsOrdered().Where(f_=>f_.HandleServer == checkOut.HandleServer).FirstOrDefault(f_ =>f_.EventNumber> checkOut.EventNumber);
+                //var checkIn = listCheckIn.AsParallel().AsOrdered().FirstOrDefault(f_ =>　listEnd.Contains(f_.EventNumber) == false && f_.EventNumber> checkOut.EventNumber);
                 var data = new AnalysisCheckOutIn(checkOut, checkIn);
                 this.Add(data);
 
@@ -210,49 +191,37 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     public void WriteText(string path_, long duplication_ = 0)
     {
         var list = new List<string>();
+        // ヘッダー
         list.Add(Header(duplication_));
-
-        //list.AddRange(_listToString(duplication_));
+        // データ
         list.AddRange(ListValue(duplication_).Select(x_=>string.Join(",",x_)));
         File.WriteAllLines(path_, list, Encoding.UTF8);
     }
 
-
     /// <summary>
-    /// ファイル保存(結合情報)
+    /// ヘッダー
     /// </summary>
-    /// <param name="path_">パス</param>
-    //public void WriteDuplicationText(string path_)
-    //{
-    //    var list = new List<string>();
-    //    list.Add(Header);
-    //    list.AddRange(ListJointEvetn().Select(x_ => x_.ToString()));
-    //    File.WriteAllLines(path_, list, Encoding.UTF8);
-    //}
-
+    /// <param name="duplication_"></param>
+    /// <returns></returns>
     public string Header(long duplication_) => AnalysisCheckOutIn.Header();
-
+    
     /// <summary>
-    /// 文字列リスト化
+    /// リスト化したヘッダー項目
     /// </summary>
-    /// <param name="duplication_">ture:重複なし</param>
-    //private List<string> _listToString(long duplication_)
-    //{
-    //    var rtn = new List<string>();
-    //    var list = (duplication_ == (long)(SelectData.ALL)) ? this : ListNoDuplication();
-    //    list.ToList().ForEach(data => rtn.Add(data.ToString(duplication_)));
-
-    //    return rtn;
-    //}
+    /// <param name="duplication_"></param>
+    /// <returns></returns>
     public ListStringStringPair ListHeader(long duplication_) => AnalysisCheckOutIn.ListHeader();
 
-
+    /// <summary>
+    /// リスト化したデータ項目
+    /// </summary>
+    /// <param name="duplication_"></param>
+    /// <returns></returns>
 
     public IEnumerable<List<string>> ListValue(long duplication_)
     {
         var list = (duplication_ == (long)(SelectData.ALL)) ? this : ListNoDuplication();
         return list.Select(x_ => (duplication_ == (long)(SelectData.ALL)) ? x_.ListValue() :x_.ListDuplicationValue());
     }
-
 
 }

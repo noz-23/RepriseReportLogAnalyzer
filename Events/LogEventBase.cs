@@ -7,10 +7,9 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
-using System.Reflection;
-using RepriseReportLogAnalyzer.Data;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -83,20 +82,38 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
         return true;
     }
 
+    /// <summary>
+    /// 現在時間を取り扱わない時間として利用する
+    /// </summary>
     public readonly static DateTime NotAnalysisEventTime = DateTime.Now;
 
 
+    /// <summary>
+    /// 現在のイベント時間
+    /// </summary>
     public static DateTime NowDateTime = NotAnalysisEventTime;
+    /// <summary>
+    /// 現在のイベント番号(重複なし)
+    /// </summary>
     public static long NowEventNumber = 0;
 
 
+    /// <summary>
+    /// 日付設定に利用
+    /// </summary>
     protected static long _NowYear { get => NowDateTime.Year; }
     protected static long _NowMonth { get => NowDateTime.Month; }
     protected static string _NowDate { get => NowDateTime.ToString("MM/dd/yyyy"); }
-    //
+
+    /// <summary>
+    /// イベント番号
+    /// </summary>
     [Sort(1)]
     public long EventNumber { get; protected set; } = 0;
-    //
+    
+    /// <summary>
+    /// イベント時間
+    /// </summary>
     [Sort(2)]
     public DateTime EventDateTime
     {
@@ -109,6 +126,10 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     }
     private DateTime _eventDateTime;
 
+    /// <summary>
+    /// イベント日付
+    /// </summary>
+    /// <returns></returns>
     public DateTime EventDate() => EventDateTimeUnit(TimeSpan.TicksPerDay);
 
     /// <summary>
@@ -211,54 +232,6 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
         var year = (month < _NowMonth) ? (_NowYear + 1) : (_NowYear);
         return DateTime.Parse(date_ + "/" + year + " " + time_);
     }
-
-    ///// <summary>
-    ///// 文字列化のヘッダー
-    ///// </summary>
-    ///// <param name="classType_">子のクラス</param>
-    ///// <returns></returns>
-    //public static string Header(Type classType_) => string.Join(",", ListHeader(classType_));
-
-    ///// <summary>
-    ///// リスト化したヘッダーの文字列
-    ///// </summary>
-    ///// <param name="classType_"></param>
-    ///// <returns></returns>
-    //public static List<string> ListHeader(Type classType_)
-    //{
-    //    var rtn = new List<string>();
-    //    var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-    //    listPropetyInfo?.ToList().ForEach(prop =>
-    //    {
-    //        rtn.Add($"{prop.Name}");
-    //    });
-
-    //    return rtn;
-    //}
-
-    ///// <summary>
-    ///// 文字列化
-    ///// </summary>
-    ///// <returns></returns>
-    //public override string ToString()=> string.Join(",", ListValue(this.GetType()));
-
-    ///// <summary>
-    ///// リスト化したデータ(文字)
-    ///// </summary>
-    ///// <param name="classTyep_"></param>
-    ///// <returns></returns>
-    //public List<string> ListValue(Type classTyep_)
-    //{
-    //    var rtn = new List<string>();
-    //    var listPropetyInfo = classTyep_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-    //    listPropetyInfo?.ToList().ForEach(prop =>
-    //    {
-    //        rtn.Add($"{prop.GetValue(this)}");
-    //    });
-    //    return rtn;
-    //}
 
     /// <summary>
     /// 比較処理

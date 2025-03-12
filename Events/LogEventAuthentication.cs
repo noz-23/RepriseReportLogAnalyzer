@@ -30,6 +30,9 @@ internal sealed class LogEventAuthentication : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventAuthentication(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Section = list_[1];
         Signature = list_[2];
 

@@ -33,6 +33,9 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
 
     public LogEventDynamicReservation(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Reservation = (list_[1] == "create") ? ReservationType.CREATE : ReservationType.REMOVE;
         User = list_[2];
         Host = list_[3];

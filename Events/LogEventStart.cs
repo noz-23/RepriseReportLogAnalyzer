@@ -31,9 +31,9 @@ internal sealed class LogEventStart : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventStart(string[] list_) : base()
     {
-        //LogEventBase.ListEventData.Add("START", (l_) => new LogEventStart(l_));
-        //var start= LogEventBase.ListEventData["START"] = (l_) => new LogEventStart(l_);
-
+        // small
+        // std
+        // detailed
         HostName = list_[1];
         EventDateTime = DateTime.Parse(list_[2] + " " + list_[3]);
     }

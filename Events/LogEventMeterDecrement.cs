@@ -30,6 +30,9 @@ internal sealed class LogEventMeterDecrement : LogEventBase
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventMeterDecrement(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         HandleLicense = list_[1];
         CounterMeter = list_[2];
         AmountDecremented = list_[3];

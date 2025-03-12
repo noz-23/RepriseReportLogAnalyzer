@@ -22,23 +22,20 @@ namespace RLMLogReader.Extensions;
 /// </summary>
 public static class DbConnectionExtension
 {
-    //public static void CreateTable<T>(this DbConnection src_) => CreateTable(src_, typeof(T));
-    //{
-    //    try
-    //    {
-    //        src_.Query(_createTabel<T>());
-    //    }
-    //    catch (Exception ex_)
-    //    {
-    //        LogFile.Instance.WriteLine(ex_.Message);
-    //    }
-    //}
-
+    /// <summary>
+    /// データベースにテーブル作成
+    /// </summary>
+    /// <param name="src_"></param>
+    /// <param name="classType_"></param>
+    /// <param name="list_"></param>
     public static void CreateTable(this DbConnection src_, Type classType_, ListStringStringPair ?list_ =null)
     {
+        list_ ??= ToDataBase.ListHeader(classType_);
+
+        LogFile.Instance.WriteLine($"[{classType_.Name}] [{list_.Count()}]");
+
         try
         {
-            list_ ??= ToDataBase.ListHeader(classType_);
             src_.Execute(_createTabel(classType_, list_));
         }
         catch (Exception ex_)
@@ -47,10 +44,17 @@ public static class DbConnectionExtension
         }
     }
 
+    /// <summary>
+    /// データベースにデータ挿入
+    /// </summary>
+    /// <param name="src_"></param>
+    /// <param name="classType_"></param>
+    /// <param name="header_"></param>
+    /// <param name="listValue_"></param>
+    /// <param name="tran_"></param>
     public static void Insert(this DbConnection src_, Type classType_, string header_, IEnumerable<List<string>> listValue_, DbTransaction? tran_ = null)
     {
-
-        //LogFile.Instance.WriteLine($"{header_} [{listValue_.Count()}]");
+        LogFile.Instance.WriteLine($"[{classType_.Name}] [{header_}] [{listValue_.Count()}]");
 
         foreach (var lv in listValue_)
         {
@@ -65,52 +69,15 @@ public static class DbConnectionExtension
         }
     }
 
-    //public static void Insert(this DbConnection src_, Type classType_, IEnumerable<string> listValue_, DbTransaction? tran_ = null)
-    //{
-
-    //    LogFile.Instance.WriteLine($"{classType_} [{listValue_.Count()}]");
-
-    //    foreach (var v in listValue_)
-    //    {
-    //        try
-    //        {
-    //            src_.Execute(_insert(classType_, v), null, tran_);
-    //        }
-    //        catch (Exception ex_)
-    //        {
-    //            LogFile.Instance.WriteLine(ex_.Message);
-    //        }
-    //    }
-    //}
-
-    //public static void Insert<T>(this DbConnection src_, ICollection<T> list_, DbTransaction? tran_ = null)
-    //{
-
-    //    LogFile.Instance.WriteLine($"{typeof(T).Name} [{list_.Count}]");
-
-    //    try
-    //    {
-    //        src_.Execute(_insert<T>(), list_, tran_);
-    //    }
-    //    catch (Exception ex_)
-    //    {
-    //        LogFile.Instance.WriteLine(ex_.Message);
-    //    }
-    //}
-
-
-    //private static string _createTabel<T>()=> _createTabel(typeof(T));
-
+    /// <summary>
+    /// テーブル作成処理クエリ
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <param name="list_"></param>
+    /// <returns></returns>
     private static string _createTabel(Type classType_, ListStringStringPair list_)
     {
         var listColunm = new List<string>();
-        //var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-        //listPropetyInfo?.ToList().ForEach(prop =>
-        //{
-        //    listColunm.Add($"{prop.Name} {_getType(prop.PropertyType)}");
-        //});
-        //
 
         list_.ForEach(column_ => listColunm.Add($"{column_.Key} {column_.Value}"));
 
@@ -120,73 +87,15 @@ public static class DbConnectionExtension
         return rtn;
     }
 
-    //private static string _insert<T>() => _insert(typeof(T));
-    //{
-    //    var listColunm = new List<string>();
-    //    var listValue = new List<string>();
-    //    var listPropetyInfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
-
-
-    //    listPropetyInfo?.ToList().ForEach(prop =>
-    //    {
-    //        listColunm.Add($"{prop.Name}");
-    //        listValue.Add($"@{prop.Name}");
-    //    });
-
-    //    var rtn = $"INSERT INTO {typeof(T).Name} ({string.Join(",", listColunm)}) VALUES({string.Join(",", listValue)});";
-    //    LogFile.Instance.WriteLine(rtn);
-    //    return rtn;
-    //}
-
-    //private static string _insert(Type classType_)
-    //{
-    //    var listColunm = new List<string>();
-    //    var listValue = new List<string>();
-    //    var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-
-
-    //    listPropetyInfo?.ToList().ForEach(prop =>
-    //    {
-    //        listColunm.Add($"{prop.Name}");
-    //        listValue.Add($"@{prop.Name}");
-    //    });
-
-    //    var rtn = $"INSERT INTO {classType_.Name} ({string.Join(",", listColunm)}) VALUES({string.Join(",", listValue)});";
-    //    LogFile.Instance.WriteLine(rtn);
-    //    return rtn;
-    //}
-
-    //private static string _insert(Type classType_, string listValue)
-    //{
-    //    var listColunm = new List<string>();
-    //    //var listValue = new List<string>();
-    //    var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-
-
-    //    listPropetyInfo?.ToList().ForEach(prop =>
-    //    {
-    //        listColunm.Add($"{prop.Name}");
-    //        //listValue.Add($"@{prop.Name}");
-    //    });
-
-    //    var rtn = $"INSERT INTO {classType_.Name} ({string.Join(",", listColunm)}) VALUES({listValue});";
-    //    LogFile.Instance.WriteLine(rtn);
-    //    return rtn;
-    //}
-
+    /// <summary>
+    /// データ挿入処理クエリ
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <param name="header_"></param>
+    /// <param name="listValue"></param>
+    /// <returns></returns>
     private static string _insert(Type classType_, string header_, List<string> listValue)
     {
-        //var listColunm = new List<string>();
-        ////var listValue = new List<string>();
-        //var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-
-
-        //listPropetyInfo?.ToList().ForEach(prop =>
-        //{
-        //    listColunm.Add($"{prop.Name}");
-        //    //listValue.Add($"@{prop.Name}");
-        //});
-
         var rtn = $"INSERT INTO {classType_.Name} ({header_}) VALUES('{string.Join("','", listValue)}');";
         //LogFile.Instance.WriteLine(rtn);
         return rtn;

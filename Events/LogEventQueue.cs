@@ -34,6 +34,7 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
     {
         if (list_.Count() < 12)
         {
+            // small
             Product = list_[1];
             Version = list_[2];
             User = list_[3];
@@ -47,6 +48,8 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
         }
         else
         {
+            // std
+            // detailed
             Product = list_[1];
             Version = list_[2];
             User = list_[3];
@@ -60,7 +63,6 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
             Project = list_[8];
             RequestedProduct = list_[9];
             RequestedVersion = list_[10];
-
             //
             EventDateTime = _GetDateTime(list_[11], list_[12]);
         }

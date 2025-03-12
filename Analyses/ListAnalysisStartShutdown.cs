@@ -6,14 +6,12 @@
  * Licensed under the MIT License 
  * 
  */
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -35,10 +33,8 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     {
         get => new()
         {
-            //new( "スキップあり", JoinEventStartShutdown.SKIP_DATA),
-            new( "スキップあり", (long)SelectData.ECLUSION),
-            //new ("全データ", JoinEventStartShutdown.USE_DATA )
-            new ("全データ", (long)SelectData.ALL )
+            new( "No Include Skip", (long)SelectData.ECLUSION),
+            new ("All Data", (long)SelectData.ALL )
         };
     }
 
@@ -47,23 +43,6 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// </summary>
     public ProgressCountDelegate? ProgressCount = null;
 
-
-    /// <summary>
-    /// 文字列化のヘッダー
-    /// </summary>
-    //public string Header(long selected_)
-    //{
-    //    var listColunm = new List<string>();
-    //    var listPropetyInfo = typeof(AnalysisStartShutdown).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-    //    listPropetyInfo?.ToList().ForEach(prop =>
-    //    {
-    //        listColunm.Add($"{prop.Name}");
-    //    });
-
-    //    return string.Join(",", listColunm);
-    //}
-
     /// <summary>
     /// 解析処理
     /// </summary>
@@ -71,19 +50,11 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     public void Analysis(ConvertReportLog log_)
     {
         var listSkipNumber = new SortedSet<long>();
-        //foreach (var end in log_.ListEnd)
-        //{
-        //    // ログのの切り替えの次のスタートはスキップ
-        //    var start = log_.ListStart.Find(x_ => x_.EventNumber > end.EventNumber);
-        //    if (start != null)
-        //    {
-        //        listSkipNumber.Add(start.EventNumber);
-        //    }
-        //}
 
         AnalysisStartShutdown? last = null;
         foreach (var start in log_.ListStart)
         {
+            // 同じ終了データが続いた場合、二つ目はスキップ(利用しない)
             LogEventBase? shutdown = log_.ListShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber);
 
             var startShutdown = new AnalysisStartShutdown(start, shutdown);
@@ -109,39 +80,48 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     }
 
     /// <summary>
-    /// スタート シャットダウン結合情報のリスト(スキップ内容を含まない)
+    /// スキップを含まないデータ
     /// </summary>
-
-    //public IEnumerable<AnalysisStartShutdown> ListWithoutSkip()=> this.Where(x_ => x_.JoinEvent().IsSkip != JoinEventStartShutdown.SKIP_DATA);
-    public IEnumerable<AnalysisStartShutdown> ListWithoutSkip() => this.Where(x_ => x_.JoinEvent().IsSkip != (long)SelectData.ECLUSION);
+    /// <returns></returns>
+    public IEnumerable<AnalysisStartShutdown> ListNoIncludeSkip() => this.Where(x_ => x_.JoinEvent().IsSkip != (long)SelectData.ECLUSION);
 
     /// <summary>
     /// ファイル保存
     /// </summary>
     /// <param name="path_">パス</param>
     /// <param name="withoutSkip_">スキップ内容ありか</param>
-    //public void WriteText(string path_, long withoutSkip_ = JoinEventStartShutdown.SKIP_DATA)
-    public void WriteText(string path_, long withoutSkip_ = (long)SelectData.ECLUSION)
+    public void WriteText(string path_, long skip_ = (long)SelectData.ECLUSION)
     {
         var list = new List<string>();
-        list.Add(Header(withoutSkip_));
-
-        //var listData = (withoutSkip_ == (long)SelectData.ALL) ? this : ListWithoutSkip();
-
-        //list.AddRange(listData.Select(x_ => x_.ToString()));
-        list.AddRange(ListValue(withoutSkip_).Select(x_ => string.Join(",",x_)));
+        // ヘッダー
+        list.Add(Header(skip_));
+        // データ
+        list.AddRange(ListValue(skip_).Select(x_ => string.Join(",",x_)));
         File.WriteAllLines(path_, list, Encoding.UTF8);
     }
 
+    /// <summary>
+    /// ヘッダー
+    /// </summary>
+    /// <param name="skip_"></param>
+    /// <returns></returns>
+    public string Header(long skip_) => AnalysisStartShutdown.Header();
 
-    public string Header(long withoutSkip_) => AnalysisStartShutdown.Header();
+    /// <summary>
+    /// リスト化したヘッダー
+    /// </summary>
+    /// <param name="skip_"></param>
+    /// <returns></returns>
+    public ListStringStringPair ListHeader(long skip_) => AnalysisStartShutdown.ListHeader();
 
-    public ListStringStringPair ListHeader(long withoutSkip_) => AnalysisStartShutdown.ListHeader();
-
-
-    public IEnumerable<List<string>> ListValue(long withoutSkip_)
+    /// <summary>
+    /// リスト化したデータ
+    /// </summary>
+    /// <param name="skip_"></param>
+    /// <returns></returns>
+    public IEnumerable<List<string>> ListValue(long skip_)
     {
-        var list = (withoutSkip_ == (long)(SelectData.ALL)) ? this : ListWithoutSkip();
+        var list = (skip_ == (long)(SelectData.ALL)) ? this : ListNoIncludeSkip();
         return list.Select(x_ =>  x_.ListValue());
     }
 }

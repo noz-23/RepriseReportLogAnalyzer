@@ -34,11 +34,6 @@ internal sealed class AnalysisCheckOutIn: ToDataBase
     }
 
     /// <summary>
-    /// 文字列化のヘッダー
-    /// </summary>
-    //public const string HEADER = "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host";
-
-    /// <summary>
     /// チェックアウト時間
     /// </summary>
     [Sort(101)]
@@ -131,29 +126,20 @@ internal sealed class AnalysisCheckOutIn: ToDataBase
     /// <param name="checkIn_">チェックイン イベント</param>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsSame(LogEventCheckIn checkIn_)
-    {
-        return _checkIn == checkIn_;
-    }
+    public bool IsSame(LogEventCheckIn checkIn_) => _checkIn == checkIn_;
 
     /// <summary>
     /// チェックアウトとチェックインの間のイベントか？
     /// </summary>
     /// <param name="number_">イベント番号</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsWithInRange(long number_)
-    {
-        return (number_ > CheckOutNumber()) && (number_ < CheckInNumber());
-    }
+    public bool IsWithInRange(long number_)=> (number_ > CheckOutNumber()) && (number_ < CheckInNumber());
 
     /// <summary>
     /// チェックアウトとチェックインの間のイベントか？
     /// </summary>
     /// <param name="dateTime_">イベント時間</param>
-    public bool IsWithInRange(DateTime dateTime_)
-    {
-        return (dateTime_ > CheckOutDateTime) && (dateTime_ < CheckInDateTime);
-    }
+    public bool IsWithInRange(DateTime dateTime_)=> (dateTime_ > CheckOutDateTime) && (dateTime_ < CheckInDateTime);
 
     /// <summary>
     /// 重複を取り除いたチェックインの時間
@@ -182,25 +168,29 @@ internal sealed class AnalysisCheckOutIn: ToDataBase
         return string.Empty;
     }
 
+    /// <summary>
+    /// ヘッダー
+    /// </summary>
+    /// <returns></returns>
+
     public static string Header() => ToDataBase.Header(typeof(AnalysisCheckOutIn));
 
+    /// <summary>
+    /// リスト化したヘッダー項目
+    /// </summary>
+    /// <returns></returns>
     public static ListStringStringPair ListHeader()=> ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
 
     /// <summary>
-    /// 文字列化
+    /// 文字列化したデータ
     /// </summary>
     /// <param name="duplication_">重複除去</param>
     public string ToString(long duplication_) => (duplication_ == (long)SelectData.ALL) ? ToString():string.Join(",", ListDuplicationValue()) ;
 
     /// <summary>
-    /// 文字列化
+    /// リスト化したデータ(重複除去)
     /// </summary>
-
-    //public override string ToString()
-    //{
-    //    return $"{CheckOutDateTime.ToString()},{CheckInDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
-    //}
-
+    /// <returns></returns>
     public List<string> ListDuplicationValue()
     {
         return new () 

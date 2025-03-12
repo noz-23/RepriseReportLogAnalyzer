@@ -31,6 +31,9 @@ internal sealed class LogEventRoamExtend : LogEventBase, ILogEventUserHost, ILog
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventRoamExtend(string[] list_) : base()
     {
+        // small
+        // std
+        // detailed
         Product = list_[1];
         Version = list_[2];
         Pool = list_[3];
