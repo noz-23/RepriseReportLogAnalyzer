@@ -67,6 +67,7 @@ public partial class AnalysisControl : UserControl
     {
         _buttonAnalysis.IsEnabled = false;
         _startDateTime = DateTime.Now;
+
         //var outFolder = _textBoxFolder.Text;
         await Task.Run(() =>
         {

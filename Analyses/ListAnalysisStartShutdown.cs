@@ -21,7 +21,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// スタート シャットダウン結合情報のリスト化 
 /// </summary>
-internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, IAnalysisTextWrite
+internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, IAnalysisOutputFile
 {
     /// <summary>
     /// コンストラクタ
@@ -31,7 +31,7 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     }
 
 
-    public static ListKeyPair ListSelect
+    public static ListStringLongPair ListSelect
     {
         get => new()
         {
@@ -51,21 +51,18 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// <summary>
     /// 文字列化のヘッダー
     /// </summary>
-    public string Header
-    {
-        get
-        {
-            var listColunm = new List<string>();
-            var listPropetyInfo = typeof(AnalysisStartShutdown).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+    //public string Header(long selected_)
+    //{
+    //    var listColunm = new List<string>();
+    //    var listPropetyInfo = typeof(AnalysisStartShutdown).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
 
-            listPropetyInfo?.ToList().ForEach(prop =>
-            {
-                listColunm.Add($"{prop.Name}");
-            });
+    //    listPropetyInfo?.ToList().ForEach(prop =>
+    //    {
+    //        listColunm.Add($"{prop.Name}");
+    //    });
 
-            return string.Join(",", listColunm);
-        }
-    }
+    //    return string.Join(",", listColunm);
+    //}
 
     /// <summary>
     /// 解析処理
@@ -127,11 +124,24 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     public void WriteText(string path_, long withoutSkip_ = (long)SelectData.ECLUSION)
     {
         var list = new List<string>();
-        list.Add(Header);
+        list.Add(Header(withoutSkip_));
 
-        var listData = (withoutSkip_ == (long)SelectData.ALL) ? this : ListWithoutSkip();
+        //var listData = (withoutSkip_ == (long)SelectData.ALL) ? this : ListWithoutSkip();
 
-        list.AddRange(listData.Select(x_ => x_.ToString()));
+        //list.AddRange(listData.Select(x_ => x_.ToString()));
+        list.AddRange(ListValue(withoutSkip_).Select(x_ => string.Join(",",x_)));
         File.WriteAllLines(path_, list, Encoding.UTF8);
+    }
+
+
+    public string Header(long withoutSkip_) => AnalysisStartShutdown.Header();
+
+    public ListStringStringPair ListHeader(long withoutSkip_) => AnalysisStartShutdown.ListHeader();
+
+
+    public IEnumerable<List<string>> ListValue(long withoutSkip_)
+    {
+        var list = (withoutSkip_ == (long)(SelectData.ALL)) ? this : ListWithoutSkip();
+        return list.Select(x_ =>  x_.ListValue());
     }
 }

@@ -10,7 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
 using System.Reflection;
-using static RepriseReportLogAnalyzer.Events.LogEventBase;
+using RepriseReportLogAnalyzer.Data;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -35,16 +35,20 @@ internal sealed partial class LogEventRegist
         LogFile.Instance.WriteLine($"Create {typeof(LogEventRegist)}");
     }
 
-    public static bool Regist(string key_, NewLogEvent event_)=> LogEventBase.Regist(key_, event_);
-
-    public static bool Regist<T>(NewListLogEvent<object> event_ ) =>LogEventBase.Regist(typeof(T), event_);
+    /// <summary>
+    /// 登録処理
+    /// </summary>
+    /// <param name="key_"></param>
+    /// <param name="event_"></param>
+    /// <returns></returns>
+    public static bool Regist(string key_, LogEventBase.NewLogEvent event_)=> LogEventBase.Regist(key_, event_);
 }
 
 /// <summary>
 /// ログ イベント(ベース)
 /// </summary>
 [Sort(99)]
-internal partial class LogEventBase: IComparer, IComparable
+internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
 {
     /// <summary>
     /// コンストラクタ
@@ -62,16 +66,10 @@ internal partial class LogEventBase: IComparer, IComparable
     /// <returns></returns>
     public delegate LogEventBase NewLogEvent(string[] list);
 
-
-    public delegate List<LogEventBase> NewListLogEvent<T>();
-
     /// <summary>
     /// 各イベントの文字とデリゲートを紐づけるリスト
     /// </summary>
     private static SortedDictionary<string, NewLogEvent> _listEventData = new ();
-
-    private static SortedDictionary<Type, NewListLogEvent<object>> _listEventList = new();
-
 
     /// <summary>
     /// 登録関数
@@ -84,13 +82,6 @@ internal partial class LogEventBase: IComparer, IComparable
         _listEventData.Add(key_, event_);
         return true;
     }
-
-    public static bool Regist(Type classType_, NewListLogEvent<object> event_)
-    {
-        _listEventList.Add(classType_, event_);
-        return true;
-    }
-
 
     public readonly static DateTime NotAnalysisEventTime = DateTime.Now;
 
@@ -151,16 +142,6 @@ internal partial class LogEventBase: IComparer, IComparable
         }
         return null;
     }
-
-    //public static List<LogEventBase> ListLogEvent(Type classType_)
-    //{
-    //    if (_listEventList.TryGetValue(classType_, out var list) == true)
-    //    {
-    //        return list?.Invoke();
-    //    }
-
-    //    return new List<LogEventBase>();
-    //}
 
     /// <summary>
     /// 初期化
@@ -231,38 +212,60 @@ internal partial class LogEventBase: IComparer, IComparable
         return DateTime.Parse(date_ + "/" + year + " " + time_);
     }
 
+    ///// <summary>
+    ///// 文字列化のヘッダー
+    ///// </summary>
+    ///// <param name="classType_">子のクラス</param>
+    ///// <returns></returns>
+    //public static string Header(Type classType_) => string.Join(",", ListHeader(classType_));
+
+    ///// <summary>
+    ///// リスト化したヘッダーの文字列
+    ///// </summary>
+    ///// <param name="classType_"></param>
+    ///// <returns></returns>
+    //public static List<string> ListHeader(Type classType_)
+    //{
+    //    var rtn = new List<string>();
+    //    var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+
+    //    listPropetyInfo?.ToList().ForEach(prop =>
+    //    {
+    //        rtn.Add($"{prop.Name}");
+    //    });
+
+    //    return rtn;
+    //}
+
+    ///// <summary>
+    ///// 文字列化
+    ///// </summary>
+    ///// <returns></returns>
+    //public override string ToString()=> string.Join(",", ListValue(this.GetType()));
+
+    ///// <summary>
+    ///// リスト化したデータ(文字)
+    ///// </summary>
+    ///// <param name="classTyep_"></param>
+    ///// <returns></returns>
+    //public List<string> ListValue(Type classTyep_)
+    //{
+    //    var rtn = new List<string>();
+    //    var listPropetyInfo = classTyep_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+
+    //    listPropetyInfo?.ToList().ForEach(prop =>
+    //    {
+    //        rtn.Add($"{prop.GetValue(this)}");
+    //    });
+    //    return rtn;
+    //}
+
     /// <summary>
-    /// 文字列化のヘッダー
+    /// 比較処理
     /// </summary>
-    /// <param name="classType_">子のクラス</param>
+    /// <param name="a_"></param>
+    /// <param name="b_"></param>
     /// <returns></returns>
-    public static string Header(Type classType_)
-    {
-        var listColunm = new List<string>();
-        var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-        listPropetyInfo?.ToList().ForEach(prop =>
-        {
-            listColunm.Add($"{prop.Name}");
-        });
-
-        return string.Join(",", listColunm);
-    }
-
-    public override string ToString()
-    {
-
-        var listValue = new List<string>();
-        var listPropetyInfo = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
-
-        listPropetyInfo?.ToList().ForEach(prop =>
-        {
-            listValue.Add($"{prop.GetValue(this)}");
-        });
-
-        return string.Join(",", listValue);
-    }
-
     public int Compare(object? a_, object? b_)
     {
         if (a_ is LogEventBase a)
@@ -275,6 +278,11 @@ internal partial class LogEventBase: IComparer, IComparable
         return -1;
     }
 
+    /// <summary>
+    /// 比較処理
+    /// </summary>
+    /// <param name="b_"></param>
+    /// <returns></returns>
     public int CompareTo(object? b_)
     {
         if (b_ is LogEventBase b)

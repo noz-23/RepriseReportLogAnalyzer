@@ -9,7 +9,7 @@
 using Dapper;
 using System.Data;
 
-namespace RepriseReportLogAnalyzer.Databases;
+namespace RepriseReportLogAnalyzer.Data;
 
 /// <summary>
 /// 文字列 → 時間変更

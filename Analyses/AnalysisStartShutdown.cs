@@ -7,8 +7,9 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
-using System.Reflection;
+using RepriseReportLogAnalyzer.Interfaces;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -17,7 +18,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// スタートとシャットダウンの時間帯
 /// (ログ集計の最後はシャットダウンとする)
 /// </summary>
-internal sealed class AnalysisStartShutdown
+internal sealed class AnalysisStartShutdown:ToDataBase
 {
     /// <summary>
     /// コンストラクタ
@@ -122,9 +123,13 @@ internal sealed class AnalysisStartShutdown
     /// <summary>
     /// 文字列化
     /// </summary>
-    public override string ToString()
-    {
-        return $"{StartDateTime.ToString()},{ShutdownDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")}";
-    }
+    //public override string ToString()
+    //{
+    //    return $"{StartDateTime.ToString()},{ShutdownDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")}";
+    //}
+    public static string Header() => ToDataBase.Header(typeof(AnalysisStartShutdown));
+
+    public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisStartShutdown));
+
 
 }

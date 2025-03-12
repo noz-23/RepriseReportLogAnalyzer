@@ -7,8 +7,10 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
+using RepriseReportLogAnalyzer.Interfaces;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -16,7 +18,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックインを結合
 /// </summary>
-internal sealed class AnalysisCheckOutIn
+internal sealed class AnalysisCheckOutIn: ToDataBase
 {
     /// <summary>
     /// コンストラクタ
@@ -34,7 +36,7 @@ internal sealed class AnalysisCheckOutIn
     /// <summary>
     /// 文字列化のヘッダー
     /// </summary>
-    public const string HEADER = "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host";
+    //public const string HEADER = "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host";
 
     /// <summary>
     /// チェックアウト時間
@@ -161,10 +163,7 @@ internal sealed class AnalysisCheckOutIn
     /// <summary>
     /// 重複を取り除いた利用時間
     /// </summary>
-    public TimeSpan DurationDuplication()
-    {
-        return JointDateTime() - CheckOutDateTime;
-    }
+    public TimeSpan DurationDuplication() => (JointDateTime() - CheckOutDateTime);
 
     /// <summary>
     /// グループ集計する名称
@@ -183,28 +182,39 @@ internal sealed class AnalysisCheckOutIn
         return string.Empty;
     }
 
+    public static string Header() => ToDataBase.Header(typeof(AnalysisCheckOutIn));
+
+    public static ListStringStringPair ListHeader()=> ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
+
     /// <summary>
     /// 文字列化
     /// </summary>
     /// <param name="duplication_">重複除去</param>
-    public string ToString(bool duplication_)
-    {
-        if (duplication_ == true)
-        {
-            return $"{CheckOutDateTime.ToString()},{JointDateTime().ToString()},{DurationDuplication().ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
-        }
-
-        return ToString();
-    }
+    public string ToString(long duplication_) => (duplication_ == (long)SelectData.ALL) ? ToString():string.Join(",", ListDuplicationValue()) ;
 
     /// <summary>
     /// 文字列化
     /// </summary>
 
-    public override string ToString()
+    //public override string ToString()
+    //{
+    //    return $"{CheckOutDateTime.ToString()},{CheckInDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
+    //}
+
+    public List<string> ListDuplicationValue()
     {
-        return $"{CheckOutDateTime.ToString()},{CheckInDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
+        return new () 
+        {
+            $"{CheckOutDateTime.ToString()}",
+            $"{JointDateTime().ToString()}",
+            $"{DurationDuplication().ToString(@"d\.hh\:mm\:ss")}",
+            $"{Product}",
+            $"{Version}",
+            $"{ProductVersion}",
+            $"{User}",
+            $"{Host}",
+            $"{UserHost}"
+        };
+
     }
-
-
 }

@@ -8,9 +8,10 @@
  */
 using Dapper;
 using RepriseReportLogAnalyzer.Analyses;
-using RepriseReportLogAnalyzer.Databases;
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Interfaces;
 using RLMLogReader.Extensions;
 using System.Data.SQLite;
 using System.IO;
@@ -105,9 +106,10 @@ namespace RepriseReportLogAnalyzer.Managers
             _connection.Open();
         }
 
-
-        public void Create(Type classType_)=>_connection?.CreateTable(classType_);
         
+        public void Create(Type classType_)=>_connection?.CreateTable(classType_);
+        public void Create(Type classType_, ListStringStringPair list_) => _connection?.CreateTable(classType_, list_);
+
 
         //public void Insert(Type classType_,ICollection<LogEventBase> list_)
         //{
@@ -118,15 +120,50 @@ namespace RepriseReportLogAnalyzer.Managers
         //    LogFile.Instance.WriteLine($"Insert [{classType_}] [{list_.Count}]");
         //}
 
-        public void Insert<T>(ICollection<T> list_)
+        //public void Insert<T>(ICollection<T> list_)
+        //{
+        //    LogFile.Instance.WriteLine($"Insert [{typeof(T)}] [{list_.Count}]");
+
+        //    using (var tran = _connection?.BeginTransaction())
+        //    {
+        //        try
+        //        {
+        //            _connection?.Insert(list_, tran);
+        //        }
+        //        catch (Exception ex_)
+        //        {
+        //            LogFile.Instance.WriteLine(ex_.Message);
+        //        }
+        //        tran?.Commit();
+        //    }
+        //}
+
+        //public void Insert(Type classType_, IEnumerable<string> list_)
+        //{
+        //    LogFile.Instance.WriteLine($"Insert [{classType_}] [{list_.Count()}]");
+
+        //    using (var tran = _connection?.BeginTransaction())
+        //    {
+        //        try
+        //        {
+        //            _connection?.Insert(classType_,list_, tran);
+        //        }
+        //        catch (Exception ex_)
+        //        {
+        //            LogFile.Instance.WriteLine(ex_.Message);
+        //        }
+        //        tran?.Commit();
+        //    }
+        //}
+        public void Insert(Type classType_, string header_, IEnumerable<List<string>> list_)
         {
-            LogFile.Instance.WriteLine($"Insert [{typeof(T)}] [{list_.Count}]");
+            LogFile.Instance.WriteLine($"Insert [{header_}] [{list_.Count()}]");
 
             using (var tran = _connection?.BeginTransaction())
             {
                 try
                 {
-                    _connection?.Insert(list_, tran);
+                    _connection?.Insert(classType_,header_, list_, tran);
                 }
                 catch (Exception ex_)
                 {
@@ -135,7 +172,6 @@ namespace RepriseReportLogAnalyzer.Managers
                 tran?.Commit();
             }
         }
-
         //public List<LogViewStartShutdown> ListLogViewStartShutdown()
         //{
         //    var query = "SELECT"

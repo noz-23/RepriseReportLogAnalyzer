@@ -59,7 +59,7 @@ class AnalysisManager : INotifyPropertyChanged
 
     public ObservableCollection<LicenseView> ListResultGroup { get; private set; } = new();
 
-    private List<IAnalysisTextWrite> _listAnalysis = new();
+    private List<IAnalysisOutputFile> _listAnalysis = new();
 
     private readonly ListAnalysisStartShutdown _listStartShutdown = new();
     private readonly ListAnalysisCheckOutIn _listCheckOutIn = new();
@@ -255,10 +255,30 @@ class AnalysisManager : INotifyPropertyChanged
     }
 
 
+
+    public IEnumerable<List<string>> ListEventValue(Type classType_)=> _convertReportLog.ListEvent(classType_).Select(x => x.ListValue(classType_));
+
+    public string EventHeader(Type classType_, long selected_) => _listAnalysis.Find(f_ => f_.GetType() == classType_)?.Header(selected_) ?? default;
+
+    public ListStringStringPair ListEventHeader(Type classType_, long selected_)=> _listAnalysis.Find(f_ => f_.GetType() == classType_)?.ListHeader(selected_) ?? default;
+
+
+    public IEnumerable<List<string>> ListEventValue(Type classType_, long selected_)
+    {
+        var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
+
+        return find?.ListValue(selected_) ?? default;
+
+    }
     public IEnumerable<T> ListEvent<T>() where T : LogEventBase => _convertReportLog.ListEvent<T>();
-    public IEnumerable<object> ListEvent(Type classType_)=>
+
+    //public List<LogEventBase> ListStart() 
+    //{
+    //    return new(ListEvent<LogEventStart>());
+    // }
+    //public IEnumerable<object> ListEvent(Type classType_)=>
     //{ 
-        _convertReportLog.ListEvent(classType_);
+    //_convertReportLog.ListEvent(classType_);
     //}
 
     //public void WriteText(string outFolder_)

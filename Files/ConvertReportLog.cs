@@ -145,10 +145,10 @@ internal sealed class ConvertReportLog
         get => ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct();
     }
 
-    public IEnumerable ListEvent( Type classType_)
-    {
-        return _listEvent.AsParallel().AsOrdered().Where(e_ => e_.GetType()== classType_).Select(x_=>Convert.ChangeType(x_, classType_));
-    }
+    public IEnumerable<LogEventBase> ListEvent(Type classType_)=> _listEvent.AsParallel().AsOrdered().Where(e_ => e_.GetType() == classType_);
+    //{
+    //    return _listEvent.AsParallel().AsOrdered().Where(e_ => e_.GetType() == classType_);
+    //}
     public IEnumerable<T> ListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase
     {
         if (ss_ == null)
@@ -163,20 +163,23 @@ internal sealed class ConvertReportLog
 
     private List<string> _listToString(Type classType_)
     {
-        var rtn = new List<string>();
+        //var rtn = new List<string>();
 
-        var method = this.GetType().GetMethods().FirstOrDefault(x_ => x_.Name == nameof(_listToString) && x_.IsGenericMethod == true);
-        method?.MakeGenericMethod(classType_);
-        //
-        List<string> list = method?.Invoke(this, null) as List<string>;
-        LogFile.Instance.WriteLine($"_listToString [{classType_}] [{list.Count}]");
+        //var method = this.GetType().GetMethods().FirstOrDefault(x_ => x_.Name == nameof(_listToString) && x_.IsGenericMethod == true);
+        //method?.MakeGenericMethod(classType_);
+        ////
+        //List<string> list = method?.Invoke(this, null) as List<string>;
+        //LogFile.Instance.WriteLine($"_listToString [{classType_}] [{list.Count}]");
+        var list = ListEvent(classType_).Select(e_=>e_.ToString());
 
-        foreach (var data in list)
-        {
-            rtn.Add(data.ToString());
-        }
+        //foreach (var data in list)
+        //{
+        //    rtn.Add(data.ToString());
+        //}
 
-        return rtn;
+        //return rtn;
+
+        return ListEvent(classType_).Select(e_ => e_.ToString()).ToList();
     }
 
     private List<string> _listToString<T>() where T : LogEventBase

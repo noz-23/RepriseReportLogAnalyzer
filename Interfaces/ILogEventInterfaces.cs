@@ -9,7 +9,8 @@
 namespace RepriseReportLogAnalyzer.Interfaces;
 
 
-public class ListKeyPair : List<KeyValuePair<string, long>>;
+public class ListStringLongPair : List<KeyValuePair<string, long>>;
+public class ListStringStringPair : List<KeyValuePair<string, string>>;
 
 interface ILogEventHost
 {
@@ -42,10 +43,13 @@ interface ILogEventWhy
     int Why { get; }
 }
 
-interface IAnalysisTextWrite
+interface IAnalysisOutputFile
 {
-    string Header { get; }
+    string Header(long select_);
     void WriteText(string path_, long select_);
+
+    ListStringStringPair ListHeader(long select_);
+    IEnumerable<List<string>> ListValue(long select_);
 
     //IEnumerable<KeyValuePair<string, long>> ListSelect { get; }
 }

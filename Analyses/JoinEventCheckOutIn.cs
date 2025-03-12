@@ -38,7 +38,7 @@ internal sealed class JoinEventCheckOutIn
         }
         else
         {
-            LogFile.Instance.WriteLine($"{checkIn_?.EventNumber} {checkIn_?.GetType()}");
+            LogFile.Instance.WriteLine($"{checkOut_.EventNumber} {checkIn_?.EventNumber} {checkIn_?.GetType()}");
         }
         _checkIn = checkIn_;
     }

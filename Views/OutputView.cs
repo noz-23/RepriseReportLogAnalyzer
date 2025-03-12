@@ -19,7 +19,7 @@ namespace RepriseReportLogAnalyzer.Views
     public class OutputView:BaseView
     {
 
-        public OutputView(Type type_, string name_="", ListKeyPair? list_=null)
+        public OutputView(Type type_, string name_="", ListStringLongPair? list_=null)
         {
             Name =(string.IsNullOrEmpty(name_)==true) ? type_.Name:name_;
             ClassType=type_;
@@ -47,7 +47,7 @@ namespace RepriseReportLogAnalyzer.Views
         public Type ClassType { get; private set; }
 
 
-        public ListKeyPair ListSelect { get; private set; } = new();
+        public ListStringLongPair ListSelect { get; private set; } = new();
 
         public int SelectedIndex
         {

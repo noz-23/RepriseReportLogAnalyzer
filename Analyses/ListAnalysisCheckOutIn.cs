@@ -13,7 +13,6 @@ using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -22,7 +21,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// チェックアウトとチェックイン結合情報のリスト化 
 /// </summary>
 [Sort(1)]
-internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalysisTextWrite
+internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalysisOutputFile
 {
     /// <summary>
     /// コンストラクタ
@@ -50,7 +49,7 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     /// </summary>
     private const string _ANALYSIS = "[CheckOut - CheckIn]";
 
-    public static ListKeyPair ListSelect
+    public static ListStringLongPair ListSelect
     {
         get => new()
         {
@@ -62,21 +61,21 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     }
 
 
-    public string Header
-    {
-        get
-        {
-            var listColunm = new List<string>();
-            var listPropetyInfo = typeof(AnalysisCheckOutIn).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+    //public string Header
+    //{
+    //    get
+    //    {
+    //        var listColunm = new List<string>();
+    //        var listPropetyInfo = typeof(AnalysisCheckOutIn).GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
 
-            listPropetyInfo?.ToList().ForEach(prop =>
-            {
-                listColunm.Add($"{prop.Name}");
-            });
+    //        listPropetyInfo?.ToList().ForEach(prop =>
+    //        {
+    //            listColunm.Add($"{prop.Name}");
+    //        });
 
-            return string.Join(",", listColunm);
-        }
-    }
+    //        return string.Join(",", listColunm);
+    //    }
+    //}
 
     /// <summary>
     /// 重複なしのデータリスト
@@ -211,8 +210,10 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     public void WriteText(string path_, long duplication_ = 0)
     {
         var list = new List<string>();
-        list.Add(AnalysisCheckOutIn.HEADER);
-        list.AddRange(_listToString(duplication_!=0));
+        list.Add(Header(duplication_));
+
+        //list.AddRange(_listToString(duplication_));
+        list.AddRange(ListValue(duplication_).Select(x_=>string.Join(",",x_)));
         File.WriteAllLines(path_, list, Encoding.UTF8);
     }
 
@@ -221,28 +222,36 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
     /// ファイル保存(結合情報)
     /// </summary>
     /// <param name="path_">パス</param>
-    public void WriteDuplicationText(string path_)
-    {
-        var list = new List<string>();
-        list.Add(Header);
-        list.AddRange(ListJointEvetn().Select(x_ => x_.ToString()));
-        File.WriteAllLines(path_, list, Encoding.UTF8);
-    }
+    //public void WriteDuplicationText(string path_)
+    //{
+    //    var list = new List<string>();
+    //    list.Add(Header);
+    //    list.AddRange(ListJointEvetn().Select(x_ => x_.ToString()));
+    //    File.WriteAllLines(path_, list, Encoding.UTF8);
+    //}
+
+    public string Header(long duplication_) => AnalysisCheckOutIn.Header();
 
     /// <summary>
     /// 文字列リスト化
     /// </summary>
     /// <param name="duplication_">ture:重複なし</param>
-    private List<string> _listToString(bool duplication_)
-    {
-        var rtn = new List<string>();
-        var list = (duplication_ == false) ? this : ListNoDuplication();
-        foreach (var data in list)
-        {
-            rtn.Add(data.ToString(duplication_));
-        }
+    //private List<string> _listToString(long duplication_)
+    //{
+    //    var rtn = new List<string>();
+    //    var list = (duplication_ == (long)(SelectData.ALL)) ? this : ListNoDuplication();
+    //    list.ToList().ForEach(data => rtn.Add(data.ToString(duplication_)));
 
-        return rtn;
+    //    return rtn;
+    //}
+    public ListStringStringPair ListHeader(long duplication_) => AnalysisCheckOutIn.ListHeader();
+
+
+
+    public IEnumerable<List<string>> ListValue(long duplication_)
+    {
+        var list = (duplication_ == (long)(SelectData.ALL)) ? this : ListNoDuplication();
+        return list.Select(x_ => (duplication_ == (long)(SelectData.ALL)) ? x_.ListValue() :x_.ListDuplicationValue());
     }
 
 

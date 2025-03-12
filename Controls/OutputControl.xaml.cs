@@ -8,6 +8,7 @@
  */
 using Microsoft.Win32;
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -125,8 +126,15 @@ public partial class OutputControl : UserControl
                     continue;
                 }
                 sql.Create(view.ClassType);
+                //if (view.ClassType==typeof(LogEventStart)) 
+                //{
+                //    sql.Insert(AnalysisManager.Instance.ListStart);
+
+                //}
                 //sql.Insert(view.ClassType,AnalysisManager.Instance.ListEvent(view.ClassType).ToList());
-                sql.Insert(AnalysisManager.Instance.ListEvent(view.ClassType).ToList());
+                //sql.Insert(AnalysisManager.Instance.ListEvent(view.ClassType).ToList());
+
+                sql.Insert(view.ClassType, ToDataBase.Header( view.ClassType), AnalysisManager.Instance.ListEventValue(view.ClassType));
             }
             foreach (var view in ListAnalysis)
             {
@@ -134,7 +142,10 @@ public partial class OutputControl : UserControl
                 {
                     continue;
                 }
-                sql.Create(view.ClassType);
+                sql.Create(view.ClassType, AnalysisManager.Instance.ListEventHeader(view.ClassType, view.SelectedValue));
+                sql.Insert(view.ClassType, AnalysisManager.Instance.EventHeader(view.ClassType, view.SelectedValue), AnalysisManager.Instance.ListEventValue(view.ClassType, view.SelectedValue));
+
+
             }
             sql.Close();
 
@@ -143,7 +154,7 @@ public partial class OutputControl : UserControl
 
 
     }
-    void _init()
+    private void _init()
     { 
         var _assembly = Assembly.GetExecutingAssembly();
 
@@ -166,20 +177,20 @@ public partial class OutputControl : UserControl
 
             if (t.Namespace == _NAME_SPACE_ANALYSES)
             {
-                //if (t.GetInterfaces().Where(t_=>t_.IsConstructedGenericType ==true && t_.GetGenericTypeDefinition() ==typeof(IAnalysisTextWrite)).Count()>0)
+                //if (t.GetInterfaces().Where(t_=>t_.IsConstructedGenericType ==true && t_.GetGenericTypeDefinition() ==typeof(IAnalysisOutputFile)).Count()>0)
                 //var list = t.GetInterfaces();
                 //if(list.Count()>0)
                 //{
-                if (t.GetInterfaces().Where(t_ => t_.Name == typeof(IAnalysisTextWrite).Name).Count() > 0)
+                if (t.GetInterfaces().Where(t_ => t_.Name == typeof(IAnalysisOutputFile).Name).Count() > 0)
                 {
                     var find = ListAnalysis.Where(x_ => x_.ClassType.Name == t.Name);
                     if (find.Count() == 0)
                     {
-                        var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static |BindingFlags.DeclaredOnly);
+                        var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static );
 
                         foreach (var p in listPropetyInfo)
                         {
-                            if (p.GetValue(null) is ListKeyPair list)
+                            if (p.GetValue(null) is ListStringLongPair list)
                             {
                                 ListAnalysis.Add(new(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty),list));
                                 LogFile.Instance.WriteLine($"{t.Name}");
@@ -198,9 +209,7 @@ public partial class OutputControl : UserControl
         foreach(var v in ListAnalysis)
         {
             v.SelectedIndex = 0;
-
         }
-
     }
 
     //private class CompareOutputView : IEqualityComparer<OutputView>
