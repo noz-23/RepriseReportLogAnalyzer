@@ -39,12 +39,14 @@
             Click="_selectClick"
             />
         <Button 
+            x:Name="_saveCsv"
             Grid.Row="3" Grid.Column="2"
             Content="Save To Csv"
             Click="_saveCsvClick"
             />
         <Button 
-            Grid.Row="4" Grid.Column="2"
+             x:Name="_saveSql"
+           Grid.Row="4" Grid.Column="2"
             Content="Save To SQLite"
             Click="_saveSqliteClick"
             />

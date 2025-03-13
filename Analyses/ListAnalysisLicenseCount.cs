@@ -307,9 +307,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="listX_">対応する時間リスト</param>
     /// <param name="timeSpan_">時間間隔</param>
     /// <returns>Key:データ内容/Value:対応するデータ</returns>
-    public Dictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
+    public SortedDictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
     {
-        var rtn = new Dictionary<string, List<double>>();
+        var rtn = new SortedDictionary<string, List<double>>();
 
         // 初期化
         foreach (var product in _listProduct)
@@ -364,9 +364,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="timeSpan_">間隔時間</param>
     /// <returns></returns>
-    private List<DateTime> _getListTimeSpan(long timeSpan_)
+    private SortedSet<DateTime> _getListTimeSpan(long timeSpan_)
     {
-        var rtn = new List<DateTime>();
+        var rtn = new SortedSet<DateTime>();
 
         var minDate = this.Select(x => x.EventBase.EventDate()).Min();
         var maxDate = this.Select(x => x.EventBase.EventDate()).Max();

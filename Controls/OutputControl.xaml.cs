@@ -51,7 +51,12 @@ public partial class OutputControl : UserControl
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private void _selectClick(object sender_, RoutedEventArgs e_)
+    private void _selectClick(object sender_, RoutedEventArgs e_) 
+    {
+        _selectOutFolder();
+    }
+
+    private bool _selectOutFolder()
     {
         var dlg = new OpenFolderDialog()
         {
@@ -62,6 +67,8 @@ public partial class OutputControl : UserControl
         {
             _textBoxFolder.Text = dlg.FolderName;
         }
+
+        return (string.IsNullOrEmpty(_textBoxFolder.Text));
     }
 
     /// <summary>
@@ -69,21 +76,24 @@ public partial class OutputControl : UserControl
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private void _saveCsvClick(object sender_, RoutedEventArgs e_)
+    private async void _saveCsvClick(object sender_, RoutedEventArgs e_)
     {
         if (string.IsNullOrEmpty(_textBoxFolder.Text) == false)
         {
-            _textBoxFolder.IsEnabled = false;
-            //AnalysisManager.Instance.WriteText(_textBoxFolder.Text);
+            if (_selectOutFolder()==true) { return; }
+        }
+
+        _saveCsv.IsEnabled = false;
+        await Task.Run(() =>
+        {
 
             foreach (var view in ListEvent)
             {
-                //AnalysisManager.Instance.WriteText
                 if (view.IsChecked == false)
                 {
                     continue;
                 }
-                string output= _textBoxFolder.Text + @"\" + view.Name + @".csv";
+                string output = _textBoxFolder.Text + @"\" + view.Name + @".csv";
                 LogFile.Instance.WriteLine($"Write : {output}");
 
                 AnalysisManager.Instance.WriteText(output, view.ClassType);
@@ -101,17 +111,22 @@ public partial class OutputControl : UserControl
 
                 AnalysisManager.Instance.WriteText(output, view.ClassType, view.SelectedValue);
             }
+        });
 
-            _textBoxFolder.IsEnabled = true;
-        }
+        _saveCsv.IsEnabled = true;
 
     }
 
-    private void _saveSqliteClick(object sender_, RoutedEventArgs e_)
+    private async void _saveSqliteClick(object sender_, RoutedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Write : {sender_}");
-
         if (string.IsNullOrEmpty(_textBoxFolder.Text) == false)
+        {
+            if (_selectOutFolder() == true) { return; }
+        }
+
+        _saveSql.IsEnabled = false;
+        await Task.Run(() =>
         {
             _textBoxFolder.IsEnabled = false;
             string output = _textBoxFolder.Text + @"\ReportLog.db";
@@ -149,8 +164,8 @@ public partial class OutputControl : UserControl
             }
             sql.Close();
 
-            _textBoxFolder.IsEnabled = true;
-        }
+        });
+        _saveSql.IsEnabled = true;
 
 
     }

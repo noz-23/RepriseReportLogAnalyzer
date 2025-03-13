@@ -68,31 +68,23 @@ public partial class AnalysisControl : UserControl
         _buttonAnalysis.IsEnabled = false;
         _startDateTime = DateTime.Now;
 
+        if (_dataGrid.Items.Count ==0)
+        {
+            return;
+        }
+
         //var outFolder = _textBoxFolder.Text;
         await Task.Run(() =>
+        //await Task.Factory.StartNew(() =>
         {
-            //int count = 0;
-            //int max = _dataGrid.Items.Count;
-            //_progressCount(0, max, _ANALYSIS);
-
-            //var analysis = new AnalysisReportLog();
-            //foreach (string path_ in _dataGrid.Items)
-            //{
-            //    LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
-            //    analysis.StartAnalysis(path_);
-            //    _progressCount(++count, max);
-            //}
-            //analysis.EndAnalysis();
-            ////_calendarShow(analysis.ListDate);
-
-            //AnalysisManager.Instance.Analysis(analysis);
             var list =new List<string>();
             foreach (string path_ in _dataGrid.Items)
             {
                 list.Add(path_);
             }
             AnalysisManager.Instance.Analysis(list);
-        });
+        }//, TaskCreationOptions.LongRunning
+        );
 
         _buttonAnalysis.IsEnabled = true;
 

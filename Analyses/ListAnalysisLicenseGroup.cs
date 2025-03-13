@@ -193,10 +193,9 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <param name="listX_">対応する時間リスト</param>
     /// <param name="timeSpan_">時間間隔</param>
     /// <returns>Key:データ内容/Value:対応するデータ</returns>
-    public Dictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
+    public SortedDictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
     {
-        var rtn = new Dictionary<string, List<double>>();
-
+        var rtn = new SortedDictionary<string, List<double>>();
 
         // 期間順にするため
         var listGroup = AnalysisManager.Instance.ListResultGroup.Select(x_ => x_.Name).Take(TOP_PLOT_USE);
@@ -209,21 +208,12 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         }
         foreach (var time in listX_)
         {
-            //var listView = ListView(time, timeSpan_);
             count = 1;
             foreach (var group in listGroup)
             {
-                //var list = listView.Where(x_ => x_.Name == group);
                 var list =( timeSpan_ != TimeSpan.TicksPerDay) ?this[group].Where(x_=>x_.IsWithInRange(time)==true): this[group].Where(x_ => (x_.CheckOut().EventDate() == time));
+                rtn[string.Format(_GROUP_FORMAT, count, group)].Add((list.Count() == 0) ? double.NaN : count);
 
-                if (list.Count() > 0)
-                {
-                    rtn[string.Format(_GROUP_FORMAT, count, group)].Add(count);
-                }
-                else
-                {
-                    rtn[string.Format(_GROUP_FORMAT, count, group)].Add(double.NaN);
-                }
                 count++;
             }
         }
@@ -264,7 +254,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         var rtn = new ListStringStringPair();
         rtn.Add(new(_group.Description(), ToDataBase.GetDatabaseType(typeof(string))));
 
-        if (product_ == (long)SelectData.ECLUSION)
+        if (product_ == (long)SelectData.ALL)
         {
             // 全て
             rtn.Add(new("Duration", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
@@ -299,7 +289,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
 
             var add = new List<string>();
             add.Add($"{key}");
-            if (product_ == (long)SelectData.ECLUSION)
+            if (product_ == (long)SelectData.ALL)
             {
                 // 全て
                 var sum = new TimeSpan(listCount.Sum(x => x.DurationDuplication().Ticks));

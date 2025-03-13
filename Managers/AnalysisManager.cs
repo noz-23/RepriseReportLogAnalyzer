@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Enums;
-using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -411,7 +410,7 @@ class AnalysisManager : INotifyPropertyChanged
             }
         }
 
-        var listY = new Dictionary<string, List<double>>();
+        var listY = new SortedDictionary<string, List<double>>();
         switch (group_)
         {
             case AnalysisGroup.USER: listY = _listUserDuration.ListPlot(listX, timeSpan); break;
