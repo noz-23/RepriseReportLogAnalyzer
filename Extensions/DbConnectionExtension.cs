@@ -7,15 +7,12 @@
  * 
  */
 using Dapper;
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.Data.Common;
-using System.Reflection;
-using System.Windows.Input;
 
-namespace RLMLogReader.Extensions;
+namespace RepriseReportLogAnalyzer.Extensions;
 
 /// <summary>
 /// DbConnection の Extension

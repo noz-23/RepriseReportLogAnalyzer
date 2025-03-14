@@ -14,6 +14,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -22,7 +24,9 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="*" MaxHeight="200"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Label 
             Grid.Row="0" Grid.Column="0"
@@ -30,31 +34,32 @@
             />
         <TextBox
             x:Name="_textBoxFolder"
-            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
             Text=""
             />
         <Button 
-            Grid.Row="1" Grid.Column="2"
+            Grid.Row="1" Grid.Column="4"
             Content="Select"
             Click="_selectClick"
+        />
+        <TextBlock
+            Grid.Row="3" Grid.Column="0" 
+            Text="Log Event"
             />
-        <Button 
-            x:Name="_saveCsv"
-            Grid.Row="3" Grid.Column="2"
-            Content="Save To Csv"
-            Click="_saveCsvClick"
-            />
-        <Button 
-             x:Name="_saveSql"
-           Grid.Row="4" Grid.Column="2"
-            Content="Save To SQLite"
-            Click="_saveSqliteClick"
+        <CheckBox
+            x:Name="_checkBoxAllEvent"
+            Grid.Row="3" Grid.Column="1"
+            IsThreeState="True"            
+            Content="Select All"
+            Checked="_changeAllEvent"
+            Unchecked="_changeAllEvent"
+            Indeterminate="_changeAllEvent"
             />
         <ListView 
-            Grid.Row="3" Grid.Column="0" Grid.RowSpan="3"
-            MaxHeight="150"
+            x:Name="_listEventView"
+            Grid.Row="4" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="2"
             ItemsSource="{Binding ListEvent,ElementName=_userControl, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
-            ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="225" VerticalAlignment="Top"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
             >
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -67,18 +72,35 @@
                         Orientation="Horizontal"
                         Width="150" Height="25"
                         >
-                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="{Binding Name,Mode=OneWay}"/>
+                        <CheckBox 
+                            IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Checked="_changeEvent"
+                            Unchecked="_changeEvent"
+                        />
+                        <TextBlock 
+                            Text="{Binding Name,Mode=OneWay}"
+                        />
                     </StackPanel>
                 </DataTemplate>
 
             </ListView.ItemTemplate>
         </ListView>
+        <TextBlock
+            Grid.Row="3" Grid.Column="2" 
+            Text="Log Analysis"
+            />
+        <CheckBox
+            Grid.Row="3" Grid.Column="3" 
+            Content="Select All"
+            IsThreeState="True"                        
+            Checked="_changeAllAnalysis"
+            Unchecked="_changeAllAnalysis"
+            Indeterminate="_changeAllAnalysis"
+            />
         <ListView 
-            Grid.Row="3" Grid.Column="1" Grid.RowSpan="3"
-            MaxHeight="150"
+            Grid.Row="4" Grid.Column="2" Grid.RowSpan="3" Grid.ColumnSpan="2"
             ItemsSource="{Binding ListAnalysis,ElementName=_userControl, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
-            ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="225" VerticalAlignment="Top"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
             >
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -91,8 +113,14 @@
                         Orientation="Horizontal"
                         Width="275" Height="25"
                         >
-                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="{Binding Name,Mode=OneWay}" Width="100"/>
+                        <CheckBox 
+                            IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Checked="_changeAnalysis"
+                            Unchecked="_changeAnalysis"
+                        />
+                        <TextBlock 
+                            Text="{Binding Name,Mode=OneWay}" Width="100"
+                        />
                         <ComboBox
                             Width="150"
                             ItemsSource="{Binding ListSelect}" 
@@ -105,5 +133,24 @@
 
             </ListView.ItemTemplate>
         </ListView>
+        <CheckBox
+            Grid.Row="7" Grid.Column="0"
+            Content="Summy"
+            IsThreeState="True"
+            IsChecked="{Binding IsSaveSummy,ElementName=_userControl, Mode=OneWay}"
+        />
+        <Button 
+            x:Name="_saveCsv"
+            Grid.Row="4" Grid.Column="4"
+            Content="Save To Csv"
+            Click="_saveCsvClick"
+            />
+        <Button 
+             x:Name="_saveSql"
+           Grid.Row="5" Grid.Column="4"
+            Content="Save To SQLite"
+            Click="_saveSqliteClick"
+            />
+
     </Grid>
 </UserControl>

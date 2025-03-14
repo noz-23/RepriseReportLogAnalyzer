@@ -28,7 +28,7 @@ internal class LicenseView :BaseView
         get => _isChecked;
         set => _SetValue(ref _isChecked, value);
     }
-    private bool _isChecked = true;
+    private bool _isChecked = false;
 
     /// <summary>
     /// メインの名称

@@ -13,7 +13,6 @@ using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
-using RLMLogReader.Extensions;
 using ScottPlot;
 using ScottPlot.WPF;
 using System.Collections.ObjectModel;

@@ -9,7 +9,7 @@
 using RepriseReportLogAnalyzer.Views;
 using System.Collections.ObjectModel;
 
-namespace RLMLogReader.Extensions;
+namespace RepriseReportLogAnalyzer.Extensions;
 
 internal static class ObservableCollectionExtension
 {

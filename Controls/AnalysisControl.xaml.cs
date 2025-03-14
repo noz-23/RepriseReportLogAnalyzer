@@ -7,11 +7,14 @@
  * 
  */
 using Microsoft.Win32;
+using RepriseReportLogAnalyzer.Extensions;
+using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
-using System.Diagnostics.Metrics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -92,7 +95,7 @@ public partial class AnalysisControl : UserControl
         {
             mainWindow._resultControl.SetDate();
             //mainWindow._tabControl._resultControl.SetData();
-            _textBlock.Text = $"[{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
+            _textLabel.Text = $"Runing [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
     }
 
@@ -124,8 +127,84 @@ public partial class AnalysisControl : UserControl
                 _resultTitle = str_;
                 _progressBar.Maximum = max_;
             }
+            _textLabel.Text = $"Runing {_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
             _progressBar.Value = count_;
-            _textBlock.Text = $"{count_} / {max_} {_resultTitle} [{(DateTime.Now- _startDateTime):hh\\:mm\\:ss}]".Trim();
+            _textProgress.Text = $"{count_} / {max_}";
         });
     }
+
+
+    /// <summary>
+    /// ドラッグアンドドロップ開始位置
+    /// </summary>
+    private System.Windows.Point _startPoint = new System.Windows.Point();
+    /// <summary>
+    /// マウスドラッグ
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _mouseDown(object sender_, MouseButtonEventArgs e_)
+    {
+        _startPoint = e_.GetPosition(null);
+    }
+
+    /// <summary>
+    /// 移動
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _mouseMove(object sender_, System.Windows.Input.MouseEventArgs e_)
+    {
+        var nowPoint = e_.GetPosition(null);
+        if (e_.LeftButton == MouseButtonState.Released == true)
+        {
+            return;
+        }
+        if (Math.Abs(nowPoint.X - _startPoint.X) < SystemParameters.MinimumHorizontalDragDistance)
+        {
+            return;
+        }
+        if (Math.Abs(nowPoint.Y - _startPoint.Y) < SystemParameters.MinimumVerticalDragDistance)
+        {
+            return;
+        }
+
+        if (_dataGrid.SelectedItem is string selectView)
+        {
+            LogFile.Instance.WriteLine($"selectView {selectView}");
+
+            // 選択されたViewをセット
+            DragDrop.DoDragDrop(_dataGrid, selectView, System.Windows.DragDropEffects.Move);
+        }
+    }
+
+    /// <summary>
+    /// ドロップ
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _drop(object sender_, System.Windows.DragEventArgs e_)
+    {
+        if (e_.Data.GetData(typeof(string)) is string dragItem)
+        {
+            // 選択したViewの取得
+            var dropPositon = e_.GetPosition(_dataGrid);
+            var hit = VisualTreeHelper.HitTest(_dataGrid, dropPositon);
+            if (hit.VisualHit.GetParentOfType<ItemsControl>() is ItemsControl dropItem)
+            {
+                // ドロップ先のViewを取得
+                var dropView = dropItem.DataContext as string;
+
+
+                var oldIndex = _dataGrid.Items.IndexOf(dragItem);
+                var newIndex = _dataGrid.Items.IndexOf(dropItem);
+
+                var item = _dataGrid.Items[newIndex];
+                _dataGrid.Items[newIndex] = _dataGrid.Items[oldIndex];
+                _dataGrid.Items[oldIndex] = item;
+            }
+        }
+    }
+
+
 }

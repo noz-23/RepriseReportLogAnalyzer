@@ -6,9 +6,9 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
-using RLMLogReader.Extensions;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows;
