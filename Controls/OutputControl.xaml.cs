@@ -7,7 +7,6 @@
  * 
  */
 using Microsoft.Win32;
-using OpenTK.Platform.Windows;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
@@ -18,7 +17,6 @@ using RepriseReportLogAnalyzer.Views;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -45,6 +43,9 @@ public partial class OutputControl : UserControl
     private const string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
     private const string _NAME_SPACE_ANALYSES = "RepriseReportLogAnalyzer.Analyses";
 
+    /// <summary>
+    /// 総合ファイルの出力
+    /// </summary>
     public bool IsSaveSummy { get; private set; } = false;
 
     public List<OutputView> ListEvent { get; private set; } = new();
@@ -53,6 +54,9 @@ public partial class OutputControl : UserControl
     public List<OutputView> ListAnalysis { get;private set; } = new();
     private Dictionary<string, bool> _listSavetAnalysis = new();
 
+    /// <summary>
+    /// 各イベント項目の追加
+    /// </summary>
     private void _init()
     {
         var _assembly = Assembly.GetExecutingAssembly();

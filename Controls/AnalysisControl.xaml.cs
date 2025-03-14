@@ -13,13 +13,8 @@ using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -37,7 +32,6 @@ public partial class AnalysisControl : UserControl
 
         AnalysisManager.Instance.SetProgressCount(_progressCount);
     }
-        private const string _ANALYSIS = "[File Read]";
 
     /// <summary>
     /// 処理内容
@@ -80,7 +74,6 @@ public partial class AnalysisControl : UserControl
         if (_dataGrid.Items.Count ==0)
         {
             return;
-        }
         }
 
         //var outFolder = _textBoxFolder.Text;
@@ -126,8 +119,6 @@ public partial class AnalysisControl : UserControl
     /// <param name="str_">文字列</param>
     private void _progressCount(int count_, int max_, string str_ = "")
     {
-            if (count_ == 0)
-            {
         App.Current.Dispatcher.Invoke(() =>
         {
             if (count_ == 0)
@@ -135,7 +126,6 @@ public partial class AnalysisControl : UserControl
                 // カウントが0の場合に最大数と文字列を更新
                 _resultTitle = str_;
                 _progressBar.Maximum = max_;
-                });
             }
             _textLabel.Text = $"Runing {_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
             _progressBar.Value = count_;

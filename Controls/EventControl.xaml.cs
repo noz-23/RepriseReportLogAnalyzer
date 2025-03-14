@@ -5,31 +5,63 @@
  * 
  * Licensed under the MIT License 
  * 
- */using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+ */using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Events;
+using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Interfaces;
+using RepriseReportLogAnalyzer.Managers;
+using RepriseReportLogAnalyzer.Views;
+using System.Reflection;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace RepriseReportLogAnalyzer.Controls
+namespace RepriseReportLogAnalyzer.Controls;
+
+/// <summary>
+/// EventControl.xaml の相互作用ロジック
+/// </summary>
+public partial class EventControl : UserControl
 {
-    /// <summary>
-    /// EventControl.xaml の相互作用ロジック
-    /// </summary>
-    public partial class EventControl : UserControl
+    public EventControl()
     {
-        public EventControl()
+        InitializeComponent();
+
+        _init();
+    }
+
+    private const string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
+
+    private void _init()
+    {
+        _comboBox.Items.Add(new OutputView(null, "NONE"));
+        var _assembly = Assembly.GetExecutingAssembly();
+
+        var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass&&t_.Namespace== _NAME_SPACE_EVENT).Distinct().OrderBy(t_ => (Attribute.GetCustomAttribute(t_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+        foreach (var t in tyepInNamespace)
         {
-            InitializeComponent();
+            if (t.GetInterfaces().Where(t_ => t_.Name == typeof(ILogEventWhy).Name).Count() > 0)
+            {
+                _comboBox.Items.Add(new OutputView(t));
+                LogFile.Instance.WriteLine($"{t.Name}");
+
+            }
+        }
+        _comboBox.SelectedIndex = 0;
+
+    }
+
+    private void _selectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_comboBox.SelectedValue is OutputView selected)
+        {
+            LogFile.Instance.WriteLine($"{selected.Name}");
+
+            if (selected.ClassType == null)
+            {
+                return;
+            }
+            _dataGrid.ItemsSource = null;
+            _dataGrid.ItemsSource = AnalysisManager.Instance.ListEvent(selected.ClassType);
+
         }
     }
 }

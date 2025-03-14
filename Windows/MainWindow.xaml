@@ -19,12 +19,17 @@
             <TabItem Header="Result">
                 <control:ResultControl
                     x:Name="_resultControl"
-                    />
+                />
+            </TabItem>
+            <TabItem Header="Why Event">
+                <control:EventControl
+                    x:Name="_eventControl"
+                />
             </TabItem>
             <TabItem Header="Output">
                 <control:OutputControl
                     x:Name="_outputControl"
-                    />
+                />
             </TabItem>
         </TabControl>
     </Grid>

@@ -96,58 +96,37 @@ internal sealed class ConvertReportLog
     /// <summary>
     /// プロダクト
     /// </summary>
-    public IEnumerable<string> ListProduct
-    {
-        get => ListProductEvent.Select(x_ => x_.Product).Distinct();
-    }
+    public IEnumerable<string> ListProduct{get => ListProductEvent.Select(x_ => x_.Product).Distinct();}
 
     /// <summary>
     /// プロダクトを持ってる イベント
     /// </summary>
-    public IEnumerable<ILogEventProduct> ListProductEvent
-    {
-        get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct).Where(e_ => string.IsNullOrEmpty(e_?.Product ??string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);
-    }
+    public IEnumerable<ILogEventProduct> ListProductEvent{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct).Where(e_ => string.IsNullOrEmpty(e_?.Product ??string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);}
 
     /// <summary>
     /// ユーザー
     /// </summary>
-    public IEnumerable<string> ListUser
-    {
-        get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser).Select(e_ => e_?.User ??string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();
-    }
+    public IEnumerable<string> ListUser{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser).Select(e_ => e_?.User ??string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct(); }
 
     /// <summary>
     /// ホスト
     /// </summary>
-    public IEnumerable<string> ListHost
-    {
-        get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();
-    }
+    public IEnumerable<string> ListHost{ get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();}
 
     /// <summary>
     /// ユーザーホスト
     /// </summary>
-    public IEnumerable<string> ListUserHost
-    {
-        get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct();
-    }
+    public IEnumerable<string> ListUserHost{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct();}
 
     /// <summary>
     /// 時間
     /// </summary>
-    public IEnumerable<DateTime> ListDateTime
-    {
-        get => _listEvent.AsParallel().Select(e_ => e_.EventDateTime).Where(e_ => e_ != LogEventBase.NotAnalysisEventTime).Distinct().OrderBy(x_ => x_);
-    }
+    public IEnumerable<DateTime> ListDateTime{get => _listEvent.AsParallel().Select(e_ => e_.EventDateTime).Where(e_ => e_ != LogEventBase.NotAnalysisEventTime).Distinct().OrderBy(x_ => x_);}
 
     /// <summary>
     /// 日付
     /// </summary>
-    public IEnumerable<DateTime> ListDate
-    {
-        get => ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct();
-    }
+    public IEnumerable<DateTime> ListDate{get => ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct();}
 
     /// <summary>
     /// イベント リスト抽出(出力系で利用)
@@ -180,6 +159,11 @@ internal sealed class ConvertReportLog
 
     private IEnumerable<string> _listToString<T>() where T : LogEventBase=> ListEvent<T>().Select(e_ => e_.ToString());
 
+    /// <summary>
+    /// 各イベントのCsv保存
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <param name="classType_"></param>
     public void WriteEventText(string path_, Type classType_)
     {
         var list = new List<string>();

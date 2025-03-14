@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"   
     xmlns:local="clr-namespace:RepriseReportLogAnalyzer.Controls"
     xmlns:manager="clr-namespace:RepriseReportLogAnalyzer.Managers"
     mc:Ignorable="d" 
@@ -13,7 +12,6 @@
     >
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -66,15 +64,6 @@
             x:Name="_comboBox"
             Grid.Column="2" Grid.Row="0" SelectionChanged="_selectionChanged"
             >
-            <ComboBoxItem
-                Content="User"
-            />
-            <ComboBoxItem
-                Content="Host"
-            />
-            <ComboBoxItem
-                Content="User@Host"
-            />
         </ComboBox>
         <DataGrid 
             Grid.Column="2" Grid.Row="1"

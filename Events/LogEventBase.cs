@@ -54,7 +54,6 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// </summary>
     public LogEventBase()
     {
-        //
         EventNumber = ++NowEventNumber;
     }
 

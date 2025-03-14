@@ -10,20 +10,7 @@ using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -41,7 +28,9 @@ public partial class ResultControl : UserControl
 
         foreach (AnalysisGroup group in Enum.GetValues(typeof(AnalysisGroup)))
         {
-            _comboBox.Items.Add(group.Description());
+            var item = group.Description();
+            LogFile.Instance.WriteLine($"Selected [{item}]");
+            _comboBox.Items.Add(item);
         }
         _comboBox.SelectedIndex = 0;
     }
@@ -56,19 +45,6 @@ public partial class ResultControl : UserControl
         LogFile.Instance.WriteLine($"Selected [{_dataPicker.SelectedDate}]");
         SetDate();
     }
-
-    /// <summary>
-    /// カレンダーダブルクリック処理
-    /// </summary>
-    /// <param name="sender_"></param>
-    /// <param name="e_"></param>
-    //private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
-    //{
-    //    //_calendar.SelectedDate = null;
-    //    _label.Content = "Selected : ";
-
-    //    SetDate();
-    //}
 
     /// <summary>
     /// グループ変更処理
@@ -97,29 +73,12 @@ public partial class ResultControl : UserControl
     /// </summary>
     public void SetDate()
     {
-        //var date = _calendar.SelectedDate;
         var date = _dataPicker.SelectedDate;
         var index = _comboBox.SelectedIndex;
 
         LogFile.Instance.WriteLine($"[{date}] [{index}]");
 
         AnalysisManager.Instance.SetData(date, (AnalysisGroup)index);
-
-        //if (date == null)
-        //{
-        //    AnalysisManager.Instance.SetAllPlot(_scottPlot);
-        //}
-        //else
-        //{
-        //    AnalysisManager.Instance.SetDatePlot(_scottPlot, date ?? DateTime.Now, index);
-        //}
         AnalysisManager.Instance.SetPlot(_scottPlot, date, (AnalysisGroup)index);
-
-    }
-
-        private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
-        {
-            _calendar.SelectedDate = null;
-        }
     }
 }

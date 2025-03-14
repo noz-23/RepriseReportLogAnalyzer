@@ -22,7 +22,7 @@ public class OutputView:BaseView
     /// <param name="type_"></param>
     /// <param name="name_"></param>
     /// <param name="list_"></param>
-    public OutputView(Type type_, string name_="", ListStringLongPair? list_=null)
+    public OutputView(Type? type_, string name_="", ListStringLongPair? list_=null)
     {
         Name =(string.IsNullOrEmpty(name_)==true) ? type_.Name:name_;
         ClassType=type_;
@@ -75,7 +75,7 @@ public class OutputView:BaseView
     /// <summary>
     /// クラスタイプ
     /// </summary>
-    public Type ClassType { get; private set; }
+    public Type? ClassType { get; private set; }
 
     /// <summary>
     /// コンボボックス表示内容

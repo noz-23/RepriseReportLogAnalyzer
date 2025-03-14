@@ -54,36 +54,6 @@ namespace RepriseReportLogAnalyzer.Managers
 
             _connection = new SQLiteConnection(config.ToString());
             _connection.Open();
-            //
-            _connection.CreateTable<LogEventStart>();
-            _connection.CreateTable<LogEventShutdown>();
-            _connection.CreateTable<LogEventCheckOut>();
-            _connection.CreateTable<LogEventCheckIn>();
-            _connection.CreateTable<LogEventLicenseDenial>();
-            _connection.CreateTable<LogEventLicenseInUse>();
-            //
-            _connection.CreateTable<LogEventProduct>();
-            _connection.CreateTable<LogEventLicenseReread>();
-            _connection.CreateTable<LogEventLicenseFile>();
-            //
-            _connection.CreateTable<LogEventQueue>();
-            _connection.CreateTable<LogEventRoamExtend>();
-            _connection.CreateTable<LogEventMeterDecrement>();
-            _connection.CreateTable<LogEventDynamicReservation>();
-            _connection.CreateTable<LogEventAuthentication>();
-            //
-            _connection.CreateTable<AnalysisStartShutdown>();
-            _connection.CreateTable<AnalysisCheckOutIn>();
-            //
-            SqlMapper.AddTypeHandler(DateTimeHandler.Default);
-
-            LogFile.Instance.WriteLine("Create");
-        }
-
-        ~SQLiteManager()
-        {
-            //_connection?.Close();
-            //_connection?.Dispose();
         }
 
         /// <summary>
@@ -116,22 +86,5 @@ namespace RepriseReportLogAnalyzer.Managers
                 tran?.Commit();
             }
         }
-
-        //public List<LogViewStartShutdown> ListLogViewStartShutdown()
-        //{
-        //    var query = "SELECT"
-        //        + " LogEventStart.EventDateTime as StartDateTime,"
-        //        + " LogEventShutdown.EventDateTime as EndDateTime,"
-        //        + " LogEventStart.HostName as HostName,"
-        //        + " LogEventShutdown.User as User,"
-        //        + " LogEventShutdown.Host as Host,"
-        //        + " LogEventShutdown.UserHost as UserHost "
-        //        + "FROM LogEventStart "
-        //        + "LEFT JOIN LogEventShutdown "
-        //        + "ON"
-        //        + " LogEventShutdown.EventNumber = (SELECT Min(LogEventShutdown.EventNumber) FROM LogEventStart LEFT JOIN LogEventShutdown ON LogEventShutdown.EventNumber > LogEventStart.EventNumber GROUP BY LogEventStart.EventNumber);";
-
-        //    return _connection.Query<LogViewStartShutdown>(query).ToList();
-        //}
     }
 }

@@ -8,6 +8,7 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -20,7 +21,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RepriseReportLogAnalyzer.Managers;
 
@@ -46,11 +46,6 @@ class AnalysisManager : INotifyPropertyChanged
     public void Create()
     {
         LogFile.Instance.WriteLine("Create");
-
-            //ListResultProduct.Add(new LicenseView() { Name = "test1" });
-            //ListResultProduct.Add(new LicenseView() { Name = "test2" });
-
-            //_notifyPropertyChanged("ListResultProduct");
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -80,7 +75,9 @@ class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.LastOrDefault(); }
 
-        public SortedSet<DateTime> ListDate { get; private set; } = new SortedSet<DateTime>();
+
+    public IEnumerable<LogEventBase> ListEvent(Type classType_) => _convertReportLog.ListEvent(classType_);
+
 
     /// <summary>
     /// 出力用の管理
