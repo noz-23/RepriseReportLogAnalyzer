@@ -1,94 +1,122 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
-using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RepriseReportLogAnalyzer.Analyses
+namespace RepriseReportLogAnalyzer.Analyses;
+
+/// <summary>
+/// チェックアウト チェックイン 結合情報
+/// 重複情報
+/// </summary>
+internal sealed class JoinEventCheckOutIn
 {
-    class JoinEventCheckOutIn
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="checkOut_">チェックアウト イベント</param>
+    /// <param name="checkIn_">チェックイン or シャットダウン イベント</param>
+    public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventBase? checkIn_)
     {
-        public const long NO_DUPLICATION_ =0;
-        public const long DUPLICATION = -1;
-
-        //public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventCheckIn checkIn_)
-        //{
-        //    CheckOutNumber=checkOut_.EventNumber;
-        //    CheckInNumber = checkIn_.EventNumber;
-        //}
-
-        //public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventShutdown shutdown_)
-        //{
-        //    CheckOutNumber = checkOut_.EventNumber;
-        //    ShutdownNumber = shutdown_.EventNumber;
-        //}
-
-        public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventBase checkIn_)
+        CheckOutNumber = checkOut_.EventNumber;
+        if (checkIn_ is LogEventCheckIn checkIn)
         {
-            CheckOutNumber = checkOut_.EventNumber;
-            if (checkIn_ is LogEventCheckIn checkIn)
-            {
-                CheckInNumber = checkIn.EventNumber;
-            }
-            else if (checkIn_ is LogEventShutdown shutdown)
-            {
-                ShutdownNumber = shutdown.EventNumber;
-            }
-            else
-            {
-                LogFile.Instance.WriteLine($"{checkIn_.EventNumber} {checkIn_.GetType()}");
-            }
+            CheckInNumber = checkIn.EventNumber;
+        }
+        else if (checkIn_ is LogEventShutdown shutdown)
+        {
+            ShutdownNumber = shutdown.EventNumber;
+        }
+        else
+        {
+            LogFile.Instance.WriteLine($"{checkOut_.EventNumber} {checkIn_?.EventNumber} {checkIn_?.GetType()}");
+        }
+        _checkIn = checkIn_;
+    }
+
+
+    /// <summary>
+    /// 重複なし(AnalysisCheckOutInのデータそのまま)
+    /// </summary>
+    //public const long NO_DUPLICATION = 0;
+
+    /// <summary>
+    /// 重複あり(利用しない)
+    /// </summary>
+    //public const long HAVE_DUPLICATION = -1;
+
+    /// <summary>
+    /// チェックアウト イベント番号
+    /// </summary>
+    [Sort(101)]
+    public long CheckOutNumber { get; private set; } = -1;
+
+    /// <summary>
+    /// チェックイン イベント番号
+    /// </summary>
+    [Sort(102)]
+    public long CheckInNumber { get; private set; } = -1;
+
+    /// <summary>
+    /// シャットダウン イベント番号(チェックインの替わり)
+    /// </summary>
+
+    [Sort(103)]
+    public long ShutdownNumber { get; private set; } = -1;
+
+
+    /// <summary>
+    /// -1  : Duplication
+    ///  0  : Use CheckInNumber or ShutdownNumber;
+    /// >0  : Use DuplicationNumber
+    /// </summary>
+    [Sort(104)]
+    //public long DuplicationNumber { get; private set; } = NO_DUPLICATION;
+    public long DuplicationNumber { get; private set; } = (long)SelectData.ALL;
+
+    /// <summary>
+    /// 重複取り除いた場合のイベント
+    /// </summary>
+    private LogEventBase? _checkIn = null;
+    public LogEventBase? CheckIn() => _checkIn;
+
+
+    /// <summary>
+    /// 
+    /// 重複あり イベント セット
+    /// </summary>
+    /// <param name="checkIn_">更新したイベント</param>
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetDuplication(LogEventBase? checkIn_ = null)
+    {
+        if (checkIn_ == null)
+        {
+            //DuplicationNumber = HAVE_DUPLICATION;
+            DuplicationNumber = (long)SelectData.ECLUSION;
+        }
+        else
+        {
             _checkIn = checkIn_;
+            //DuplicationNumber = _checkIn?.EventNumber ?? NO_DUPLICATION;
+            DuplicationNumber = _checkIn?.EventNumber ?? (long)SelectData.ALL;
         }
+    }
 
-        [ColumnSort(101)]
-        public long CheckOutNumber { get; private set; } = -1;
-
-        [ColumnSort(102)]
-        public long CheckInNumber { get; private set; } = -1;
-        //public long CheckInNumber {get => (_checkIn is LogEventCheckIn checkIn) ? checkIn.EventNumber : -1; }
-        //
-
-        [ColumnSort(103)]
-        public long ShutdownNumber { get; private set; } = -1;
-        //public long ShutdownNumber { get => (_checkIn is LogEventShutdown shutdown) ? shutdown.EventNumber : -1; }
-
-
-        /// <summary>
-        /// -1  : Duplication
-        ///  0  : Use CheckInNumber or ShutdownNumber;
-        /// >0  : Use DuplicationNumber
-        /// </summary>
-        [ColumnSort(104)]
-        public long DuplicationNumber { get; private set; } = NO_DUPLICATION_;
-
-        private LogEventBase _checkIn;
-        public LogEventBase CheckIn() => _checkIn;
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetDuplication()
-        {
-            DuplicationNumber  = DUPLICATION;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetDuplication(LogEventBase checkIn_)
-        {
-            _checkIn = checkIn_;
-            DuplicationNumber = _checkIn.EventNumber;
-        }
-
-
-        public static string HEADER { get => "CheckOut,CheckIn,Shutdown,Duplication"; }
-        public override string ToString()
-        {
-            return $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
-        }
+    /// <summary>
+    /// 文字列化
+    /// </summary>
+    public override string ToString()
+    {
+        return $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
     }
 }

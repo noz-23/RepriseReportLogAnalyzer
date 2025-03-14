@@ -1,5 +1,6 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using RepriseReportLogAnalyzer.Events;
+using RepriseReportLogAnalyzer.Files;
+using RepriseReportLogAnalyzer.Managers;
 using System.Windows;
 
 namespace RepriseReportLogAnalyzer;
@@ -11,7 +12,10 @@ public partial class App : Application
 {
     private void _startup(object sender, StartupEventArgs e)
     {
-
+        LogFile.Instance.Create();
+        LogEventRegist.Instance.Create();
+        AnalysisManager.Instance.Create();
+        //SQLiteManager.Instance.Create();
     }
 }
 

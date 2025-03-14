@@ -15,46 +15,50 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" MaxHeight="150"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Label
-                    Grid.Row="0" Grid.Column="0"
-                    Content="Open Reprise Report Log Files [as one file from top]"
-                    />
+            Grid.Row="0" Grid.Column="0"
+            Content="Open Reprise Report Log Files [as one file from top]"
+            />
         <DataGrid
-                    x:Name="_dataGrid"
-                    Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
-                    AutoGenerateColumns="False"
-                    HeadersVisibility="None"
-                    >
+            x:Name="_dataGrid"
+            Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
+            AutoGenerateColumns="False"
+            AllowDrop="True"
+            HeadersVisibility="None"
+            MouseDown="_mouseDown"
+            MouseMove="_mouseMove"
+            Drop="_drop"
+            >
             <DataGrid.Columns>
                 <DataGridTextColumn
-                            Width="*"
-                            IsReadOnly="True"
-                            Binding="{Binding}"
-                            />
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding}"
+                    />
                 <DataGridTemplateColumn
-                            Width="50"
-                        >
+                    Width="50"
+                    >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button 
-                                        Content="Delete"
-                                        Click="_deleteClick"
-                                        />
+                                Content="Delete"
+                                Click="_deleteClick"
+                            />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <Button 
-                    Grid.Row="1" Grid.Column="1"
-                    Content="Open"
-                    Click="_openClick"
-                    />
+            Grid.Row="1" Grid.Column="1"
+            Content="Open"
+            Click="_openClick"
+            />
         <Label 
                     Grid.Row="3" Grid.Column="0"
                     Content="Select Output Folder"
@@ -70,20 +74,25 @@
                     Click="_selectClick"
                     />
         <Button 
-                    x:Name="_buttonAnalysis"
-                    Grid.Row="5" Grid.Column="1"
-                    Content="Analysis"
-                    Click="_analysisClick"
-                    />
+            x:Name="_buttonAnalysis"
+            Grid.Row="5" Grid.Column="1"
+            Content="Analysis"
+            Click="_analysisClick"
+        />
+        <TextBlock 
+            x:Name="_textLabel"
+            Grid.Row="4" Grid.Column="0"
+            Text="Runing "
+        />
         <ProgressBar
-                    x:Name="_progressBar"
-                    Grid.Row="5" Grid.Column="0"
-                    />
+            x:Name="_progressBar"
+            Grid.Row="5" Grid.Column="0"
+        />
         <TextBlock
-                    x:Name="_textBlock"
-                    Grid.Row="5" Grid.Column="0"
-                    TextAlignment="Center"
-                    />
+            x:Name="_textProgress"
+            Grid.Row="5" Grid.Column="0"
+            TextAlignment="Center"
+        />
 
     </Grid>
 </UserControl>

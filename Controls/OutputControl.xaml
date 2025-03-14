@@ -1,0 +1,156 @@
+﻿<UserControl
+    x:Name="_userControl"
+    x:Class="RepriseReportLogAnalyzer.Controls.OutputControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:RepriseReportLogAnalyzer.Controls"
+    mc:Ignorable="d" 
+    d:DesignHeight="300" d:DesignWidth="800"
+    Loaded="_loaded"
+    >
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*" MaxHeight="200"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <Label 
+            Grid.Row="0" Grid.Column="0"
+            Content="Select Output Folder"
+            />
+        <TextBox
+            x:Name="_textBoxFolder"
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+            Text=""
+            />
+        <Button 
+            Grid.Row="1" Grid.Column="4"
+            Content="Select"
+            Click="_selectClick"
+        />
+        <TextBlock
+            Grid.Row="3" Grid.Column="0" 
+            Text="Log Event"
+            />
+        <CheckBox
+            x:Name="_checkBoxAllEvent"
+            Grid.Row="3" Grid.Column="1"
+            IsThreeState="True"            
+            Content="Select All"
+            Checked="_changeAllEvent"
+            Unchecked="_changeAllEvent"
+            Indeterminate="_changeAllEvent"
+            />
+        <ListView 
+            x:Name="_listEventView"
+            Grid.Row="4" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="2"
+            ItemsSource="{Binding ListEvent,ElementName=_userControl, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
+            >
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Width="150" Height="25"
+                        >
+                        <CheckBox 
+                            IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Checked="_changeEvent"
+                            Unchecked="_changeEvent"
+                        />
+                        <TextBlock 
+                            Text="{Binding Name,Mode=OneWay}"
+                        />
+                    </StackPanel>
+                </DataTemplate>
+
+            </ListView.ItemTemplate>
+        </ListView>
+        <TextBlock
+            Grid.Row="3" Grid.Column="2" 
+            Text="Log Analysis"
+            />
+        <CheckBox
+            Grid.Row="3" Grid.Column="3" 
+            Content="Select All"
+            IsThreeState="True"                        
+            Checked="_changeAllAnalysis"
+            Unchecked="_changeAllAnalysis"
+            Indeterminate="_changeAllAnalysis"
+            />
+        <ListView 
+            Grid.Row="4" Grid.Column="2" Grid.RowSpan="3" Grid.ColumnSpan="2"
+            ItemsSource="{Binding ListAnalysis,ElementName=_userControl, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
+            >
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Width="275" Height="25"
+                        >
+                        <CheckBox 
+                            IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Checked="_changeAnalysis"
+                            Unchecked="_changeAnalysis"
+                        />
+                        <TextBlock 
+                            Text="{Binding Name,Mode=OneWay}" Width="100"
+                        />
+                        <ComboBox
+                            Width="150"
+                            ItemsSource="{Binding ListSelect}" 
+                            SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                            SelectedValue="{Binding SelectedValue, Mode=TwoWay}"
+                            DisplayMemberPath="Key" SelectedValuePath="Value" 
+                            />
+                    </StackPanel>
+                </DataTemplate>
+
+            </ListView.ItemTemplate>
+        </ListView>
+        <CheckBox
+            Grid.Row="7" Grid.Column="0"
+            Content="Summy"
+            IsThreeState="True"
+            IsChecked="{Binding IsSaveSummy,ElementName=_userControl, Mode=OneWay}"
+        />
+        <Button 
+            x:Name="_saveCsv"
+            Grid.Row="4" Grid.Column="4"
+            Content="Save To Csv"
+            Click="_saveCsvClick"
+            />
+        <Button 
+             x:Name="_saveSql"
+           Grid.Row="5" Grid.Column="4"
+            Content="Save To SQLite"
+            Click="_saveSqliteClick"
+            />
+
+    </Grid>
+</UserControl>

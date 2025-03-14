@@ -1,124 +1,210 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Data;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Files;
-using System;
+using RepriseReportLogAnalyzer.Interfaces;
 using System.Runtime.CompilerServices;
 
-namespace RepriseReportLogAnalyzer.Analyses
+namespace RepriseReportLogAnalyzer.Analyses;
+
+/// <summary>
+/// チェックアウトとチェックインを結合
+/// </summary>
+internal sealed class AnalysisCheckOutIn: ToDataBase
 {
-    class AnalysisCheckOutIn
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="checkOut_">チェックアウト イベント</param>
+    /// <param name="checkIn_">チェックイン or シャットダウン イベント</param>
+    public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase? checkIn_)
     {
-        //public AnalysisCheckOutIn(AnalysisStartShutdown startShutdown_, LogEventCheckOut checkOut_, LogEventCheckIn? checkIn_)
+        _checkOut = checkOut_;
+        _checkIn = checkIn_;
 
-        public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase checkIn_)
+        _joinEvent = new JoinEventCheckOutIn(checkOut_, checkIn_);
+    }
+
+    /// <summary>
+    /// チェックアウト時間
+    /// </summary>
+    [Sort(101)]
+    public DateTime CheckOutDateTime { get => _checkOut.EventDateTime; }
+
+    /// <summary>
+    /// チェックイン時間
+    /// </summary>
+    [Sort(102)]
+    public DateTime CheckInDateTime { get => _checkIn?.EventDateTime ?? LogEventBase.NowDateTime; }
+
+    /// <summary>
+    /// 利用時間
+    /// </summary>
+    [Sort(103)]
+    public TimeSpan Duration { get => CheckInDateTime - CheckOutDateTime; }
+
+    /// <summary>
+    /// プロダクト
+    /// </summary>
+    [Sort(111)]
+    public string Product { get => _checkOut.Product; }
+    /// <summary>
+    /// バージョン
+    /// </summary>
+    [Sort(112)]
+    public string Version { get => _checkOut.Version; }
+    /// <summary>
+    /// プロダクト バージョン
+    /// </summary>
+    [Sort(113)]
+    public string ProductVersion { get => _checkOut.ProductVersion; }
+    /// <summary>
+    /// ユーザー
+    /// </summary>
+    [Sort(121)]
+    public string User { get => _checkOut.User; }
+    /// <summary>
+    /// ホスト
+    /// </summary>
+    [Sort(121)]
+    public string Host { get => _checkOut.Host; }
+    /// <summary>
+    /// ユーザー@ホスト
+    /// </summary>
+    [Sort(121)]
+    public string UserHost { get => _checkOut.UserHost; }
+
+    /// <summary>
+    /// チェックアウト イベント
+    /// </summary>
+    private readonly LogEventCheckOut _checkOut;
+    /// <summary>
+    /// チェックイン(シャットダウン) イベント
+    /// </summary>
+    private readonly LogEventBase? _checkIn = null;
+    /// <summary>
+    /// 結合情報
+    /// </summary>
+    private readonly JoinEventCheckOutIn _joinEvent;
+
+    /// <summary>
+    /// チェックアウト イベント(リフレクションで呼び出さないため関数化)
+    /// </summary>
+    public LogEventCheckOut CheckOut() => _checkOut;
+
+    /// <summary>
+    /// チェックイン イベント(リフレクションで呼び出さないため関数化)
+    /// </summary>
+    public LogEventBase? CheckIn() => _checkIn;
+
+    /// <summary>
+    /// 結合情報(リフレクションで呼び出さないため関数化)
+    /// </summary>
+    public JoinEventCheckOutIn JoinEvent() => _joinEvent;
+
+    /// <summary>
+    /// チェックアウトのイベント番号
+    /// </summary>
+    public long CheckOutNumber() => _checkOut.EventNumber;
+
+    /// <summary>
+    /// チェックインのイベント番号
+    /// </summary>
+    public long CheckInNumber() => _checkIn?.EventNumber ?? LogEventBase.NowEventNumber;
+
+    /// <summary>
+    /// 同一のチェックインのか？
+    /// </summary>
+    /// <param name="checkIn_">チェックイン イベント</param>
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsSame(LogEventCheckIn checkIn_) => _checkIn == checkIn_;
+
+    /// <summary>
+    /// チェックアウトとチェックインの間のイベントか？
+    /// </summary>
+    /// <param name="number_">イベント番号</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsWithInRange(long number_)=> (number_ > CheckOutNumber()) && (number_ < CheckInNumber());
+
+    /// <summary>
+    /// チェックアウトとチェックインの間のイベントか？
+    /// </summary>
+    /// <param name="dateTime_">イベント時間</param>
+    public bool IsWithInRange(DateTime dateTime_)=> (dateTime_ > CheckOutDateTime) && (dateTime_ < CheckInDateTime);
+
+    /// <summary>
+    /// 重複を取り除いたチェックインの時間
+    /// </summary>
+    public DateTime JointDateTime() => _joinEvent.CheckIn()?.EventDateTime ?? LogEventBase.NowDateTime;
+
+    /// <summary>
+    /// 重複を取り除いた利用時間
+    /// </summary>
+    public TimeSpan DurationDuplication() => (JointDateTime() - CheckOutDateTime);
+
+    /// <summary>
+    /// グループ集計する名称
+    /// </summary>
+    /// <param name="group_"></param>
+    public string GroupName(AnalysisGroup group_)
+    {
+        switch (group_)
         {
-            _checkOut = checkOut_;
-            _checkIn = checkIn_;
-
-            //if (checkIn_ is LogEventCheckIn checkIn)
-            //{
-            //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn);
-            //}
-            //else if (checkIn_ is LogEventShutdown shutdown)
-            //{
-            //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, shutdown);
-            //}
-            //else
-            //{
-            //    LogFile.Instance.WriteLine($"{checkIn_.EventNumber} {checkIn_.GetType()}");
-            //}
-            _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn_);
+            case AnalysisGroup.USER: return User;
+            case AnalysisGroup.HOST: return Host;
+            case AnalysisGroup.USER_HOST: return UserHost;
+            default:
+                break;
         }
+        return string.Empty;
+    }
 
-        //public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventCheckIn checkIn_)
-        //{
-        //    _checkOut = checkOut_;
-        //    _checkIn = checkIn_;
+    /// <summary>
+    /// ヘッダー
+    /// </summary>
+    /// <returns></returns>
 
-        //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn_);
-        //}
+    public static string Header() => ToDataBase.Header(typeof(AnalysisCheckOutIn));
 
-        //public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventShutdown checkIn_)
-        //{
-        //    _checkOut = checkOut_;
-        //    _checkIn = checkIn_;
+    /// <summary>
+    /// リスト化したヘッダー項目
+    /// </summary>
+    /// <returns></returns>
+    public static ListStringStringPair ListHeader()=> ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
 
-        //    _joinCheckOutIn = new JoinEventCheckOutIn(checkOut_, checkIn_);
-        //}
+    /// <summary>
+    /// 文字列化したデータ
+    /// </summary>
+    /// <param name="duplication_">重複除去</param>
+    public string ToString(long duplication_) => (duplication_ == (long)SelectData.ALL) ? ToString():string.Join(",", ListDuplicationValue()) ;
 
-        //[Sort(101)]
-        //public long StartNumber { get => _startShutdown.StartNumber; }
-        [ColumnSort(102)]
-        public DateTime CheckOutDateTime { get => _checkOut.EventDateTime; }
-
-        [ColumnSort(103)]
-        public DateTime CheckInDateTime { get => _checkIn.EventDateTime; }
-
-        [ColumnSort(104)]
-        public TimeSpan Duration { get => CheckInDateTime - CheckOutDateTime; }
-
-        //
-        [ColumnSort(111)]
-        public string Product { get => _checkOut.Product; }
-        [ColumnSort(112)]
-        public string Version { get => _checkOut.Version; }
-        [ColumnSort(113)]
-        public string ProductVersion { get => _checkOut.ProductVersion; }
-        //
-        [ColumnSort(121)]
-        public string User { get => _checkOut.User; }
-        [ColumnSort(121)]
-        public string Host { get => _checkOut.Host; }
-        [ColumnSort(121)]
-        public string UserHost { get => _checkOut.UserHost; }
-
-        private readonly LogEventCheckOut _checkOut;
-        private readonly LogEventBase _checkIn;
-        private readonly JoinEventCheckOutIn _joinCheckOutIn;
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsSame(LogEventCheckIn checkIn_)
+    /// <summary>
+    /// リスト化したデータ(重複除去)
+    /// </summary>
+    /// <returns></returns>
+    public List<string> ListDuplicationValue()
+    {
+        return new () 
         {
-            return _checkIn == checkIn_;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsWithInRange(long number_)
-        {
-            return number_ > CheckOutNumber() && number_ < CheckInNumber();
-        }
-
-        public LogEventCheckOut CheckOut() => _checkOut;
-        public LogEventBase CheckIn() => _checkIn;
-        public JoinEventCheckOutIn JoinEvent() => _joinCheckOutIn;
-
-        public long CheckOutNumber()  => _checkOut.EventNumber;
-        public long CheckInNumber() => _checkIn.EventNumber;
-
-        public TimeSpan DurationDuplication() 
-        {
-            return _joinCheckOutIn.CheckIn().EventDateTime - CheckOutDateTime;
-        }
-
-        public static string HEADER { get => "CheckOut Date Time,CheckIn Date Time,Duration,Product,Version,Product Version,User,Host,User@Host"; }
-
-
-        public string ToString( bool duplication_)
-        {
-            if (duplication_ == true)
-            {
-                return $"{CheckOutDateTime.ToString()},{_joinCheckOutIn.CheckIn().EventDateTime.ToString()},{DurationDuplication().ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
-            }
-
-            return ToString();
-        }
-
-        public override string ToString()
-        {
-            return $"{CheckOutDateTime.ToString()},{CheckInDateTime.ToString()},{Duration.ToString(@"d\.hh\:mm\:ss")},{Product},{Version},{ProductVersion},{User},{Host},{UserHost}";
-        }
-
+            $"{CheckOutDateTime.ToString()}",
+            $"{JointDateTime().ToString()}",
+            $"{DurationDuplication().ToString(@"d\.hh\:mm\:ss")}",
+            $"{Product}",
+            $"{Version}",
+            $"{ProductVersion}",
+            $"{User}",
+            $"{Host}",
+            $"{UserHost}"
+        };
 
     }
 }

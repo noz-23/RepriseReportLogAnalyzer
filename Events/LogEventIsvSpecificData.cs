@@ -1,25 +1,47 @@
-﻿using RepriseReportLogAnalyzer.Attributes;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Attributes;
 
-namespace RepriseReportLogAnalyzer.Events
+namespace RepriseReportLogAnalyzer.Events;
+
+/// <summary>
+/// 文字列 と イベントの紐づけ登録
+/// </summary>
+internal sealed partial class LogEventRegist
 {
-    internal class LogEventIsvSpecificData : LogEventBase
+    private bool _logEventIsvSpecificData = Regist("log", (l_) => new LogEventIsvSpecificData(l_));
+}
+
+/// <summary>
+/// isv-specific data
+/// </summary>
+[Sort(83)]
+internal sealed class LogEventIsvSpecificData : LogEventBase
+{
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="list_">スペースで分割した文字列リスト</param>
+
+    public LogEventIsvSpecificData(string[] list_) : base()
     {
-        //isv-specific data
-        //log mm/dd hh:mm:ss isv-specific-data-here
-        //0   1     2        3
-        [ColumnSort(101)]
-        public string IsvSpecificData { get; private set; } = string.Empty;
-
-        public LogEventIsvSpecificData(string[] list_):base()
-        {
-            EventDateTime = _GetDateTime(list_[1], list_[2]);
-            IsvSpecificData = list_[3];
-        }
-
-        new public static string HEADER { get => "Number,Date Time,IsvSpecificData"; }
-        public override string ToString()
-        {
-            return $"{EventNumber},{EventDateTime.ToString()},{IsvSpecificData}";
-        }
+        // small
+        // std
+        // detailed
+        EventDateTime = _GetDateTime(list_[1], list_[2]);
+        IsvSpecificData = list_[3];
     }
+
+    //isv-specific data
+    //log mm/dd hh:mm:ss isv-specific-data-here
+    //0   1     2        3
+    [Sort(101)]
+    public string IsvSpecificData { get; private set; } = string.Empty;
+
 }

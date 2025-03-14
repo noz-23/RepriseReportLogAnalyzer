@@ -1,11 +1,16 @@
-﻿using Microsoft.Win32;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using Microsoft.Win32;
+using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RepriseReportLogAnalyzer.Windows;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,101 +21,200 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RepriseReportLogAnalyzer.Controls
+namespace RepriseReportLogAnalyzer.Controls;
+
+/// <summary>
+/// AnalysisControl.xaml の相互作用ロジック
+/// </summary>
+public partial class AnalysisControl : UserControl
 {
     /// <summary>
-    /// AnalysisControl.xaml の相互作用ロジック
+    /// コンストラクタ
     /// </summary>
-    public partial class AnalysisControl : UserControl
+    public AnalysisControl()
     {
-        public AnalysisControl()
-        {
-            InitializeComponent();
+        InitializeComponent();
 
-            AnalysisManager.Instance.SetProgressCount(_progressCount);
-        }
+        AnalysisManager.Instance.SetProgressCount(_progressCount);
+    }
         private const string _ANALYSIS = "[File Read]";
 
-        private string _resultTitle =string.Empty;
+    /// <summary>
+    /// 処理内容
+    /// </summary>
+    private string _resultTitle = string.Empty;
 
-        private void _openClick(object sender_, RoutedEventArgs e_)
+    private DateTime _startDateTime =DateTime.Now;
+
+    /// <summary>
+    /// レポートログ を開く
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _openClick(object sender_, RoutedEventArgs e_)
+    {
+        var dlg = new OpenFileDialog()
         {
-            var dlg = new OpenFileDialog()
+            Title = "Please Select Reprise Report Log Files",
+            Filter = "Reprise Report Log|*.*",
+            Multiselect = true
+        };
+        if (dlg.ShowDialog() == true)
+        {
+            var list = dlg.FileNames.ToList();
+            list.Sort();
+            list.ForEach(path_ => _dataGrid.Items.Add(path_));
+        }
+    }
+
+    /// <summary>
+    /// 解析開始
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private async void _analysisClick(object sender_, RoutedEventArgs e_)
+    {
+        _buttonAnalysis.IsEnabled = false;
+        _startDateTime = DateTime.Now;
+
+        if (_dataGrid.Items.Count ==0)
+        {
+            return;
+        }
+        }
+
+        //var outFolder = _textBoxFolder.Text;
+        await Task.Run(() =>
+        //await Task.Factory.StartNew(() =>
+        {
+            var list =new List<string>();
+            foreach (string path_ in _dataGrid.Items)
             {
-                Title = "Please Select Reprise Report Log Files",
-                Filter = "Reprise Report Log|*.*",
-                Multiselect = true
-            };
-            if (dlg.ShowDialog() == true)
-            {
-                var list = dlg.FileNames.ToList();
-                list.Sort();
-                list.ForEach(path_ => _dataGrid.Items.Add(path_));
+                list.Add(path_);
             }
-        }
+            AnalysisManager.Instance.Analysis(list);
+        }//, TaskCreationOptions.LongRunning
+        );
 
-        private void _selectClick(object sender_, RoutedEventArgs e_)
+        _buttonAnalysis.IsEnabled = true;
+
+        if (App.Current.MainWindow is MainWindow mainWindow)
         {
-            var dlg = new OpenFolderDialog()
-            {
-                Title = "Please Select Output Folder",
-                Multiselect = false
-            };
-            if (dlg.ShowDialog() == true)
-            {
-                _textBoxFolder.Text = dlg.FolderName;
-            }
+            mainWindow._resultControl.SetDate();
+            //mainWindow._tabControl._resultControl.SetData();
+            _textLabel.Text = $"Runing [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
+    }
 
-        private async void _analysisClick(object sender_, RoutedEventArgs e_)
-        {
-            _buttonAnalysis.IsEnabled = false;
-            var outFolder = _textBoxFolder.Text;
-            await Task.Run(() =>
+    /// <summary>
+    /// ファイル項目の削除
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _deleteClick(object sender_, RoutedEventArgs e_)
+    {
+        var select = _dataGrid.SelectedItem;
+
+        _dataGrid.Items.Remove(select);
+    }
+
+    /// <summary>
+    /// プログレスバーの情報更新
+    /// </summary>
+    /// <param name="count_">カウント</param>
+    /// <param name="max_">最大数</param>
+    /// <param name="str_">文字列</param>
+    private void _progressCount(int count_, int max_, string str_ = "")
+    {
+            if (count_ == 0)
             {
-                int count = 0;
-                int max = _dataGrid.Items.Count;
-                _progressCount(0, max, _ANALYSIS);
-
-                var analysis = new AnalysisReportLog();
-                foreach (string path_ in _dataGrid.Items)
-                {
-                    LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
-                    analysis.StartAnalysis(path_);
-                    _progressCount(++count, max);
-                }
-                analysis.EndAnalysis();
-                //_calendarShow(analysis.ListDate);
-
-                AnalysisManager.Instance.Analysis(analysis);
-            });
-
-            _buttonAnalysis.IsEnabled = true;
-        }
-
-
-        private void _deleteClick(object sender_, RoutedEventArgs e_)
-        {
-            var select = _dataGrid.SelectedItem;
-
-            _dataGrid.Items.Remove(select);
-        }
-
-        private void _progressCount(int count_, int max_, string str_ = "")
+        App.Current.Dispatcher.Invoke(() =>
         {
             if (count_ == 0)
             {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    _resultTitle = str_;
-                    _progressBar.Maximum = max_;
+                // カウントが0の場合に最大数と文字列を更新
+                _resultTitle = str_;
+                _progressBar.Maximum = max_;
                 });
             }
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                _progressBar.Value = count_;
-                _textBlock.Text = $"{count_} / {max_} {_resultTitle}".Trim();
-            });
+            _textLabel.Text = $"Runing {_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
+            _progressBar.Value = count_;
+            _textProgress.Text = $"{count_} / {max_}";
+        });
+    }
+
+
+    /// <summary>
+    /// ドラッグアンドドロップ開始位置
+    /// </summary>
+    private System.Windows.Point _startPoint = new System.Windows.Point();
+    /// <summary>
+    /// マウスドラッグ
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _mouseDown(object sender_, MouseButtonEventArgs e_)
+    {
+        _startPoint = e_.GetPosition(null);
+    }
+
+    /// <summary>
+    /// 移動
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _mouseMove(object sender_, System.Windows.Input.MouseEventArgs e_)
+    {
+        var nowPoint = e_.GetPosition(null);
+        if (e_.LeftButton == MouseButtonState.Released == true)
+        {
+            return;
+        }
+        if (Math.Abs(nowPoint.X - _startPoint.X) < SystemParameters.MinimumHorizontalDragDistance)
+        {
+            return;
+        }
+        if (Math.Abs(nowPoint.Y - _startPoint.Y) < SystemParameters.MinimumVerticalDragDistance)
+        {
+            return;
+        }
+
+        if (_dataGrid.SelectedItem is string selectView)
+        {
+            LogFile.Instance.WriteLine($"selectView {selectView}");
+
+            // 選択されたViewをセット
+            DragDrop.DoDragDrop(_dataGrid, selectView, System.Windows.DragDropEffects.Move);
         }
     }
+
+    /// <summary>
+    /// ドロップ
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _drop(object sender_, System.Windows.DragEventArgs e_)
+    {
+        if (e_.Data.GetData(typeof(string)) is string dragItem)
+        {
+            // 選択したViewの取得
+            var dropPositon = e_.GetPosition(_dataGrid);
+            var hit = VisualTreeHelper.HitTest(_dataGrid, dropPositon);
+            if (hit.VisualHit.GetParentOfType<ItemsControl>() is ItemsControl dropItem)
+            {
+                // ドロップ先のViewを取得
+                var dropView = dropItem.DataContext as string;
+
+
+                var oldIndex = _dataGrid.Items.IndexOf(dragItem);
+                var newIndex = _dataGrid.Items.IndexOf(dropItem);
+
+                var item = _dataGrid.Items[newIndex];
+                _dataGrid.Items[newIndex] = _dataGrid.Items[oldIndex];
+                _dataGrid.Items[oldIndex] = item;
+            }
+        }
+    }
+
+
 }

@@ -1,4 +1,14 @@
-﻿using RepriseReportLogAnalyzer.Files;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Extensions;
+using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
 using System;
 using System.Collections.Generic;
@@ -15,40 +25,97 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RepriseReportLogAnalyzer.Controls
+namespace RepriseReportLogAnalyzer.Controls;
+
+/// <summary>
+/// ResultControl.xaml の相互作用ロジック
+/// </summary>
+public partial class ResultControl : UserControl
 {
     /// <summary>
-    /// ResultControl.xaml の相互作用ロジック
+    /// コンストラクタ
     /// </summary>
-    public partial class ResultControl : UserControl
+    public ResultControl()
     {
-        public ResultControl()
+        InitializeComponent();
+
+        foreach (AnalysisGroup group in Enum.GetValues(typeof(AnalysisGroup)))
         {
-            InitializeComponent();
+            _comboBox.Items.Add(group.Description());
         }
+        _comboBox.SelectedIndex = 0;
+    }
 
+    /// <summary>
+    /// カレンダー選択時
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _datePickerSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
+    {
+        LogFile.Instance.WriteLine($"Selected [{_dataPicker.SelectedDate}]");
+        SetDate();
+    }
 
-        private void _calendarSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
-        {
-            //if( sender_ is Calendar calendar )
-            //{
-                LogFile.Instance.WriteLine($"Selected {_calendar.SelectedDate}");
-                AnalysisManager.Instance.SetDate(_calendar.SelectedDate);
-            //}
-        }
+    /// <summary>
+    /// カレンダーダブルクリック処理
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    //private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
+    //{
+    //    //_calendar.SelectedDate = null;
+    //    _label.Content = "Selected : ";
 
-        public void CalendarShow(IEnumerable<DateTime> list_)
-        {
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                _calendar.DisplayDateStart = list_.First();
-                _calendar.DisplayDateEnd = list_.Last();
+    //    SetDate();
+    //}
 
-                //_calendar.SelectedDates.Clear();
-                //list_.ToList().ForEach(date_ => _calendar.SelectedDates.Add(date_));
-            });
+    /// <summary>
+    /// グループ変更処理
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
+    {
+        LogFile.Instance.WriteLine($"Selected [{_comboBox.SelectedIndex}]");
+        SetDate();
+    }
+    
+    /// <summary>
+    /// プロダクト表 チェック変更処理
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _sourceUpdated(object sender_, System.Windows.Data.DataTransferEventArgs e_)
+    {
+        LogFile.Instance.WriteLine($"DataGrid Updated");
+        SetDate();
+    }
 
-        }
+    /// <summary>
+    /// データ表示処理
+    /// </summary>
+    public void SetDate()
+    {
+        //var date = _calendar.SelectedDate;
+        var date = _dataPicker.SelectedDate;
+        var index = _comboBox.SelectedIndex;
+
+        LogFile.Instance.WriteLine($"[{date}] [{index}]");
+
+        AnalysisManager.Instance.SetData(date, (AnalysisGroup)index);
+
+        //if (date == null)
+        //{
+        //    AnalysisManager.Instance.SetAllPlot(_scottPlot);
+        //}
+        //else
+        //{
+        //    AnalysisManager.Instance.SetDatePlot(_scottPlot, date ?? DateTime.Now, index);
+        //}
+        AnalysisManager.Instance.SetPlot(_scottPlot, date, (AnalysisGroup)index);
+
+    }
 
         private void _mouseDoubleClick(object sender_, MouseButtonEventArgs e_)
         {
