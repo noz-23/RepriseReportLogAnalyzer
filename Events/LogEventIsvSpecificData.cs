@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// isv-specific data
 /// </summary>
-[Sort(83)]
+[Sort(83)][Table("TbIsvSpecificData")]
 internal sealed class LogEventIsvSpecificData : LogEventBase
 {
     /// <summary>
@@ -36,12 +38,14 @@ internal sealed class LogEventIsvSpecificData : LogEventBase
         // detailed
         EventDateTime = _GetDateTime(list_[1], list_[2]);
         IsvSpecificData = list_[3];
+        LogFormat = LogFormat.NONE;
     }
 
     //isv-specific data
     //log mm/dd hh:mm:ss isv-specific-data-here
     //0   1     2        3
     [Sort(101)]
+    [Column("Isv Specific Data Here")]
     public string IsvSpecificData { get; private set; } = string.Empty;
 
 }

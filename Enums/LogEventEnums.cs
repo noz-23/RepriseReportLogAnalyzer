@@ -28,6 +28,14 @@ internal enum AnalysisGroup
     USER_HOST = 3,
 }
 
+internal enum LogFormat
+{
+    NONE,
+    SMALL,
+    STANDARD,
+    DETAILED
+}
+
 internal enum ReservationType
 {
     CREATE,

@@ -76,7 +76,7 @@ public static class DbConnectionExtension
     {
         var listColunm = new List<string>();
 
-        list_.ForEach(column_ => listColunm.Add($"{column_.Key} {column_.Value}"));
+        list_.ForEach(column_ => listColunm.Add($"'{column_.Key}' {column_.Value}"));
 
         var rtn = $"CREATE TABLE {classType_.Name} ({string.Join(",", listColunm)});";
         LogFile.Instance.WriteLine(rtn);

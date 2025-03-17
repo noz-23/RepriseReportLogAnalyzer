@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// Authentication data
 /// </summary>
-[Sort(70)]
+[Sort(70)][Table("TbAuthentication")]
 internal sealed class LogEventAuthentication : LogEventBase
 {
     /// <summary>
@@ -37,12 +39,16 @@ internal sealed class LogEventAuthentication : LogEventBase
         Signature = list_[2];
 
         EventDateTime = NowDateTime;
+        LogFormat = LogFormat.NONE;
     }
 
     //AUTH section signature
     //0    1       2
     [Sort(101)]
+    [Column("Section")]
     public string Section { get; private set; } = string.Empty;
+
     [Sort(102)]
+    [Column("Signature")]
     public string Signature { get; private set; } = string.Empty;
 }

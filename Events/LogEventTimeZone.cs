@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file start
 /// </summary>
-[Sort(90)]
+[Sort(98)][Table("TbTimeZone")]
 internal sealed class LogEventTimeZone : LogEventBase
 {
     /// <summary>
@@ -38,14 +40,20 @@ internal sealed class LogEventTimeZone : LogEventBase
         Rules = list_[3];
         //
         EventDateTime = NowDateTime;
+        LogFormat = LogFormat.NONE;
     }
 
     //TIMEZONE minutes-west-of-UTC daylight rules # readable version of data
     //0        1                   2        3     
     [Sort(101)]
+    [Column("Minutes West Of UTC")]
     public string MinutesWestOfUTC { get; private set; } = string.Empty;
+
     [Sort(102)]
+    [Column("DayLight")]
     public string DayLight { get; private set; } = string.Empty;
+
     [Sort(103)]
+    [Column("Rules")]
     public string Rules { get; private set; } = string.Empty;
 }

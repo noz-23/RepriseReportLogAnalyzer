@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// server time jump
 /// </summary>
-[Sort(91)]
+[Sort(97)][Table("TbTimeJump")]
 internal sealed class LogEventTimeJump : LogEventBase
 {
     /// <summary>
@@ -35,11 +37,13 @@ internal sealed class LogEventTimeJump : LogEventBase
         // detailed
         Minutes = list_[1];
         EventDateTime = DateTime.Parse(list_[2] + " " + list_[3]);
+        LogFormat = LogFormat.NONE;
     }
 
     //server time jump
     //TIMEJUMP[+ | -]minutes mm/dd hh:mm:ss
     //0        1             2     3
     [Sort(101)]
+    [Column("Minutes")]
     public string Minutes { get; private set; } = string.Empty;
 }

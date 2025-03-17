@@ -7,7 +7,9 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -23,7 +25,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// checkout
 /// </summary>
-[Sort(11)]
+[Sort(11)][Table("TbCheckOut")]
 internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEventCountCurrent
 {
     /// <summary>
@@ -46,6 +48,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
             HandleShare = list_[8];
             //
             EventDateTime = DateTime.Parse(_NowDate + " " + list_[9]);
+            LogFormat = LogFormat.SMALL;
         }
         else
         {
@@ -72,6 +75,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
 
             //
             EventDateTime = _GetDateTime(list_[16], list_[17]);
+            LogFormat = (list_[17].Contains(".") == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
         }
     }
 
@@ -81,43 +85,71 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     //OUT product version user  host “isv_def” count      server_handle share_handle hh:mm
     //0   1       2       3     4     5          6          7             8            9          10            11           12          13          14                    15                   16    17                       18                         19                   20        21          22
     [Sort(11)]
+    [Column("Product")]
     public string Product { get; private set; } = string.Empty;
+
     [Sort(12)]
+    [Column("Version")]
     public string Version { get; private set; } = string.Empty;
+ 
     [Sort(13)]
+    [Column("Product Version")]
     public string ProductVersion { get => Product + " " + Version; }
     //
     [Sort(21)]
+    [Column("User")]
     public string User { get; private set; } = string.Empty;
+
     [Sort(22)]
+    [Column("Host")]
     public string Host { get; private set; } = string.Empty;
+
     [Sort(23)]
+    [Column("User@Host")]
     public string UserHost { get => User + "@" + Host; }
     //
     [Sort(101)]
+    [Column("Isv Def")]
     public string IsvDef { get; private set; } = string.Empty;
+
     [Sort(102)]
+    [Column("Pool")]
     public string Pool { get; private set; } = string.Empty;
     //
     [Sort(103)]
+    [Column("Count")]
     public int Count { get; private set; } = -1;
+
     [Sort(104)]
+    [Column("Current Count")]
     public int CountCurrent { get; private set; } = -1;
+ 
     [Sort(105)]
+    [Column("Current Resuse")]
     public int ResuseCurrent { get; private set; } = -1;
     //
     [Sort(106)]
+    [Column("Server Handle")]
     public string HandleServer { get; private set; } = string.Empty;
+
     [Sort(107)]
+    [Column("Share Handle")]
     public string HandleShare { get; private set; } = string.Empty;
+
     [Sort(108)]
+    [Column("Process ID")]
     public string ProcessId { get; private set; } = string.Empty;
     //
     [Sort(109)]
+    [Column("Project")]
     public string Project { get; private set; } = string.Empty;
+
     [Sort(110)]
+    [Column("Requested Product")]
     public string RequestedProduct { get; private set; } = string.Empty;
+
     [Sort(111)]
+    [Column("Requested Version")]
     public string RequestedVersion { get; private set; } = string.Empty;
     //
 

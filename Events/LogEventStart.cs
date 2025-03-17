@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -22,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// log file start
 /// </summary>
 
-[Sort(1)]
+[Sort(1)][Table("TbStart")]
 internal sealed class LogEventStart : LogEventBase
 {
     /// <summary>
@@ -36,12 +38,13 @@ internal sealed class LogEventStart : LogEventBase
         // detailed
         HostName = list_[1];
         EventDateTime = DateTime.Parse(list_[2] + " " + list_[3]);
+        LogFormat = LogFormat.NONE;
     }
 
 
-    //public const LogEventType LogType = LogEventType.Start;
     //START hostname mm/dd/yyyy hh:mm
     //0     1        2          3
     [Sort(101)]
+    [Column("Host Name")]
     public string HostName { get; private set; } = string.Empty;
 }

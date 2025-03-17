@@ -7,7 +7,9 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -22,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// server reread of license/option file
 /// </summary>
-[Sort(32)]
+[Sort(32)][Table("TbLicenseReread")]
 internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
 {
     /// <summary>
@@ -38,6 +40,7 @@ internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
         Host = list_[2];
 
         EventDateTime = _GetDateTime(list_[3], list_[4]);
+        LogFormat = LogFormat.NONE;
     }
 
     //server reread of license/option file

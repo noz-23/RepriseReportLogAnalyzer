@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// support for a product
 /// </summary>
-[Sort(72)]
+[Sort(72)][Table("TbRepProcessed")]
 internal sealed class LogEventRepProcessed : LogEventBase
 {
     /// <summary>
@@ -36,10 +38,12 @@ internal sealed class LogEventRepProcessed : LogEventBase
         Version = list_[3];
 
         EventDateTime = NowDateTime;
+        LogFormat = LogFormat.NONE;
     }
 
     //REPROCESSED with rlmanon vx.y
     //0           1    2       3
     [Sort(101)]
+    [Column("Version")]
     public string Version { get; private set; } = string.Empty;
 }

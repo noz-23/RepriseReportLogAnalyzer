@@ -7,7 +7,9 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -22,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// server shutdown
 /// </summary>
-[Sort(2)]
+[Sort(2)][Table("TbShutdown")]
 internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
 {
     /// <summary>
@@ -38,6 +40,7 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
         Host = list_[2];
         //
         EventDateTime = _GetDateTime(list_[3], list_[4]);
+        LogFormat = LogFormat.NONE;
     }
 
     /// <summary>
@@ -54,10 +57,14 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
     //SHUTDOWN user host mm/dd hh:mm:ss
     //0        1    2    3     4
     [Sort(21)]
+    [Column("User")]
     public string User { get; private set; } = string.Empty;
+
     [Sort(22)]
+    [Column("Host")]
     public string Host { get; private set; } = string.Empty;
     //
+    [Column("User@Host")]
     [Sort(23)]
     public string UserHost { get => User + "@" + Host; }
     //

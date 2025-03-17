@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -22,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file start
 /// </summary>
-[Sort(31)]
+[Sort(31)][Table("TbLicenseFile")]
 internal sealed class LogEventLicenseFile : LogEventBase
 {
     /// <summary>
@@ -36,10 +38,12 @@ internal sealed class LogEventLicenseFile : LogEventBase
         // detailed
         FileName = list_[2];
         EventDateTime = NowDateTime;
+        LogFormat = LogFormat.NONE;
     }
 
     //LICENSE FILE filename
     //0       1    2
     [Sort(101)]
+    [Column("FileName")]
     public string FileName { get; private set; } = string.Empty;
 }

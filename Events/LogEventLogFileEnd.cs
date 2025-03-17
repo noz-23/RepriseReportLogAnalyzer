@@ -6,6 +6,10 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RepriseReportLogAnalyzer.Events;
 
 /// <summary>
@@ -19,6 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file end
 /// </summary>
+[Sort(75)][Table("TbLicenseTemporary")]
 internal sealed class LogEventLogFileEnd : LogEventBase
 {
     /// <summary>
@@ -31,6 +36,7 @@ internal sealed class LogEventLogFileEnd : LogEventBase
         // std
         // detailed
         EventDateTime = DateTime.Parse(list_[1] + " " + list_[2]);
+        LogFormat = LogFormat.NONE;
     }
 
     //END mm/dd/yyyy hh:mm

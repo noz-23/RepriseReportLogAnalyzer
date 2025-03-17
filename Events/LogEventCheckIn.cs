@@ -9,6 +9,7 @@
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -23,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// check-in
 /// </summary>
-[Sort(12)]
+[Sort(12)][Table("TbCheckIn")]
 internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEventCountCurrent, ILogEventWhy
 {
     /// <summary>
@@ -41,6 +42,8 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
             HandleServer = list_[3];
             //
             EventDateTime = DateTime.Parse(_NowDate + " " + list_[4]);
+            LogFormat = LogFormat.SMALL;
+
         }
         else
         {
@@ -61,6 +64,8 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
             HandleServer = list_[10];
             //
             EventDateTime = _GetDateTime(list_[11], list_[12]);
+
+            LogFormat = (list_[12].Contains(".") == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
         }
     }
 
@@ -72,31 +77,52 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     //IN why count   server_handle hh:mm
     //0  1   2       3             4     5     6          7     8       9          10            11    12
     [Sort(11)]
+    [Column("Product")]
     public string Product { get; private set; } = string.Empty;
+
     [Sort(12)]
+    [Column("Version")]
     public string Version { get; private set; } = string.Empty;
+
     [Sort(13)]
+    [Column("Product Version")]
     public string ProductVersion { get => Product + " " + Version; }
+
     [Sort(21)]
+    [Column("User")]
     public string User { get; private set; } = string.Empty;
+
     [Sort(22)]
+    [Column("Host")]
     public string Host { get; private set; } = string.Empty;
+
     [Sort(23)]
+    [Column("User@Host")]
     public string UserHost { get => User + "@" + Host; }
     //
     [Sort(101)]
+    [Column("Why")]
     public StatusValue Why { get; private set; } = StatusValue.Success;
     //public int Why { get; private set; } = 0;
+
     [Sort(102)]
+    [Column("Isv Def")]
     public string IsvDef { get; private set; } = string.Empty;
     //
     [Sort(103)]
+    [Column("Count")]
     public int Count { get; private set; } = -1;
+
     [Sort(104)]
+    [Column("Current Count")]
     public int CountCurrent { get; private set; } = -1;
+
     [Sort(105)]
+    [Column("Current Resuse")]
     public int ResuseCurrent { get; private set; } = -1;
+
     [Sort(106)]
+    [Column("Server Handle")]
     public string HandleServer { get; private set; } = string.Empty;
     //
 }

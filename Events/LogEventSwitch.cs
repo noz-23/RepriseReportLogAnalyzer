@@ -8,6 +8,7 @@
  */
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -23,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// log file start
 /// log file end
 /// </summary>
-[Sort(81)]
+[Sort(81)][Table("TbSwitch")]
 internal sealed class LogEventSwitch : LogEventBase
 {
     /// <summary>
@@ -38,6 +39,7 @@ internal sealed class LogEventSwitch : LogEventBase
         Switch = (list_[1] == "to") ? SwitchType.TO : SwitchType.FROM;
         OldReportLogName = list_[2];
         EventDateTime = NowDateTime;
+        LogFormat = LogFormat.NONE;
     }
 
     //log file end
@@ -47,8 +49,10 @@ internal sealed class LogEventSwitch : LogEventBase
     //SWITCH from old-reportlog-name (new in v14.0, not authenticated)
     //0      1    2                  4
     [Sort(101)]
+    [Column("Switch")]
     public SwitchType Switch { get; private set; } = SwitchType.FROM;
 
     [Sort(102)]
+    [Column("Old Report Log Name")]
     public string OldReportLogName { get; private set; } = string.Empty;
 }

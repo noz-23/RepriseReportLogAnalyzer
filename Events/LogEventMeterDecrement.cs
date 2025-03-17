@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// meter decrement
 /// </summary>
-[Sort(73)]
+[Sort(73)][Table("TbMeterDecrement")]
 internal sealed class LogEventMeterDecrement : LogEventBase
 {
     /// <summary>
@@ -38,16 +40,22 @@ internal sealed class LogEventMeterDecrement : LogEventBase
         AmountDecremented = list_[3];
         //
         EventDateTime = _GetDateTime(list_[4], list_[5]);
+        LogFormat = LogFormat.NONE;
     }
 
     //meter decrement
     //METER_DEC license_handle meter_counter amount_decremented mm/dd hh:mm:ss[.tenths_of_msec]
     //0         1              2             3                  4     5
     [Sort(101)]
+    [Column("License Handle")]
     public string HandleLicense { get; private set; } = string.Empty;
+
     [Sort(102)]
+    [Column("Meter Counter")]
     public string CounterMeter { get; private set; } = string.Empty;
+
     [Sort(103)]
+    [Column("Amount Decremented")]
     public string AmountDecremented { get; private set; } = string.Empty;
 
 }

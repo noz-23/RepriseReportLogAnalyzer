@@ -7,13 +7,15 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
 /// <summary>
 /// periodic timestamp
 /// </summary>
-[Sort(98)]
+[Sort(99)][Table("TbTimeStamp")]
 internal sealed class LogEventTimeStamp : LogEventBase
 {
     /// <summary>
@@ -26,6 +28,7 @@ internal sealed class LogEventTimeStamp : LogEventBase
         // std
         // detailed
         EventDateTime = DateTime.Parse(list_[0] + " " + list_[1]);
+        LogFormat = LogFormat.NONE;
     }
 
     //periodic timestamp

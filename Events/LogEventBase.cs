@@ -8,8 +8,10 @@
  */
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Data;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -108,12 +110,14 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// イベント番号
     /// </summary>
     [Sort(1)]
+    [Column("No")]
     public long EventNumber { get; protected set; } = 0;
     
     /// <summary>
     /// イベント時間
     /// </summary>
     [Sort(2)]
+    [Column("DateTime")]
     public DateTime EventDateTime
     {
         get => _eventDateTime;
@@ -124,6 +128,9 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
         }
     }
     private DateTime _eventDateTime;
+
+
+    public LogFormat LogFormat { get; set; } = LogFormat.NONE;
 
     /// <summary>
     /// イベント日付

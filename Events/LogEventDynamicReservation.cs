@@ -9,6 +9,7 @@
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -23,7 +24,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// dynamic reservation
 /// </summary>
-[Sort(71)]
+[Sort(71)][Table("TbDynamicReservation")]
 internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHost
 {
     /// <summary>
@@ -45,6 +46,7 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
         //
         StringData = list_[6];
         EventDateTime = _GetDateTime(list_[7], list_[8]);
+        LogFormat = LogFormat.NONE;
     }
 
 
@@ -53,16 +55,27 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
     //0      1                 2    3    4            5      6         7     8
     //
     [Sort(11)]
+    [Column("User")]
     public string User { get; private set; } = string.Empty;
+
     [Sort(12)]
+    [Column("Host")]
     public string Host { get; private set; } = string.Empty;
+
     [Sort(13)]
+    [Column("User@Host")]
     public string UserHost { get => User + "@" + Host; }
+
     [Sort(101)]
+    [Column("Reservation")]
     public ReservationType Reservation { get; private set; } = ReservationType.CREATE;
+
     [Sort(102)]
+    [Column("License Pool")]
     public int LicensePool { get; private set; } = -1;
+
     [Sort(103)]
+    [Column("Count")]
     public int Count { get; private set; } = -1;
     [Sort(104)]
     public String StringData { get; private set; } = string.Empty;

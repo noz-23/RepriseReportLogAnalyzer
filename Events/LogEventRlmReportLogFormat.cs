@@ -7,6 +7,8 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -21,7 +23,7 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file start
 /// </summary>
-[Sort(82)]
+[Sort(82)][Table("TbRlmReportLogFormat")]
 internal sealed class LogEventRlmReportLogFormat : LogEventBase
 {
     /// <summary>
@@ -36,10 +38,12 @@ internal sealed class LogEventRlmReportLogFormat : LogEventBase
         Version = list_[6];
 
         EventDateTime = NowDateTime;
+        LogFormat = LogFormat.NONE;
     }
 
     //RLM Report Log Format d, version x.y authentication flag
     //0   1      2   3      4  5       6
     [Sort(101)]
+    [Column("Version")]
     public string Version { get; private set; } = string.Empty;
 }
