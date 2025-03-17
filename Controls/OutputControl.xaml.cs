@@ -46,7 +46,7 @@ public partial class OutputControl : UserControl
     /// <summary>
     /// 総合ファイルの出力
     /// </summary>
-    public bool IsSaveSummy { get; private set; } = false;
+    public bool IsSaveSummy { get; set; } = false;
 
     public List<OutputView> ListEvent { get; private set; } = new();
     private Dictionary<string, bool> _listSavetEvent = new();
@@ -148,20 +148,21 @@ public partial class OutputControl : UserControl
     /// <param name="e_"></param>
     private async void _saveCsvClick(object sender_, RoutedEventArgs e_)
     {
-        if (string.IsNullOrEmpty(_textBoxFolder.Text) == false)
+        if (string.IsNullOrEmpty(_textBoxFolder.Text) == true)
         {
             if (_selectOutFolder()==true) { return; }
         }
+        string outputFolder = _textBoxFolder.Text ;
 
         _saveCsv.IsEnabled = false;
         await Task.Run(() =>
         {
             if (IsSaveSummy == true)
             {
-                string output = _textBoxFolder.Text + @"\Summy.txt";
-                LogFile.Instance.WriteLine($"Write : {output}");
+                string outPath = outputFolder + @"\Summy.txt";
+                LogFile.Instance.WriteLine($"Write : {outPath}");
 
-                AnalysisManager.Instance.WriteSummy(output);
+                AnalysisManager.Instance.WriteSummy(outPath);
             }
 
             foreach (var view in ListEvent)
@@ -170,10 +171,10 @@ public partial class OutputControl : UserControl
                 {
                     continue;
                 }
-                string output = _textBoxFolder.Text + @"\" + view.Name + @".csv";
-                LogFile.Instance.WriteLine($"Write : {output}");
+                var outPath = outputFolder + @"\" + view.Name + @".csv";
+                LogFile.Instance.WriteLine($"Write : {outPath}");
 
-                AnalysisManager.Instance.WriteText(output, view.ClassType);
+                AnalysisManager.Instance.WriteText(outPath, view.ClassType);
             }
 
             foreach (var view in ListAnalysis)
@@ -183,10 +184,10 @@ public partial class OutputControl : UserControl
                     continue;
                 }
 
-                string output = _textBoxFolder.Text + @"\" + view.Name + @".csv";
-                LogFile.Instance.WriteLine($"Write : {output}");
+                string outPath = outputFolder + @"\" + view.Name + @".csv";
+                LogFile.Instance.WriteLine($"Write : {outPath}");
 
-                AnalysisManager.Instance.WriteText(output, view.ClassType, view.SelectedValue);
+                AnalysisManager.Instance.WriteText(outPath, view.ClassType, view.SelectedValue);
             }
         });
 
@@ -197,18 +198,18 @@ public partial class OutputControl : UserControl
     private async void _saveSqliteClick(object sender_, RoutedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Write : {sender_}");
-        if (string.IsNullOrEmpty(_textBoxFolder.Text) == false)
+        if (string.IsNullOrEmpty(_textBoxFolder.Text) == true)
         {
             if (_selectOutFolder() == true) { return; }
         }
 
         _saveSql.IsEnabled = false;
+        _textBoxFolder.IsEnabled = false;
+        string output = _textBoxFolder.Text + @"\ReportLog.db";
+        LogFile.Instance.WriteLine($"Write : {output}");
+
         await Task.Run(() =>
         {
-            _textBoxFolder.IsEnabled = false;
-            string output = _textBoxFolder.Text + @"\ReportLog.db";
-            LogFile.Instance.WriteLine($"Write : {output}");
-
             var sql = new SQLiteManager(output);
 
             foreach (var view in ListEvent)

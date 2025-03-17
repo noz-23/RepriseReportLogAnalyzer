@@ -7,6 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -41,7 +42,8 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
         IsvDef = list_[5];
         //
         Count = int.Parse(list_[6]);
-        Why = int.Parse(list_[7]);
+        //Why = int.Parse(list_[7]);
+        Why = (StatusValue)int.Parse(list_[7]);
         LastAttempt = list_[8];
         ProcessId = list_[9];
 
@@ -71,7 +73,8 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
     [Sort(102)]
     public int Count { get; private set; } = -1;
     [Sort(103)]
-    public int Why { get; private set; } = -1;
+    public StatusValue Why { get; private set; } = StatusValue.Success;
+    //public int Why { get; private set; } = -1;
     [Sort(104)]
     public string LastAttempt { get; private set; } = string.Empty;
     [Sort(105)]

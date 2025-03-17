@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Linq;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -185,7 +186,7 @@ public partial class AnalysisControl : UserControl
     /// <param name="e_"></param>
     private void _drop(object sender_, System.Windows.DragEventArgs e_)
     {
-        if (e_.Data.GetData(typeof(string)) is string dragItem)
+        if (e_.Data.GetData(typeof(string)) is string dragView)
         {
             // 選択したViewの取得
             var dropPositon = e_.GetPosition(_dataGrid);
@@ -193,18 +194,22 @@ public partial class AnalysisControl : UserControl
             if (hit.VisualHit.GetParentOfType<ItemsControl>() is ItemsControl dropItem)
             {
                 // ドロップ先のViewを取得
-                var dropView = dropItem.DataContext as string;
+                var dropView = (dropItem.DataContext as string)?? _dataGrid.Items[_dataGrid.Items.Count-1].ToString();
 
+                var listItem = new List<string>();
+                foreach (var item in _dataGrid.Items)
+                {
+                    listItem.Add(item.ToString());
+                }
 
-                var oldIndex = _dataGrid.Items.IndexOf(dragItem);
-                var newIndex = _dataGrid.Items.IndexOf(dropItem);
+                var oldIndex = listItem.IndexOf(dragView);
+                var newIndex = listItem.IndexOf(dropView);
 
-                var item = _dataGrid.Items[newIndex];
+                var temp = _dataGrid.Items[newIndex];
                 _dataGrid.Items[newIndex] = _dataGrid.Items[oldIndex];
-                _dataGrid.Items[oldIndex] = item;
+                _dataGrid.Items[oldIndex] = temp;
             }
         }
     }
-
 
 }

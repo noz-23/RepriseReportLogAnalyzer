@@ -105,7 +105,7 @@ internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalys
                 {
                     listCheckOutIn[key] = new();
                 }
-                ProgressCount?.Invoke(++count, max);
+                //ProgressCount?.Invoke(++count, max);
             }
             var listEnd = new SortedSet<long>();
             //var listEnd = new ConcurrentBag<long>();

@@ -7,6 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.Reflection;
 
@@ -63,12 +64,19 @@ namespace RepriseReportLogAnalyzer.Data
 
             listPropetyInfo?.ToList().ForEach(prop =>
             {
-                if (prop.GetType() == typeof(TimeSpan))
+                var classType = prop.PropertyType;
+                if (classType == typeof(TimeSpan))
                 {
 
                     rtn.Add($"{prop.GetValue(this)}:d\\.hh\\:mm\\:ss");
                 }
-                else 
+                if (classType==typeof(StatusValue))
+                //if (classType.FullName == typeof(StatusValue).FullName)
+                {
+                    StatusValue val = (StatusValue)Enum.Parse(typeof(StatusValue), prop.GetValue(this).ToString());
+                    rtn.Add($"{(long)val}");
+                }
+                else
                 {
                     rtn.Add($"{prop.GetValue(this)}");
                 }
@@ -88,6 +96,10 @@ namespace RepriseReportLogAnalyzer.Data
                 return "TEXT";
             }
             if (type_ == typeof(Enum))
+            {
+                return "INTEGER";
+            }
+            if (type_ == typeof(StatusValue))
             {
                 return "INTEGER";
             }

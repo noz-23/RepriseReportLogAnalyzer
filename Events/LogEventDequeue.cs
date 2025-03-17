@@ -7,6 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -34,7 +35,8 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
         if (list_.Count() < 4)
         {
             // small
-            Why = int.Parse(list_[1]);
+            //Why = int.Parse(list_[1]);
+            Why = (StatusValue)int.Parse(list_[1]);
             Count = int.Parse(list_[2]);
             HandleServer = list_[3];
             //
@@ -44,7 +46,8 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
         {
             // std
             // detailed
-            Why = int.Parse(list_[1]);
+            //Why = int.Parse(list_[1]);
+            Why = (StatusValue)int.Parse(list_[1]);
             Product = list_[2];
             Version = list_[3];
             User = list_[4];
@@ -79,7 +82,8 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     public string UserHost { get => User + "@" + Host; }
 
     [Sort(101)]
-    public int Why { get; private set; } = 0;
+    public StatusValue Why { get; private set; } = StatusValue.Success;
+    //public int Why { get; private set; } = 0;
     [Sort(102)]
     public string IsvDef { get; private set; } = string.Empty;
     [Sort(103)]

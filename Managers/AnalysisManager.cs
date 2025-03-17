@@ -113,6 +113,7 @@ class AnalysisManager : INotifyPropertyChanged
     public SortedSet<string> ListHost { get; private set; } = new();
     public SortedSet<string> ListUserHost { get; private set; } = new();
     public SortedSet<DateTime> ListDate { get; private set; } = new();
+    public SortedSet<DateTime> ListDateTime { get; private set; } = new();
 
     /// <summary>
     /// 解析処理開始時間
@@ -151,6 +152,7 @@ class AnalysisManager : INotifyPropertyChanged
         ListHost.Clear();
         ListUserHost.Clear();
         ListDate.Clear();
+        ListDateTime.Clear();
 
         //
         _listStartShutdown.Clear();
@@ -170,16 +172,17 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="listFile"></param>
     public void Analysis(IEnumerable<string> listFile)
     {
-        _runStartTime ??= DateTime.MinValue;
-
-        _listFile.AddRange(listFile);
         //
         _clear();
         //
+
+        _runStartTime = DateTime.Now;
+
+        _listFile.AddRange(listFile);
         _convert(); // 変換
         _analysis(); // 解析
 
-        _runEndTime ??= DateTime.MinValue;
+        _runEndTime = DateTime.Now;
 
     }
 
@@ -209,6 +212,7 @@ class AnalysisManager : INotifyPropertyChanged
         ListHost.AddRange(_convertReportLog.ListHost);
         ListUserHost.AddRange(_convertReportLog.ListUserHost);
         ListDate.AddRange(_convertReportLog.ListDate);
+        ListDateTime.AddRange(_convertReportLog.ListDateTime);
         //
         _listStartShutdown.Analysis(_convertReportLog);
         _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListNoIncludeSkip());
@@ -240,6 +244,12 @@ class AnalysisManager : INotifyPropertyChanged
         list.Add($"End     Time : {_runEndTime}");
         list.Add("\n");
         //
+        list.Add($"Replort Log Period");
+        list.Add($"Start   Time : {ListDateTime.FirstOrDefault()}");
+        list.Add($"End     Time : {ListDateTime.LastOrDefault()}");
+        list.Add("\n");
+
+
         list.Add($"License Count : {ListProduct.Count()}");
         list.AddRange(ListProductVersion.Select(x_ => $"{x_.Product},{x_.Version}"));
         list.Add("\n");
@@ -274,6 +284,7 @@ class AnalysisManager : INotifyPropertyChanged
     {
         _convertReportLog.WriteEventText(path_, classType_);
     }
+
     /// <summary>
     /// 解析系のテキストファイル出力
     /// </summary>
@@ -284,7 +295,6 @@ class AnalysisManager : INotifyPropertyChanged
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
         find?.WriteText(path_, selected_);
-
     }
 
     /// <summary>
@@ -429,7 +439,6 @@ class AnalysisManager : INotifyPropertyChanged
             var plotCount = plot_.Plot.Add.Scatter(listX.ToArray(), listY[key].ToArray());
             plotCount.LegendText = key;
         }
-
 
         plot_.Plot.Axes.DateTimeTicksBottom();
         plot_.Refresh();

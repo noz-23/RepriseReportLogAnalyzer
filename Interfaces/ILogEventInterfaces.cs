@@ -6,6 +6,8 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Enums;
+
 namespace RepriseReportLogAnalyzer.Interfaces;
 
 
@@ -40,7 +42,8 @@ interface ILogEventCountCurrent : ILogEventProduct
 
 interface ILogEventWhy
 {
-    int Why { get; }
+    //int Why { get; }
+    StatusValue Why { get; }
 }
 
 interface IAnalysisOutputFile

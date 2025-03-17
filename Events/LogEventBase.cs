@@ -242,7 +242,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     {
         if (a_ is LogEventBase a)
         {
-            if (a_ is LogEventBase b)
+            if (b_ is LogEventBase b)
             {
                 return (int)(a.EventNumber - b.EventNumber);
             }
@@ -255,13 +255,5 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// </summary>
     /// <param name="b_"></param>
     /// <returns></returns>
-    public int CompareTo(object? b_)
-    {
-        if (b_ is LogEventBase b)
-        {
-            return (int)(this.EventNumber - b.EventNumber);
-        }
-        return -1;
-
-    }
+    public int CompareTo(object? b_)=> (b_ is LogEventBase b) ? (int)(this.EventNumber - b.EventNumber) : -1;
 }

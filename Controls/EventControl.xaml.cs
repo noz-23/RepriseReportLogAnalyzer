@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -35,6 +36,7 @@ public partial class EventControl : UserControl
         _comboBox.Items.Add(new OutputView(null, "NONE"));
         var _assembly = Assembly.GetExecutingAssembly();
 
+        // Why を持っているイベントの抽出
         var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass&&t_.Namespace== _NAME_SPACE_EVENT).Distinct().OrderBy(t_ => (Attribute.GetCustomAttribute(t_, typeof(SortAttribute)) as SortAttribute)?.Sort);
         foreach (var t in tyepInNamespace)
         {
@@ -60,8 +62,13 @@ public partial class EventControl : UserControl
                 return;
             }
             _dataGrid.ItemsSource = null;
-            _dataGrid.ItemsSource = AnalysisManager.Instance.ListEvent(selected.ClassType);
 
+            var listEvent =AnalysisManager.Instance.ListEvent(selected.ClassType);
+            //var list = listEvent.Join(Enum.GetValues(typeof(StatusValue)),e_=>(e_  as ILogEventWhy)?.Why,v_=>(long)v_, (event_, value_) => new With { });
+            //var listEvent =AnalysisManager.Instance.ListEvent(selected.ClassType);
+            _dataGrid.ItemsSource = listEvent;
+
+            LogFile.Instance.WriteLine($"{listEvent.Count()}");
         }
     }
 }

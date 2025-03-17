@@ -137,7 +137,7 @@
             Grid.Row="7" Grid.Column="0"
             Content="Summy"
             IsThreeState="True"
-            IsChecked="{Binding IsSaveSummy,ElementName=_userControl, Mode=OneWay}"
+            IsChecked="{Binding IsSaveSummy,ElementName=_userControl, Mode=TwoWay}"
         />
         <Button 
             x:Name="_saveCsv"
