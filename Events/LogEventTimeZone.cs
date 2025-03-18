@@ -45,15 +45,12 @@ internal sealed class LogEventTimeZone : LogEventBase
 
     //TIMEZONE minutes-west-of-UTC daylight rules # readable version of data
     //0        1                   2        3     
-    [Sort(101)]
-    [Column("Minutes West Of UTC")]
+    [Column("Minutes West Of UTC", Order =101)]
     public string MinutesWestOfUTC { get; private set; } = string.Empty;
 
-    [Sort(102)]
-    [Column("DayLight")]
+    [Column("DayLight", Order =102)]
     public string DayLight { get; private set; } = string.Empty;
 
-    [Sort(103)]
-    [Column("Rules")]
+    [Column("Rules", Order =103)]
     public string Rules { get; private set; } = string.Empty;
 }

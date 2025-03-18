@@ -56,49 +56,38 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
     //DENY product version user host “isv_def” count why last_attempt pid mm/dd hh:mm
     //DENY product version user host “isv_def” count why last_attempt pid mm/dd hh:mm:ss.tenths_of_msec
     //0    1       2       3    4     5          6     7   8            9   10    11
-    [Sort(11)]
-    [Column("Product")]
+    [Column("Product", Order =11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Sort(12)]
-    [Column("Version")]
+    [Column("Version", Order =12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Sort(13)]
-    [Column("Product Version")]
+    [Column("Product Version", Order =13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Sort(21)]
-    [Column("User")]
+    [Column("User", Order =21)]
     public string User { get; private set; } = string.Empty;
 
-    [Sort(22)]
-    [Column("Host")]
+    [Column("Host", Order =22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Sort(23)]
-    [Column("User@Host")]
+    [Column("User@Host", Order =23)]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Sort(101)]
-    [Column("Isv Def")]
+    [Column("Isv Def", Order =101)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Sort(102)]
-    [Column("Count")]
+    [Column("Count", Order =102)]
     public int Count { get; private set; } = -1;
 
-    [Sort(103)]
-    [Column("Why")]
+    [Column("Why", Order =103)]
     public StatusValue Why { get; private set; } = StatusValue.Success;
     //public int Why { get; private set; } = -1;
 
-    [Sort(104)]
-    [Column("Last Attempt")]
+    [Column("Last Attempt", Order =104)]
     public string LastAttempt { get; private set; } = string.Empty;
 
-    [Sort(105)]
-    [Column("Process ID")]
+    [Column("Process ID", Order =105)]
     public string ProcessId { get; private set; } = string.Empty;
     //
 

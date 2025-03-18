@@ -70,92 +70,70 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct
     //PRODUCT name     version pool# count #reservations soft_limit “hostid” “contract” “customer” “issuer” “line_item” “options”        share max_share type named_user_count meter_type meter_counter meter_initial_decrement meter_period meter_period_decrement
     //0       1        2       3     4     5             6           7          8            9            10         11            12                13    14        15   16               17         18            19                      20           21
     //PRODUCT AbcName  25      1     1     0             1           ""         "A-B-C-D-E"  ""           ""         ""            "LA:xx_XX TY:XXX" 3     0         0    0                0          0             0                       0            0
-    [Sort(11)]
-    [Column("Product")]
+    [Column("Product", Order =11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Sort(12)]
-    [Column("Version")]
+    [Column("Version", Order =12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Sort(13)]
-    [Column("Product Version")]
+    [Column("Product Version", Order =13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Sort(101)]
-    [Column("Pool")]
+    [Column("Pool", Order =101)]
     public string Pool { get; private set; } = string.Empty;
     //
-    [Sort(102)]
-    [Column("Count")]
+    [Column("Count", Order =102)]
     public int Count { get; private set; } = -1;
 
-    [Sort(103)]
-    [Column("Reservations")]
+    [Column("Reservations", Order =103)]
     public int Reservations { get; private set; } = -1;
 
-    [Sort(104)]
-    [Column("Limit Soft")]
+    [Column("Limit Soft", Order =104)]
     public int LimitSoft { get; private set; } = -1;
     //
-    [Sort(105)]
-    [Column("Host ID")]
+    [Column("Host ID", Order =105)]
     public string HostId { get; private set; } = string.Empty;
     //
-    [Sort(106)]
-    [Column("Contract")]
+    [Column("Contract", Order =106)]
     public string Contract { get; private set; } = string.Empty;
 
-    [Sort(107)]
-    [Column("Customer")]
+    [Column("Customer", Order =107)]
     public string Customer { get; private set; } = string.Empty;
 
-    [Sort(108)]
-    [Column("Issuer")]
+    [Column("Issuer", Order =108)]
     public string Issuer { get; private set; } = string.Empty;
 
-    [Sort(109)]
-    [Column("Line Item")]
+    [Column("Line Item", Order =109)]
     public string LineItem { get; private set; } = string.Empty;
 
-    [Sort(110)]
-    [Column("Options")]
+    [Column("Options", Order =110)]
     public string Options { get; private set; } = string.Empty;
 
-    [Sort(111)]
-    [Column("Share")]
+    [Column("Share", Order =111)]
     public int Share { get; private set; } = -1;
 
-    [Sort(112)]
-    [Column("Max Share")]
+    [Column("Max Share", Order =112)]
     public int ShareMax { get; private set; } = -1;
 
-    [Sort(113)]
-    [Column("Type Share")]
+    [Column("Type Share", Order =113)]
     public int ShareType { get; private set; } = -1;
 
-    [Sort(114)]
-    [Column("Count Named User")]
+    [Column("Count Named User", Order =114)]
     public int CountNamedUser { get; private set; } = -1;
 
-    [Sort(115)]
-    [Column("Meter Type")]
+    [Column("Meter Type", Order =115)]
     public int MeterType { get; private set; } = -1;
 
-    [Sort(116)]
-    [Column("Counter Counter")]
+    [Column("Counter Counter", Order =116)]
     public int MeterCounter { get; private set; } = -1;
 
-    [Sort(117)]
-    [Column("Meter Initial Decrement")]
+    [Column("Meter Initial Decrement", Order =117)]
     public int MeterInitialDecrement { get; private set; } = -1;
 
-    [Sort(118)]
-    [Column("Meter Period")]
+    [Column("Meter Period", Order =118)]
     public int MeterPeriod { get; private set; } = -1;
 
-    [Sort(119)]
-    [Column("Meter Period Decrement")]
+    [Column("Meter Period Decrement", Order =119)]
     public int MeterPeriodDecrement { get; private set; } = -1;
     //
 }

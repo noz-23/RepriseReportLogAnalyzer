@@ -9,12 +9,11 @@
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
 
@@ -23,7 +22,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックイン結合情報のリスト化 
 /// </summary>
-[Sort(1)]
+[Sort(1)][Table("TbAnalysisCheckOutCheckIn")]
 internal sealed class ListAnalysisCheckOutIn : List<AnalysisCheckOutIn>, IAnalysisOutputFile
 {
     /// <summary>

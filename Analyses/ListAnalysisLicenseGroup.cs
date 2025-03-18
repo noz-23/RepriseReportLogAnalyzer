@@ -15,6 +15,7 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
 
@@ -23,7 +24,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// 出力のためグループを分けクラス化(User)
 /// </summary>
-[Sort(11)]
+[Sort(11)][Table("TbAnalysisLicenseUseUser")]
 
 internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
@@ -40,7 +41,7 @@ internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnaly
 /// <summary>
 /// 出力のためグループを分けクラス化(Host)
 /// </summary>
-[Sort(12)]
+[Sort(12)][Table("TbAnalysisLicenseUseHost")]
 internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseHost() : base(AnalysisGroup.HOST)
@@ -55,7 +56,7 @@ internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnaly
 /// <summary>
 /// 出力のためグループを分けクラス化(User@Host)
 /// </summary>
-[Sort(13)]
+[Sort(13)][Table("TbAnalysisLicenseUseUserHost")]
 internal sealed class ListAnalysisLicenseUserHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseUserHost() : base(AnalysisGroup.USER_HOST)

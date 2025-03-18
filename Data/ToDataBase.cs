@@ -9,6 +9,7 @@
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 namespace RepriseReportLogAnalyzer.Data
@@ -34,11 +35,14 @@ namespace RepriseReportLogAnalyzer.Data
         public static ListStringStringPair ListHeader(Type classType_)
         {
             var rtn = new ListStringStringPair();
-            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
 
             listPropetyInfo?.ToList().ForEach(prop =>
             {
-                rtn.Add(new ($"{prop.Name}",$"{GetDatabaseType(prop.PropertyType)}"));
+                var column = Attribute.GetCustomAttribute(prop, typeof(ColumnAttribute)) as ColumnAttribute;
+
+                //rtn.Add(new ($"{prop.Name}",$"{GetDatabaseType(prop.PropertyType)}"));
+                rtn.Add(new($"{column.Name}", $"{GetDatabaseType(prop.PropertyType)}"));
             });
 
             return rtn;
@@ -55,19 +59,18 @@ namespace RepriseReportLogAnalyzer.Data
         /// </summary>
         /// <param name="classTyep_"></param>
         /// <returns></returns>
-        public virtual List<string> ListValue(Type? classTyep_ =null)
+        public virtual List<string> ListValue(Type? classType_ = null)
         {
-            classTyep_ ??= this.GetType();
+            classType_ ??= this.GetType();
             //
             var rtn = new List<string>();
-            var listPropetyInfo = classTyep_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(SortAttribute)) as SortAttribute)?.Sort);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
 
             listPropetyInfo?.ToList().ForEach(prop =>
             {
                 var classType = prop.PropertyType;
                 if (classType == typeof(TimeSpan))
                 {
-
                     rtn.Add($"{prop.GetValue(this)}:d\\.hh\\:mm\\:ss");
                 }
                 if (classType==typeof(StatusValue))

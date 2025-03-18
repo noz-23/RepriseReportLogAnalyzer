@@ -109,15 +109,13 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <summary>
     /// イベント番号
     /// </summary>
-    [Sort(1)]
-    [Column("No")]
+    [Column("No", Order =1)]
     public long EventNumber { get; protected set; } = 0;
     
     /// <summary>
     /// イベント時間
     /// </summary>
-    [Sort(2)]
-    [Column("DateTime")]
+    [Column("DateTime", Order =2)]
     public DateTime EventDateTime
     {
         get => _eventDateTime;
@@ -130,6 +128,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     private DateTime _eventDateTime;
 
 
+    [Column("Format", Order = 999)]
     public LogFormat LogFormat { get; set; } = LogFormat.NONE;
 
     /// <summary>

@@ -43,7 +43,6 @@ internal sealed class LogEventRepProcessed : LogEventBase
 
     //REPROCESSED with rlmanon vx.y
     //0           1    2       3
-    [Sort(101)]
-    [Column("Version")]
+    [Column("Version", Order =101)]
     public string Version { get; private set; } = string.Empty;
 }

@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -36,31 +37,31 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     /// <summary>
     /// スタート イベント番号
     /// </summary>
-    [Sort(101)]
+    [Column("Start No", Order = 101)]
     public long StartNumber { get => _start.EventNumber; }
 
     /// <summary>
     /// シャットダウン イベント番号
     /// </summary>
-    [Sort(102)]
+    [Column("Shutdown No", Order = 102)]
     public long ShutdownNumber { get => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber; }
 
     /// <summary>
     /// スタート 時間
     /// </summary>
-    [Sort(111)]
+    [Column("Start Date Time", Order = 111)]
     public DateTime StartDateTime { get => _start.EventDateTime; }
 
     /// <summary>
     /// シャットダウン 時間
     /// </summary>
-    [Sort(112)]
+    [Column("Shutdown Date Time", Order = 112)]
     public DateTime ShutdownDateTime { get => _shutdown?.EventDateTime ?? LogEventBase.NowDateTime; }
 
     /// <summary>
     /// 稼働時間
     /// </summary>
-    [Sort(113)]
+    [Column("Duration", Order = 112)]
     public TimeSpan Duration { get => (ShutdownDateTime - StartDateTime); }
 
     /// <summary>

@@ -44,8 +44,7 @@ internal sealed class LogEventIsvSpecificData : LogEventBase
     //isv-specific data
     //log mm/dd hh:mm:ss isv-specific-data-here
     //0   1     2        3
-    [Sort(101)]
-    [Column("Isv Specific Data Here")]
+    [Column("Isv Specific Data Here", Order =101)]
     public string IsvSpecificData { get; private set; } = string.Empty;
 
 }

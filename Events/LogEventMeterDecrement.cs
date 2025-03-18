@@ -47,15 +47,15 @@ internal sealed class LogEventMeterDecrement : LogEventBase
     //METER_DEC license_handle meter_counter amount_decremented mm/dd hh:mm:ss[.tenths_of_msec]
     //0         1              2             3                  4     5
     [Sort(101)]
-    [Column("License Handle")]
+    [Column("License Handle", Order =101)]
     public string HandleLicense { get; private set; } = string.Empty;
 
     [Sort(102)]
-    [Column("Meter Counter")]
+    [Column("Meter Counter", Order =102)]
     public string CounterMeter { get; private set; } = string.Empty;
 
     [Sort(103)]
-    [Column("Amount Decremented")]
+    [Column("Amount Decremented", Order =103)]
     public string AmountDecremented { get; private set; } = string.Empty;
 
 }

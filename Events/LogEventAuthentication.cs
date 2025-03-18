@@ -44,11 +44,9 @@ internal sealed class LogEventAuthentication : LogEventBase
 
     //AUTH section signature
     //0    1       2
-    [Sort(101)]
-    [Column("Section")]
+    [Column("Section",Order =101)]
     public string Section { get; private set; } = string.Empty;
 
-    [Sort(102)]
-    [Column("Signature")]
+    [Column("Signature", Order =102)]
     public string Signature { get; private set; } = string.Empty;
 }

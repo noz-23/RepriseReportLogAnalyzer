@@ -44,6 +44,6 @@ internal sealed class LogEventLicenseFile : LogEventBase
     //LICENSE FILE filename
     //0       1    2
     [Sort(101)]
-    [Column("FileName")]
+    [Column("FileName", Order =101)]
     public string FileName { get; private set; } = string.Empty;
 }

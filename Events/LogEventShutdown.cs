@@ -56,16 +56,14 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
     //server shutdown
     //SHUTDOWN user host mm/dd hh:mm:ss
     //0        1    2    3     4
-    [Sort(21)]
-    [Column("User")]
+    [Column("User", Order =21)]
     public string User { get; private set; } = string.Empty;
 
-    [Sort(22)]
-    [Column("Host")]
+    [Column("Host", Order =22)]
     public string Host { get; private set; } = string.Empty;
     //
-    [Column("User@Host")]
-    [Sort(23)]
+
+    [Column("User@Host", Order =23)]
     public string UserHost { get => User + "@" + Host; }
     //
 }

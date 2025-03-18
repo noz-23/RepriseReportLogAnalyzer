@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -57,20 +58,19 @@ internal sealed class JoinEventCheckOutIn
     /// <summary>
     /// チェックアウト イベント番号
     /// </summary>
-    [Sort(101)]
+    [Column("CheckOut No", Order = 101)]
     public long CheckOutNumber { get; private set; } = -1;
 
     /// <summary>
     /// チェックイン イベント番号
     /// </summary>
-    [Sort(102)]
+    [Column("CheckIn No", Order = 102)]
     public long CheckInNumber { get; private set; } = -1;
 
     /// <summary>
     /// シャットダウン イベント番号(チェックインの替わり)
     /// </summary>
-
-    [Sort(103)]
+    [Column("Shutdown No", Order = 103)]
     public long ShutdownNumber { get; private set; } = -1;
 
 
@@ -79,8 +79,7 @@ internal sealed class JoinEventCheckOutIn
     ///  0  : Use CheckInNumber or ShutdownNumber;
     /// >0  : Use DuplicationNumber
     /// </summary>
-    [Sort(104)]
-    //public long DuplicationNumber { get; private set; } = NO_DUPLICATION;
+    [Column("Duplication StNo", Order = 104)]
     public long DuplicationNumber { get; private set; } = (long)SelectData.ALL;
 
     /// <summary>

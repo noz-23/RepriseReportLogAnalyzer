@@ -49,10 +49,10 @@ internal sealed class LogEventSwitch : LogEventBase
     //SWITCH from old-reportlog-name (new in v14.0, not authenticated)
     //0      1    2                  4
     [Sort(101)]
-    [Column("Switch")]
+    [Column("Switch", Order =101)]
     public SwitchType Switch { get; private set; } = SwitchType.FROM;
 
     [Sort(102)]
-    [Column("Old Report Log Name")]
+    [Column("Old Report Log Name", Order =102)]
     public string OldReportLogName { get; private set; } = string.Empty;
 }

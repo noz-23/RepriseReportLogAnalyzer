@@ -6,11 +6,13 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
 
@@ -19,6 +21,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// スタート シャットダウン結合情報のリスト化 
 /// </summary>
+[Sort(3)][Table("TbAnalysisStartShutdown")]
 internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, IAnalysisOutputFile
 {
     /// <summary>

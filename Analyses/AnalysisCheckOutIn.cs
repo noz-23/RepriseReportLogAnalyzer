@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -36,50 +37,50 @@ internal sealed class AnalysisCheckOutIn: ToDataBase
     /// <summary>
     /// チェックアウト時間
     /// </summary>
-    [Sort(101)]
+    [Column("CheckOut Date Time", Order =101)]
     public DateTime CheckOutDateTime { get => _checkOut.EventDateTime; }
 
     /// <summary>
     /// チェックイン時間
     /// </summary>
-    [Sort(102)]
+    [Column("CheckIn Date Time", Order = 102)]
     public DateTime CheckInDateTime { get => _checkIn?.EventDateTime ?? LogEventBase.NowDateTime; }
 
     /// <summary>
     /// 利用時間
     /// </summary>
-    [Sort(103)]
+    [Column("Duration", Order = 103)]
     public TimeSpan Duration { get => CheckInDateTime - CheckOutDateTime; }
 
     /// <summary>
     /// プロダクト
     /// </summary>
-    [Sort(111)]
+    [Column("Product", Order = 111)]
     public string Product { get => _checkOut.Product; }
     /// <summary>
     /// バージョン
     /// </summary>
-    [Sort(112)]
+    [Column("Version", Order = 112)]
     public string Version { get => _checkOut.Version; }
     /// <summary>
     /// プロダクト バージョン
     /// </summary>
-    [Sort(113)]
+    [Column("Product Version", Order = 113)]
     public string ProductVersion { get => _checkOut.ProductVersion; }
     /// <summary>
     /// ユーザー
     /// </summary>
-    [Sort(121)]
+    [Column("User", Order = 121)]
     public string User { get => _checkOut.User; }
     /// <summary>
     /// ホスト
     /// </summary>
-    [Sort(121)]
+    [Column("Host", Order = 121)]
     public string Host { get => _checkOut.Host; }
     /// <summary>
     /// ユーザー@ホスト
     /// </summary>
-    [Sort(121)]
+    [Column("User@Host", Order = 121)]
     public string UserHost { get => _checkOut.UserHost; }
 
     /// <summary>

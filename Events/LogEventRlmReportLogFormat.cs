@@ -43,7 +43,6 @@ internal sealed class LogEventRlmReportLogFormat : LogEventBase
 
     //RLM Report Log Format d, version x.y authentication flag
     //0   1      2   3      4  5       6
-    [Sort(101)]
-    [Column("Version")]
+    [Column("Version", Order =101)]
     public string Version { get; private set; } = string.Empty;
 }

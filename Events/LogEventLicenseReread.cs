@@ -47,11 +47,13 @@ internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
     //REREAD user host mm/dd hh:mm:ss
     //0      1    2    3     4
     //
-    [Sort(21)]
+    [Column("Host", Order =21)]
     public string User { get; private set; } = string.Empty;
-    [Sort(22)]
+
+    [Column("Host", Order =22)]
     public string Host { get; private set; } = string.Empty;
-    [Sort(23)]
+
+    [Column("User@Host", Order =23)]
     public string UserHost { get => User + "@" + Host; }
     //
 }

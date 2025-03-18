@@ -10,6 +10,8 @@ using Dapper;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
+using ScottPlot.MultiplotLayouts;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 
 namespace RepriseReportLogAnalyzer.Extensions;
@@ -75,10 +77,12 @@ public static class DbConnectionExtension
     private static string _createTabel(Type classType_, ListStringStringPair list_)
     {
         var listColunm = new List<string>();
-
         list_.ForEach(column_ => listColunm.Add($"'{column_.Key}' {column_.Value}"));
 
-        var rtn = $"CREATE TABLE {classType_.Name} ({string.Join(",", listColunm)});";
+        var name =( Attribute.GetCustomAttribute(classType_, typeof(TableAttribute)) as TableAttribute)?.Name?? classType_.Name;
+
+
+        var rtn = $"CREATE TABLE {name} ({string.Join(",", listColunm)});";
         LogFile.Instance.WriteLine(rtn);
 
         return rtn;

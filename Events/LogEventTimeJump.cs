@@ -44,6 +44,6 @@ internal sealed class LogEventTimeJump : LogEventBase
     //TIMEJUMP[+ | -]minutes mm/dd hh:mm:ss
     //0        1             2     3
     [Sort(101)]
-    [Column("Minutes")]
+    [Column("Minutes", Order =101)]
     public string Minutes { get; private set; } = string.Empty;
 }

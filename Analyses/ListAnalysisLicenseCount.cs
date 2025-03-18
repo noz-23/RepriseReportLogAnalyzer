@@ -14,6 +14,7 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
 
@@ -26,7 +27,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// 　MaxProduct  :プロダクト-最大数
 /// 　OutInProduct:プロダクト-ログの数値
 /// </summary>
-[Sort(2)]
+[Sort(2)][Table("TbAnalysisLicenseCount")]
 internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAnalysisOutputFile
 {
 

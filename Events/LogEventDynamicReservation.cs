@@ -54,30 +54,25 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
     //DYNRES [create | remove] user host license-pool count “string” mm/dd hh:mm:ss
     //0      1                 2    3    4            5      6         7     8
     //
-    [Sort(11)]
-    [Column("User")]
+    [Column("User", Order =11)]
     public string User { get; private set; } = string.Empty;
 
-    [Sort(12)]
-    [Column("Host")]
+    [Column("Host", Order =12)]
     public string Host { get; private set; } = string.Empty;
 
-    [Sort(13)]
-    [Column("User@Host")]
+    [Column("User@Host", Order =13)]
     public string UserHost { get => User + "@" + Host; }
 
-    [Sort(101)]
-    [Column("Reservation")]
+    [Column("Reservation", Order =101)]
     public ReservationType Reservation { get; private set; } = ReservationType.CREATE;
 
-    [Sort(102)]
-    [Column("License Pool")]
+    [Column("License Pool", Order =102)]
     public int LicensePool { get; private set; } = -1;
 
-    [Sort(103)]
-    [Column("Count")]
+    [Column("Count", Order =103)]
     public int Count { get; private set; } = -1;
-    [Sort(104)]
-    public String StringData { get; private set; } = string.Empty;
+
+    [Column("String Data", Order = 104)]
+    public string StringData { get; private set; } = string.Empty;
     //
 }

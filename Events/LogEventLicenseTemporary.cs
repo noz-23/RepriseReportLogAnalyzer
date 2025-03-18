@@ -64,51 +64,51 @@ internal sealed class LogEventLicenseTemporary : LogEventBase, ILogEventUserHost
     //TEMP[create | remove | restart | expired] product version license-pool user host “isv_def” expdate exptime server_handle mm/dd hh:mm:ss
     //0    1                                    2       3       4            5    6     7          8       9       10            11    12
     [Sort(11)]
-    [Column("Product")]
+    [Column("Product", Order =11)]
     public string Product { get; private set; } = string.Empty;
 
     [Sort(12)]
-    [Column("Version")]
+    [Column("Version", Order =12)]
     public string Version { get; private set; } = string.Empty;
 
     [Sort(13)]
-    [Column("Product Version")]
+    [Column("Product Version", Order =13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
     [Sort(21)]
-    [Column("User")]
+    [Column("User", Order =21)]
     public string User { get; private set; } = string.Empty;
 
     [Sort(22)]
-    [Column("Host")]
+    [Column("Host", Order =22)]
     public string Host { get; private set; } = string.Empty;
 
     [Sort(23)]
-    [Column("User@Host")]
+    [Column("User@Host", Order =23)]
     public string UserHost { get => User + "@" + Host; }
 
     [Sort(101)]
-    [Column("License Temporary")]
+    [Column("License Temporary", Order =10)]
     public LicenseTemporaryType LicenseTemporary { get; private set; } = LicenseTemporaryType.CREATE;
 
     [Sort(102)]
-    [Column("License Pool")]
+    [Column("License Pool", Order =102)]
     public string LicensePool { get; private set; } = string.Empty;
 
     [Sort(103)]
-    [Column("Isv Def")]
+    [Column("Isv Def", Order =103)]
     public string IsvDef { get; private set; } = string.Empty;
     //
     [Sort(104)]
-    [Column("Expired Date")]
+    [Column("Expired Date", Order =104)]
     public string ExpiredDate { get; private set; } = string.Empty;
 
     [Sort(105)]
-    [Column("Expired Time")]
+    [Column("Expired Time", Order =105)]
     public string ExpiredTime { get; private set; } = string.Empty;
 
     [Sort(106)]
-    [Column("Server Handle")]
+    [Column("Server Handle", Order =106)]
     public string HandleServer { get; private set; } = string.Empty;
     //
 }

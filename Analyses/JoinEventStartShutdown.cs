@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Analyses;
 
@@ -38,31 +39,16 @@ internal sealed class JoinEventStartShutdown
     }
 
     /// <summary>
-    /// 文字列化のヘッダー
-    /// </summary>
-    public const string HEADER = "StartNumber,ShutdownNumber,IsSkip";
-
-    /// <summary>
-    /// スキップする情報
-    /// </summary>
-    //public const long SKIP_DATA = -1;
-
-    /// <summary>
-    /// スキップなし
-    /// </summary>
-    //public const long USE_DATA = 0;
-
-    /// <summary>
     /// スタート イベント番号
     /// </summary>
 
-    [Sort(101)]
+    [Column("Start No", Order = 101)]
     public long StartNumber { get; private set; } = -1;
 
     /// <summary>
     /// シャットダウン イベント番号
     /// </summary>
-    [Sort(102)]
+    [Column("Shutdonw No", Order = 102)]
     public long ShutdownNumber { get; private set; } = -1;
 
     /// <summary>
@@ -70,8 +56,7 @@ internal sealed class JoinEventStartShutdown
     ///  0  : Shutdown
     /// >0  : Other Event
     /// </summary>
-    [Sort(103)]
-    //public long IsSkip { get; private set; } = USE_DATA;
+    [Column("Skip StNo", Order = 103)]
     public long IsSkip { get; private set; } = (long)SelectData.ALL;
 
     /// <summary>

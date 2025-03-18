@@ -70,45 +70,35 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     //DEQUE why product version       user  host “isv_def” count server_handle mm/dd hh:mm:ss.tenths_of_msec
     //DEQUE why count   server_handle hh:mm
     //0     1   2       3             4     5     6          7     8             9     10
-    [Sort(11)]
-    [Column("Product")]
+    [Column("Product", Order =11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Sort(12)]
-    [Column("Version")]
+    [Column("Version", Order =12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Sort(13)]
-    [Column("Product Version")]
+    [Column("Product Version", Order =13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Sort(21)]
-    [Column("User")]
+    [Column("User", Order =21)]
     public string User { get; private set; } = string.Empty;
 
-    [Sort(22)]
-    [Column("Host")]
+    [Column("Host", Order =22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Sort(23)]
-    [Column("User@Host")]
+    [Column("User@Host", Order =23)]
     public string UserHost { get => User + "@" + Host; }
 
-    [Sort(101)]
-    [Column("Why")]
+    [Column("Why", Order =101)]
     public StatusValue Why { get; private set; } = StatusValue.Success;
     //public int Why { get; private set; } = 0;
 
-    [Sort(102)]
-    [Column("Isv Def")]
+    [Column("Isv Def", Order =102)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Sort(103)]
-    [Column("User")]
+    [Column("User", Order =103)]
     public int Count { get; private set; } = -1;
 
-    [Sort(104)]
-    [Column("Server Handle")]
+    [Column("Server Handle", Order =104)]
     public string HandleServer { get; private set; } = string.Empty;
     //
 }
