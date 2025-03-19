@@ -6,8 +6,6 @@
  * Licensed under the MIT License 
  * 
  */using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
-using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
@@ -64,8 +62,6 @@ public partial class EventControl : UserControl
             _dataGrid.ItemsSource = null;
 
             var listEvent =AnalysisManager.Instance.ListEvent(selected.ClassType);
-            //var list = listEvent.Join(Enum.GetValues(typeof(StatusValue)),e_=>(e_  as ILogEventWhy)?.Why,v_=>(long)v_, (event_, value_) => new With { });
-            //var listEvent =AnalysisManager.Instance.ListEvent(selected.ClassType);
             _dataGrid.ItemsSource = listEvent;
 
             LogFile.Instance.WriteLine($"{listEvent.Count()}");

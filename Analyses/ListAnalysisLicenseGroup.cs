@@ -247,7 +247,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <summary>
     /// ヘッダー
     /// </summary>
-    public string Header(long product_) => string.Join(",", ListHeader(product_).Select(x_ => x_.Key));
+    public string Header(long product_) => "'"+string.Join("','", ListHeader(product_).Select(x_ => x_.Key))+"'";
 
     /// <summary>
     /// リスト化したヘッダー

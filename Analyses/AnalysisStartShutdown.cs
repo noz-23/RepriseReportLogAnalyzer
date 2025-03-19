@@ -6,7 +6,6 @@
  * Licensed under the MIT License 
  * 
  */
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;

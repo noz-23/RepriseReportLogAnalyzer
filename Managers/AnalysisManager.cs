@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RepriseReportLogAnalyzer.Managers;
 
@@ -294,7 +295,10 @@ class AnalysisManager : INotifyPropertyChanged
     public async Task WriteText(string path_, Type classType_, long selected_)
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
-        await find?.WriteText(path_, selected_);
+        if (find != null)
+        {
+            await find.WriteText(path_, selected_);
+        }
     }
 
     /// <summary>
@@ -330,6 +334,7 @@ class AnalysisManager : INotifyPropertyChanged
     public IEnumerable<List<string>> ListEventValue(Type classType_, long selected_)
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
+
         return find?.ListValue(selected_) ?? default;
     }
 
@@ -377,37 +382,7 @@ class AnalysisManager : INotifyPropertyChanged
     public void SetPlot(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
     {
         plot_.Plot.Clear();
-
-        var title = string.Empty;
-        var xlabel = (date_ ==null) ? $"Date":$"[{date_.GetValueOrDefault().ToShortDateString()}] Time (30 Minute)";
-        var ylabel = string.Empty;
-        var pos = Alignment.LowerRight;
-        switch (group_)
-        {
-            case AnalysisGroup.USER: 
-            case AnalysisGroup.HOST: 
-            case AnalysisGroup.USER_HOST:
-                title = (date_ == null) ? $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
-                ylabel = $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
-                plot_.Plot.Axes.SetLimitsY( ListAnalysisLicenseGroup.TOP_PLOT_USE, 1);
-                pos = Alignment.LowerLeft;
-                break;
-            default:
-            case AnalysisGroup.NONE:
-                title = (date_ == null) ? $"Product - License Count": $"[{ date_.GetValueOrDefault().ToShortDateString()}] Product - License Count";
-                ylabel = $"Count";
-                pos = Alignment.UpperLeft;
-                plot_.Plot.Axes.SetLimitsY(0, _listLicenseCount.Max);
-                break;
-        }
-        plot_.Plot.Title(title);
-
-
-        plot_.Plot.XLabel(xlabel);
-        plot_.Plot.YLabel(ylabel);
-        //plot_.Plot.ShowLegend(Edge.Right); // なぜか二重に表示されるので見合わせ
-        plot_.Plot.ShowLegend(pos);
-
+        _setPlotLabel(plot_, date_, group_);
 
         long timeSpan = TimeSpan.TicksPerDay;
         var listX = new List<DateTime>();
@@ -443,6 +418,39 @@ class AnalysisManager : INotifyPropertyChanged
 
         plot_.Plot.Axes.DateTimeTicksBottom();
         plot_.Refresh();
+
+    }
+
+    private void _setPlotLabel(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
+    {
+        var title = string.Empty;
+        var xlabel = (date_ == null) ? $"Date" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Time (30 Minute)";
+        var ylabel = string.Empty;
+        var pos = Alignment.LowerRight;
+        switch (group_)
+        {
+            case AnalysisGroup.USER:
+            case AnalysisGroup.HOST:
+            case AnalysisGroup.USER_HOST:
+                title = (date_ == null) ? $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
+                ylabel = $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
+                plot_.Plot.Axes.SetLimitsY(ListAnalysisLicenseGroup.TOP_PLOT_USE, 1);
+                pos = Alignment.LowerLeft;
+                break;
+            default:
+            case AnalysisGroup.NONE:
+                title = (date_ == null) ? $"Product - License Count" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Product - License Count";
+                ylabel = $"Count";
+                pos = Alignment.UpperLeft;
+                plot_.Plot.Axes.SetLimitsY(0, _listLicenseCount.Max);
+                break;
+        }
+        plot_.Plot.Title(title);
+
+        plot_.Plot.XLabel(xlabel);
+        plot_.Plot.YLabel(ylabel);
+        //plot_.Plot.ShowLegend(Edge.Right); // なぜか二重に表示されるので見合わせ
+        plot_.Plot.ShowLegend(pos);
 
     }
 

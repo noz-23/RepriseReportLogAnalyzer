@@ -81,10 +81,4 @@ public class OutputView:BaseView
     /// コンボボックス表示内容
     /// </summary>
     public ListStringLongPair ListSelect { get; private set; } = new();
-
-    /// <summary>
-    /// 通知をしないで更新(ALL用)
-    /// </summary>
-    /// <param name="flg_"></param>
-    public void SetChecked(bool flg_)=> _isChecked = flg_;
 }

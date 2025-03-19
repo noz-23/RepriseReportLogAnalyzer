@@ -55,6 +55,11 @@ public static class DbConnectionExtension
     {
         LogFile.Instance.WriteLine($"[{classType_.Name}] [{header_}] [{listValue_.Count()}]");
 
+        if (listValue_.Any() == false)
+        {
+            return;
+        }
+
         foreach (var lv in listValue_)
         {
             try
@@ -68,6 +73,8 @@ public static class DbConnectionExtension
         }
     }
 
+    private static string _tableName(Type classType_) =>(Attribute.GetCustomAttribute(classType_, typeof(TableAttribute)) as TableAttribute)?.Name?? classType_.Name;
+
     /// <summary>
     /// テーブル作成処理クエリ
     /// </summary>
@@ -79,12 +86,9 @@ public static class DbConnectionExtension
         var listColunm = new List<string>();
         list_.ForEach(column_ => listColunm.Add($"'{column_.Key}' {column_.Value}"));
 
-        var name =( Attribute.GetCustomAttribute(classType_, typeof(TableAttribute)) as TableAttribute)?.Name?? classType_.Name;
 
-
-        var rtn = $"CREATE TABLE {name} ({string.Join(",", listColunm)});";
+        var rtn = $"CREATE TABLE {_tableName(classType_)} ({string.Join(",", listColunm)});";
         LogFile.Instance.WriteLine(rtn);
-
         return rtn;
     }
 
@@ -97,7 +101,7 @@ public static class DbConnectionExtension
     /// <returns></returns>
     private static string _insert(Type classType_, string header_, List<string> listValue)
     {
-        var rtn = $"INSERT INTO {classType_.Name} ({header_}) VALUES('{string.Join("','", listValue)}');";
+        var rtn = $"INSERT INTO {_tableName(classType_)} ({header_}) VALUES('{string.Join("','", listValue)}');";
         //LogFile.Instance.WriteLine(rtn);
         return rtn;
     }

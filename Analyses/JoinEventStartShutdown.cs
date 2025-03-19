@@ -6,7 +6,6 @@
  * Licensed under the MIT License 
  * 
  */
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
@@ -62,17 +61,11 @@ internal sealed class JoinEventStartShutdown
     /// <summary>
     /// スキップ セット
     /// </summary>
-    public void SetSkip()
-    {
-        //IsSkip = SKIP_DATA;
-        IsSkip = (long)SelectData.ECLUSION;
-    }
+    public void SetSkip()=> IsSkip = (long)SelectData.ECLUSION;
+    
 
     /// <summary>
     /// 文字列化
     /// </summary>
-    public override string ToString()
-    {
-        return $"{StartNumber},{ShutdownNumber},{IsSkip}";
-    }
+    public override string ToString()=> $"{StartNumber},{ShutdownNumber},{IsSkip}";
 }

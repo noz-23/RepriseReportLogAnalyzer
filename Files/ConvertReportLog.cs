@@ -219,9 +219,6 @@ internal sealed class ConvertReportLog
 
             return true;
         }
-        public int GetHashCode(ILogEventProduct codeh_)
-        {
-            return codeh_.Product.GetHashCode() ^ codeh_.Version.GetHashCode();
-        }
+        public int GetHashCode(ILogEventProduct codeh_)=> codeh_.Product.GetHashCode() ^ codeh_.Version.GetHashCode();
     }
 }

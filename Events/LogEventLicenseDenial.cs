@@ -82,7 +82,6 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
 
     [Column("Why", Order =103)]
     public StatusValue Why { get; private set; } = StatusValue.Success;
-    //public int Why { get; private set; } = -1;
 
     [Column("Last Attempt", Order =104)]
     public string LastAttempt { get; private set; } = string.Empty;

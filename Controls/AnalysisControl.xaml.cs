@@ -15,7 +15,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Linq;
 
 namespace RepriseReportLogAnalyzer.Controls;
 
@@ -77,25 +76,21 @@ public partial class AnalysisControl : UserControl
             return;
         }
 
-        //var outFolder = _textBoxFolder.Text;
-        await Task.Run(() =>
-        //await Task.Factory.StartNew(() =>
+        var list = new List<string>();
+        foreach (string path_ in _dataGrid.Items)
         {
-            var list =new List<string>();
-            foreach (string path_ in _dataGrid.Items)
-            {
-                list.Add(path_);
-            }
-            AnalysisManager.Instance.Analysis(list);
-        }//, TaskCreationOptions.LongRunning
-        );
+            list.Add(path_);
+        }
+        await Task.Run(async () =>
+        {
+            await AnalysisManager.Instance.Analysis(list);
+        });
 
         _buttonAnalysis.IsEnabled = true;
 
         if (App.Current.MainWindow is MainWindow mainWindow)
         {
             mainWindow._resultControl.SetDate();
-            //mainWindow._tabControl._resultControl.SetData();
             _textLabel.Text = $"Runing [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
     }

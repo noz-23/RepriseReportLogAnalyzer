@@ -98,7 +98,7 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
     [Column("Isv Def", Order =101)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Version", Order =102)]
+    [Column("Count", Order =102)]
     public int Count { get; private set; } = -1;
 
     [Column("Server Handle", Order =103)]

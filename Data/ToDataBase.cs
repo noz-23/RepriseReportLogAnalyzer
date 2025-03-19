@@ -6,7 +6,6 @@
  * Licensed under the MIT License 
  * 
  */
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,7 +24,7 @@ namespace RepriseReportLogAnalyzer.Data
         /// </summary>
         /// <param name="classType_">子のクラス</param>
         /// <returns></returns>
-        public static string Header(Type classType_) => string.Join(",", ListHeader(classType_).Select(x_=>x_.Key));
+        public static string Header(Type classType_) =>"'" +string.Join("','", ListHeader(classType_).Select(x_=>x_.Key))+"'";
 
         /// <summary>
         /// リスト化したヘッダー
@@ -35,15 +34,14 @@ namespace RepriseReportLogAnalyzer.Data
         public static ListStringStringPair ListHeader(Type classType_)
         {
             var rtn = new ListStringStringPair();
-            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => ((Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order ?? 0) != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
 
-            listPropetyInfo?.ToList().ForEach(prop =>
-            {
-                var column = Attribute.GetCustomAttribute(prop, typeof(ColumnAttribute)) as ColumnAttribute;
+            foreach(var prop in listPropetyInfo)
+            { 
+                var name = (Attribute.GetCustomAttribute(prop, typeof(ColumnAttribute)) as ColumnAttribute)?.Name ?? prop.Name;
 
-                //rtn.Add(new ($"{prop.Name}",$"{GetDatabaseType(prop.PropertyType)}"));
-                rtn.Add(new($"{column.Name}", $"{GetDatabaseType(prop.PropertyType)}"));
-            });
+                rtn.Add(new($"{name}", $"{GetDatabaseType(prop.PropertyType)}"));
+            }
 
             return rtn;
         }
@@ -66,24 +64,23 @@ namespace RepriseReportLogAnalyzer.Data
             var rtn = new List<string>();
             var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
 
-            listPropetyInfo?.ToList().ForEach(prop =>
+            foreach(var prop in listPropetyInfo)
             {
                 var classType = prop.PropertyType;
                 if (classType == typeof(TimeSpan))
                 {
-                    rtn.Add($"{prop.GetValue(this)}:d\\.hh\\:mm\\:ss");
-                }
-                if (classType==typeof(StatusValue))
-                //if (classType.FullName == typeof(StatusValue).FullName)
+                    rtn.Add($"{prop.GetValue(this):d\\.hh\\:mm\\:ss}");
+
+                }else if (classType == typeof(StatusValue))
                 {
-                    StatusValue val = (StatusValue)Enum.Parse(typeof(StatusValue), prop.GetValue(this).ToString());
+                    var val = (StatusValue)Enum.Parse(typeof(StatusValue), prop.GetValue(this).ToString());
                     rtn.Add($"{(long)val}");
                 }
                 else
                 {
                     rtn.Add($"{prop.GetValue(this)}");
                 }
-            });
+            }
             return rtn;
         }
 
@@ -94,6 +91,7 @@ namespace RepriseReportLogAnalyzer.Data
         /// <returns></returns>
         public static string GetDatabaseType(Type type_)
         {
+
             if (type_ == typeof(string))
             {
                 return "TEXT";

@@ -17,6 +17,7 @@ using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
+using System.Windows.Controls;
 
 namespace RepriseReportLogAnalyzer.Analyses;
 
@@ -42,22 +43,21 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// コンボボックスの項目
     /// </summary>
     public static ListStringLongPair ListSelect { get => _listSelect; }
-    private static ListStringLongPair _listSelect
+    private static ListStringLongPair _listSelect= new ()
     {
-        get => new ()
-        {
-            new("Interval Event", _NO_TIME_STAMP),
-            new("Interval 1 Day", TimeSpan.TicksPerDay),
-            new("Interval 1 Hour", TimeSpan.TicksPerHour),
-            new("Interval 30 Minute", 30*TimeSpan.TicksPerMinute),
-        };
-    }
+        new("Interval Event", _NO_TIME_STAMP),
+        new("Interval 1 Day", TimeSpan.TicksPerDay),
+        new("Interval 1 Hour", TimeSpan.TicksPerHour),
+        new("Interval 30 Minute", 30*TimeSpan.TicksPerMinute),
+    };
+
 
     public int Max 
     {
         get
         {
-            int max = 0;
+            //return this.SelectMany(x_ => x_.MaxProduct).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value);
+            int rtn = 0;
             foreach (var list in this)
             {
                 foreach (var product in list.MaxProduct.Keys)
@@ -66,11 +66,10 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                     {
                         continue;
                     }
-                    max = Math.Max(max, list.MaxProduct[product]);
-
+                    rtn = Math.Max(rtn, list.MaxProduct[product]);
                 }
             }
-            return max;
+            return rtn;
         }
 
     }
@@ -414,7 +413,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
 
-    public string Header(long timeSpan_ ) => string.Join(",", ListHeader(timeSpan_).Select(x_=>x_.Key));
+    public string Header(long timeSpan_ ) => "'"+string.Join("','", ListHeader(timeSpan_).Select(x_=>x_.Key))+"'";
 
     /// <summary>
     /// リスト化したヘッダー

@@ -6,7 +6,6 @@
  * Licensed under the MIT License 
  * 
  */
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
@@ -88,7 +87,6 @@ internal sealed class JoinEventCheckOutIn
     private LogEventBase? _checkIn = null;
     public LogEventBase? CheckIn() => _checkIn;
 
-
     /// <summary>
     /// 
     /// 重複あり イベント セット
@@ -100,13 +98,11 @@ internal sealed class JoinEventCheckOutIn
     {
         if (checkIn_ == null)
         {
-            //DuplicationNumber = HAVE_DUPLICATION;
             DuplicationNumber = (long)SelectData.ECLUSION;
         }
         else
         {
             _checkIn = checkIn_;
-            //DuplicationNumber = _checkIn?.EventNumber ?? NO_DUPLICATION;
             DuplicationNumber = _checkIn?.EventNumber ?? (long)SelectData.ALL;
         }
     }
@@ -114,8 +110,5 @@ internal sealed class JoinEventCheckOutIn
     /// <summary>
     /// 文字列化
     /// </summary>
-    public override string ToString()
-    {
-        return $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
-    }
+    public override string ToString()=> $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
 }

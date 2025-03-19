@@ -17,8 +17,15 @@ namespace RepriseReportLogAnalyzer.Views
     public class BaseView : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public bool SuspendedPropertyChanged { get; set; } = false;
         protected void _NotifyPropertyChanged([CallerMemberName] String propertyName_ = "")
         {
+            if (SuspendedPropertyChanged == true)
+            {
+                return;
+            }
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName_));
         }
 
@@ -40,5 +47,7 @@ namespace RepriseReportLogAnalyzer.Views
             _NotifyPropertyChanged(propertyName_);
             return true;
         }
+
+
     }
 }

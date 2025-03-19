@@ -155,42 +155,39 @@ public partial class OutputControl : UserControl
         string outputFolder = _textBoxFolder.Text ;
 
         _saveCsv.IsEnabled = false;
-        await Task.Run(async () =>
+
+        if (IsSaveSummy == true)
         {
-            if (IsSaveSummy == true)
-            {
-                string outPath = outputFolder + @"\Summy.txt";
-                LogFile.Instance.WriteLine($"Write : {outPath}");
+            string outPath = outputFolder + @"\Summy.txt";
+            LogFile.Instance.WriteLine($"Write : {outPath}");
 
-                await AnalysisManager.Instance.WriteSummy(outPath);
+            await AnalysisManager.Instance.WriteSummy(outPath);
+        }
+
+        foreach (var view in ListEvent)
+        {
+            if (view.IsChecked == false)
+            {
+                continue;
+            }
+            var outPath = outputFolder + @"\" + view.Name + @".csv";
+            LogFile.Instance.WriteLine($"Write : {outPath}");
+
+            await AnalysisManager.Instance.WriteText(outPath, view.ClassType);
+        }
+
+        foreach (var view in ListAnalysis)
+        {
+            if (view.IsChecked == false)
+            {
+                continue;
             }
 
-            foreach (var view in ListEvent)
-            {
-                if (view.IsChecked == false)
-                {
-                    continue;
-                }
-                var outPath = outputFolder + @"\" + view.Name + @".csv";
-                LogFile.Instance.WriteLine($"Write : {outPath}");
+            string outPath = outputFolder + @"\" + view.Name + @".csv";
+            LogFile.Instance.WriteLine($"Write : {outPath}");
 
-                await AnalysisManager.Instance.WriteText(outPath, view.ClassType);
-            }
-
-            foreach (var view in ListAnalysis)
-            {
-                if (view.IsChecked == false)
-                {
-                    continue;
-                }
-
-                string outPath = outputFolder + @"\" + view.Name + @".csv";
-                LogFile.Instance.WriteLine($"Write : {outPath}");
-
-                await AnalysisManager.Instance.WriteText(outPath, view.ClassType, view.SelectedValue);
-            }
-        });
-
+            await AnalysisManager.Instance.WriteText(outPath, view.ClassType, view.SelectedValue);
+        }
         _saveCsv.IsEnabled = true;
 
     }

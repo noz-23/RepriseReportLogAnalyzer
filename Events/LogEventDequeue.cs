@@ -90,7 +90,6 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
 
     [Column("Why", Order =101)]
     public StatusValue Why { get; private set; } = StatusValue.Success;
-    //public int Why { get; private set; } = 0;
 
     [Column("Isv Def", Order =102)]
     public string IsvDef { get; private set; } = string.Empty;
