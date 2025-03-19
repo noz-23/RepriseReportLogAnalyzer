@@ -59,7 +59,7 @@ interface IAnalysisOutputFile
     /// </summary>
     /// <param name="path_"></param>
     /// <param name="select_"></param>
-    void WriteText(string path_, long select_);
+    Task WriteText(string path_, long select_);
     /// <summary>
     /// リスト化したヘッダー
     /// </summary>

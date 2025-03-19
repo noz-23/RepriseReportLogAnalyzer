@@ -170,7 +170,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// ファイルの変換解析
     /// </summary>
     /// <param name="listFile"></param>
-    public void Analysis(IEnumerable<string> listFile)
+    public async Task Analysis(IEnumerable<string> listFile)
     {
         //
         _clear();
@@ -179,7 +179,7 @@ class AnalysisManager : INotifyPropertyChanged
         _runStartTime = DateTime.Now;
 
         _listFile.AddRange(listFile);
-        _convert(); // 変換
+        await _convert(); // 変換
         _analysis(); // 解析
 
         _runEndTime = DateTime.Now;
@@ -189,13 +189,13 @@ class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// 変換処理
     /// </summary>
-    private void _convert() 
+    private async Task _convert() 
     {
         int max = _listFile.Count();
         foreach (string path_ in _listFile)
         {
             LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
-            _convertReportLog.Start(path_);
+            await _convertReportLog.Start(path_);
         }
         _convertReportLog.End();
     }
@@ -231,7 +231,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// 総合データの書き出し
     /// </summary>
     /// <param name="path_"></param>
-    public void WriteSummy(string path_)
+    public async Task WriteSummy(string path_)
     {
         var list = new List<string>();
 
@@ -270,7 +270,7 @@ class AnalysisManager : INotifyPropertyChanged
         list.Add("\n");
         LogFile.Instance.WriteLine($"ListUserHost:{ListUserHost.Count()}");
 
-        File.WriteAllLines(path_, list, Encoding.UTF8);
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
 
@@ -280,9 +280,9 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="path_"></param>
     /// <param name="classType_"></param>
 
-    public void WriteText(string path_, Type classType_)
+    public async Task WriteText(string path_, Type classType_)
     {
-        _convertReportLog.WriteEventText(path_, classType_);
+        await _convertReportLog.WriteEventText(path_, classType_);
     }
 
     /// <summary>
@@ -291,10 +291,10 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="path_"></param>
     /// <param name="classType_"></param>
     /// <param name="selected_"></param>
-    public void WriteText(string path_, Type classType_, long selected_)
+    public async Task WriteText(string path_, Type classType_, long selected_)
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
-        find?.WriteText(path_, selected_);
+        await find?.WriteText(path_, selected_);
     }
 
     /// <summary>
@@ -389,7 +389,7 @@ class AnalysisManager : INotifyPropertyChanged
             case AnalysisGroup.USER_HOST:
                 title = (date_ == null) ? $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
                 ylabel = $"Top {ListAnalysisLicenseGroup.TOP_PLOT_USE} - {group_.Description()}";
-                plot_.Plot.Axes.SetLimitsY(bottom: ListAnalysisLicenseGroup.TOP_PLOT_USE, top: 1);
+                plot_.Plot.Axes.SetLimitsY( ListAnalysisLicenseGroup.TOP_PLOT_USE, 1);
                 pos = Alignment.LowerLeft;
                 break;
             default:
@@ -397,6 +397,7 @@ class AnalysisManager : INotifyPropertyChanged
                 title = (date_ == null) ? $"Product - License Count": $"[{ date_.GetValueOrDefault().ToShortDateString()}] Product - License Count";
                 ylabel = $"Count";
                 pos = Alignment.UpperLeft;
+                plot_.Plot.Axes.SetLimitsY(0, _listLicenseCount.Max);
                 break;
         }
         plot_.Plot.Title(title);

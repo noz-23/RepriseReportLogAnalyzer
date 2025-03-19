@@ -86,11 +86,5 @@ public class OutputView:BaseView
     /// 通知をしないで更新(ALL用)
     /// </summary>
     /// <param name="flg_"></param>
-    public void SetChecked(bool flg_)
-    {
-        _isChecked = flg_;
-    }
-
-
-
+    public void SetChecked(bool flg_)=> _isChecked = flg_;
 }

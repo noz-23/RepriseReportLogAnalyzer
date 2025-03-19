@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Files;
@@ -42,12 +43,12 @@ internal sealed class ConvertReportLog
     /// 解析開始
     /// </summary>
     /// <param name="filePath_"></param>
-    public void Start(string filePath_)
+    public async Task Start(string filePath_)
     {
-        //_startTime??=DateTime.Now;
         if (File.Exists(filePath_) == true)
         {
-            var list = File.ReadAllLines(filePath_).Where(s_ => string.IsNullOrEmpty(s_) == false);
+            var listLine = await File.ReadAllLinesAsync(filePath_);
+            var list = listLine.Where(s_ => string.IsNullOrEmpty(s_) == false);
 
             int count = 0;
             int max = list.Count();
@@ -101,22 +102,23 @@ internal sealed class ConvertReportLog
     /// <summary>
     /// プロダクトを持ってる イベント
     /// </summary>
-    public IEnumerable<ILogEventProduct> ListProductEvent{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct).Where(e_ => string.IsNullOrEmpty(e_?.Product ??string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);}
+    //public IEnumerable<ILogEventProduct> ListProductEvent{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct).Where(e_ => string.IsNullOrEmpty(e_?.Product ??string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);}
+    public IEnumerable<ILogEventProduct> ListProductEvent { get => _listEvent.AsParallel().OfType<ILogEventProduct>().Where(e_ => string.IsNullOrEmpty(e_?.Product ?? string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version); }
 
     /// <summary>
     /// ユーザー
     /// </summary>
-    public IEnumerable<string> ListUser{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUser).Select(e_ => e_ as ILogEventUser).Select(e_ => e_?.User ??string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct(); }
+    public IEnumerable<string> ListUser{get => _listEvent.AsParallel().OfType<ILogEventUser>().Select(e_ => e_?.User ??string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct(); }
 
     /// <summary>
     /// ホスト
     /// </summary>
-    public IEnumerable<string> ListHost{ get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventHost).Select(e_ => e_ as ILogEventHost).Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();}
+    public IEnumerable<string> ListHost{ get => _listEvent.AsParallel().OfType<ILogEventHost>().Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();}
 
     /// <summary>
     /// ユーザーホスト
     /// </summary>
-    public IEnumerable<string> ListUserHost{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventUserHost).Select(e_ => e_ as ILogEventUserHost).Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct();}
+    public IEnumerable<string> ListUserHost{get => _listEvent.AsParallel().OfType<ILogEventUserHost>().Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct();}
 
     /// <summary>
     /// 時間
@@ -145,9 +147,11 @@ internal sealed class ConvertReportLog
     {
         if (ss_ == null)
         { 
-            return _listEvent.AsParallel().AsOrdered().Where(e_ => e_ is T).Select(e_ => e_ as T);
+            //return _listEvent.AsParallel().AsOrdered().Where(e_ => e_ is T).Select(e_ => e_ as T);
+            return _listEvent.AsParallel().AsOrdered().OfType<T>();
         }
-        return _listEvent.AsParallel().Where(e_ => (e_ is T) && (ss_.IsWithInRange(e_.EventNumber) == true)).Select(e_ => e_ as T);
+        //return _listEvent.AsParallel().Where(e_ => (e_ is T) && (ss_.IsWithInRange(e_.EventNumber) == true)).Select(e_ => e_ as T);
+        return _listEvent.AsParallel().OfType<T>().Where(e_=>ss_.IsWithInRange(e_.EventNumber) == true).Select(e_ => e_ as T);
     }
 
     /// <summary>
@@ -164,26 +168,26 @@ internal sealed class ConvertReportLog
     /// </summary>
     /// <param name="path_"></param>
     /// <param name="classType_"></param>
-    public void WriteEventText(string path_, Type classType_)
+    public async Task WriteEventText(string path_, Type classType_)
     {
         var list = new List<string>();
         // ヘッダー
         list.Add(LogEventBase.Header(classType_));
         // データ
         list.AddRange(_listToString(classType_));
-        File.WriteAllLines(path_, list, Encoding.UTF8);
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
 
-    public void WriteEventText<T>(string path_) where T : LogEventBase
+    public async Task WriteEventText<T>(string path_) where T : LogEventBase
     {
         var list = new List<string>();
         // ヘッダー
         list.Add(LogEventBase.Header(typeof(T)));
         // データ
         list.AddRange(_listToString<T>());
-        File.WriteAllLines(path_, list, Encoding.UTF8);
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
     }

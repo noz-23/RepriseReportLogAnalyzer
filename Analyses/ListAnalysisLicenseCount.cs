@@ -41,7 +41,8 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <summary>
     /// コンボボックスの項目
     /// </summary>
-    public static ListStringLongPair ListSelect
+    public static ListStringLongPair ListSelect { get => _listSelect; }
+    private static ListStringLongPair _listSelect
     {
         get => new ()
         {
@@ -50,6 +51,28 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             new("Interval 1 Hour", TimeSpan.TicksPerHour),
             new("Interval 30 Minute", 30*TimeSpan.TicksPerMinute),
         };
+    }
+
+    public int Max 
+    {
+        get
+        {
+            int max = 0;
+            foreach (var list in this)
+            {
+                foreach (var product in list.MaxProduct.Keys)
+                {
+                    if (AnalysisManager.Instance.IsProductChecked(product) == false)
+                    {
+                        continue;
+                    }
+                    max = Math.Max(max, list.MaxProduct[product]);
+
+                }
+            }
+            return max;
+        }
+
     }
 
     /// <summary>
@@ -105,6 +128,11 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="listCheckOutIn_">チェックアウト チェックイン 結合情報</param>
     public void Analysis(ConvertReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
     {
+        if (listCheckOutIn_.Any() == false)
+        {
+            return;
+        }
+
         // プロダクトのコピー
         _listProduct.UnionWith(log_.ListProduct);
 
@@ -348,14 +376,14 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="path_">パス</param>
     /// <param name="timeSpan_">間隔時間</param>
-    public void WriteText(string path_, long timeSpan_= _NO_TIME_STAMP)
+    public async Task WriteText(string path_, long timeSpan_= _NO_TIME_STAMP)
     {
         var list = new List<string>();
         // ヘッダー
         list.Add(Header(timeSpan_));
         // データ
         list.AddRange(ListValue(timeSpan_).Select(x_=>string.Join(",",x_)));
-        File.WriteAllLines(path_, list, Encoding.UTF8);
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
@@ -400,9 +428,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         rtn.Add(new("Time", ToDataBase.GetDatabaseType(typeof(DateTime))));
         foreach (var product in _listProduct)
         {
-            rtn.Add(new($"{product}_Use", ToDataBase.GetDatabaseType(typeof(long))));
-            rtn.Add(new($"{product}_Have", ToDataBase.GetDatabaseType(typeof(long))));
-            //rtn.Add(new($"{product}_OutIn", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add(new($"{product}[Use]", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add(new($"{product}[Have]", ToDataBase.GetDatabaseType(typeof(long))));
+            //rtn.Add(new($"{product}[OutIn]", ToDataBase.GetDatabaseType(typeof(long))));
         }
 
         return rtn;

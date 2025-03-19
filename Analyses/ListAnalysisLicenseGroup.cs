@@ -95,7 +95,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <summary>
     /// プロット用の文字列
     /// </summary>
-    private const string _GROUP_FORMAT = "{0}.{1}";
+    private const string _GROUP_FORMAT = "{0:D2}.{1}";
 
     /// <summary>
     /// 解析内容
@@ -136,6 +136,11 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
 
     public void Analysis(IEnumerable<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
     {
+        if (listCheckOutIn_.Any() == false)
+        {
+            return;
+        }
+
         // プロダクトのコピー
         _listProduct.UnionWith(listCheckOutIn_.Select(x_=>x_.Product));
         // グループのコピー
@@ -227,14 +232,14 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// ファイル保存
     /// </summary>
     /// <param name="path_">パス</param>
-    public void WriteText(string path_, long product_)
+    public async Task WriteText(string path_, long product_)
     {
         var list = new List<string>();
         // ヘッダー
         list.Add(Header(product_));
         // データ
         list.AddRange(ListValue(product_).Select(x_=>string.Join(",",x_)));
-        File.WriteAllLines(path_, list, Encoding.UTF8);
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
@@ -268,9 +273,9 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         // プロダクト毎
         foreach (var product in _listProduct)
         {
-            rtn.Add(new($"{product}_Duration", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
-            rtn.Add(new($"{product}_Days", ToDataBase.GetDatabaseType(typeof(long))));
-            rtn.Add(new($"{product}_Count", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add(new($"{product}[Duration]", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
+            rtn.Add(new($"{product}[Days]", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add(new($"{product}[Count]", ToDataBase.GetDatabaseType(typeof(long))));
         }
         return rtn;
     }

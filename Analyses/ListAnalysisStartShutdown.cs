@@ -32,14 +32,13 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     }
 
 
-    public static ListStringLongPair ListSelect
+    public static ListStringLongPair ListSelect { get => _listSelect; }
+    private static ListStringLongPair _listSelect = new()
     {
-        get => new()
-        {
-            new( "No Include Skip", (long)SelectData.ECLUSION),
-            new ("All Data", (long)SelectData.ALL )
-        };
-    }
+        new( "No Include Skip", (long)SelectData.ECLUSION),
+        new ("All Data", (long)SelectData.ALL )
+    };
+
 
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
@@ -93,14 +92,14 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// </summary>
     /// <param name="path_">パス</param>
     /// <param name="withoutSkip_">スキップ内容ありか</param>
-    public void WriteText(string path_, long skip_ = (long)SelectData.ECLUSION)
+    public async Task WriteText(string path_, long skip_ = (long)SelectData.ECLUSION)
     {
         var list = new List<string>();
         // ヘッダー
         list.Add(Header(skip_));
         // データ
         list.AddRange(ListValue(skip_).Select(x_ => string.Join(",",x_)));
-        File.WriteAllLines(path_, list, Encoding.UTF8);
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
     }
 
     /// <summary>
