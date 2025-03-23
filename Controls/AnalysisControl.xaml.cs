@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -123,7 +124,12 @@ public partial class AnalysisControl : UserControl
                 _resultTitle = str_;
                 _progressBar.Maximum = max_;
             }
-            _textLabel.Text = $"Runing {_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
+
+            //_textLabel.Text = $"Runing {_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
+            StringBuilder str = new StringBuilder("Runing ");
+            str.Append($"{ _resultTitle} [{ (DateTime.Now - _startDateTime):hh\\:mm\\:ss}]");
+            _textLabel.Text = str.ToString();
+
             _progressBar.Value = count_;
             _textProgress.Text = $"{count_} / {max_}";
         });

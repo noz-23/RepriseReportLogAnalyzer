@@ -98,7 +98,6 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// </summary>
     public static long NowEventNumber = 0;
 
-
     /// <summary>
     /// 日付設定に利用
     /// </summary>
@@ -248,10 +247,11 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     {
         if (a_ is LogEventBase a)
         {
-            if (b_ is LogEventBase b)
-            {
-                return (int)(a.EventNumber - b.EventNumber);
-            }
+            //if (b_ is LogEventBase b)
+            //{
+            //    return (int)(a.EventNumber - b.EventNumber);
+            //}
+            return a.CompareTo(b_);
         }
         return -1;
     }

@@ -102,15 +102,12 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// </summary>
     private const string _ANALYSIS = "[License Group Duration]";
 
-    //private const long _ALL = 0;
-    //private const long _PRODUCT = 0;
-
     protected static ListStringLongPair _ListSelect
     {
         get => new()
         {
-            new("All In One", (long)SelectData.ALL),
             new("By Product",(long)SelectData.ECLUSION),
+            new("All In One", (long)SelectData.ALL),
         };
     }
 

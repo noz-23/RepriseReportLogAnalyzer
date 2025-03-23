@@ -40,6 +40,8 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
             Why = (StatusValue)int.Parse(list_[1]);
             Count = int.Parse(list_[2]);
             HandleServer = list_[3];
+            HandleServerNum = Convert.ToInt32(HandleServer, 16);
+
             //
             EventDateTime = DateTime.Parse(_NowDate + " " + list_[4]);
             LogFormat = LogFormat.SMALL;
@@ -113,4 +115,8 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     [Column("Server Handle", Order =106)]
     public string HandleServer { get; private set; } = string.Empty;
     //
+    //public int HandleServerNum() => _handleServerNum;
+    //private int _handleServerNum = 1;
+    public int HandleServerNum { get; private set; } = -1;
+
 }

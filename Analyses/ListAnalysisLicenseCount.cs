@@ -149,8 +149,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             {
                 // 時間が定まってないため処理しない
                 continue;
-            }
-
+            } else
             if (ev is LogEventProduct eventProduct)
             {
                 // プロダクト の場合 プロダクトの最大数を更新
@@ -158,8 +157,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 {
                     _add(eventProduct);
                 }
-            }
-
+            } else
             if (ev is LogEventCheckOut eventCheckOut)
             {
                 // チェックアウトの場合、カウント増加
@@ -167,7 +165,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 {
                     _add(eventCheckOut);
                 }
-            }
+            }else
             if (ev is LogEventCheckIn eventCheckIn)
             {
                 // チェックインの場合、カウント減少
@@ -179,14 +177,13 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 else
                 {
                     // チェックインにはプロダクトの情報がない場合があるため
-                    LogFile.Instance.WriteLine($"CheckIn: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
+                    //LogFile.Instance.WriteLine($"CheckIn: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
 
                     var checkOut = listCheckOutIn_.Find(eventCheckIn);
                     if (checkOut != null)
                     {
-                        LogFile.Instance.WriteLine($"CheckOut: {checkOut.EventNumber} {checkOut.EventDateTime} {checkOut.Product}");
+                        LogFile.Instance.WriteLine($"CheckOut: {checkOut.ToString()}");
                         flg = _setCountDown(checkOut.Product, eventCheckIn.CountCurrent);
-
                     }
                     else
                     {
@@ -198,17 +195,16 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 {
                     _add(eventCheckIn);
                 }
-            }
+            }else
             if (ev is LogEventShutdown eventShutdown)
             {
                 // シャットダウン時に、一旦クリア
                 _clearCount();
                 _add(eventShutdown);
-            }
+            }else
             if (ev is LogEventTimeStamp eventTimeStamp)
             {
                 _add(eventTimeStamp);
-
             }
             ProgressCount?.Invoke(++count, max);
         }

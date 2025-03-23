@@ -66,6 +66,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
             ResuseCurrent = int.Parse(list_[9]);
             //
             HandleServer = list_[10];
+            HandleServerNum = Convert.ToInt32(HandleServer,16);
             HandleShare = list_[11];
             //
             ProcessId = list_[12];
@@ -120,6 +121,11 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     [Column("Server Handle", Order =106)]
     public string HandleServer { get; private set; } = string.Empty;
 
+    //public int HandleServerNum()=> _handleServerNum;
+    //private int _handleServerNum = 1;
+    public int HandleServerNum { get; private set; } = -1;
+
+
     [Column("Share Handle", Order =107)]
     public string HandleShare { get; private set; } = string.Empty;
 
@@ -146,4 +152,8 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsFindCheckIn(string hande_,long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);
+
 }

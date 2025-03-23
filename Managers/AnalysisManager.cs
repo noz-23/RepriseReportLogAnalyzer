@@ -216,7 +216,7 @@ class AnalysisManager : INotifyPropertyChanged
         ListDateTime.AddRange(_convertReportLog.ListDateTime);
         //
         _listStartShutdown.Analysis(_convertReportLog);
-        _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListNoIncludeSkip());
+        _listCheckOutIn.AnalysisExEx(_convertReportLog, _listStartShutdown.ListNoIncludeSkip()); //
         _listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
         //
         _listUserDuration.Analysis(ListUser, _listCheckOutIn);

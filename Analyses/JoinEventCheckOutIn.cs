@@ -36,23 +36,12 @@ internal sealed class JoinEventCheckOutIn
         {
             ShutdownNumber = shutdown.EventNumber;
         }
-        else
-        {
-            LogFile.Instance.WriteLine($"{checkOut_.EventNumber} {checkIn_?.EventNumber} {checkIn_?.GetType()}");
-        }
+        //else
+        //{
+            //LogFile.Instance.WriteLine($"{checkOut_.EventNumber} {checkIn_?.EventNumber} {checkIn_?.GetType()}");
+        //}
         _checkIn = checkIn_;
     }
-
-
-    /// <summary>
-    /// 重複なし(AnalysisCheckOutInのデータそのまま)
-    /// </summary>
-    //public const long NO_DUPLICATION = 0;
-
-    /// <summary>
-    /// 重複あり(利用しない)
-    /// </summary>
-    //public const long HAVE_DUPLICATION = -1;
 
     /// <summary>
     /// チェックアウト イベント番号

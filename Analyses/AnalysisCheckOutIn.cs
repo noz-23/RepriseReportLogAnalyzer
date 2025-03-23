@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
+using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
@@ -18,7 +19,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックインを結合
 /// </summary>
-internal sealed class AnalysisCheckOutIn: ToDataBase
+internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
 {
     /// <summary>
     /// コンストラクタ
@@ -205,6 +206,31 @@ internal sealed class AnalysisCheckOutIn: ToDataBase
             $"{Host}",
             $"{UserHost}"
         };
-
     }
+
+    /// <summary>
+    /// 比較処理
+    /// </summary>
+    /// <param name="a_"></param>
+    /// <param name="b_"></param>
+    /// <returns></returns>
+    public int Compare(object? a_, object? b_)
+    {
+        if (a_ is AnalysisCheckOutIn a)
+        {
+            //if (b_ is AnalysisCheckOutIn b)
+            //{
+            //    return (int)(a.CheckOutNumber() - b.CheckOutNumber());
+            //}
+            return a.CompareTo(b_);
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// 比較処理
+    /// </summary>
+    /// <param name="b_"></param>
+    /// <returns></returns>
+    public int CompareTo(object? b_) => (b_ is AnalysisCheckOutIn b) ? (int)(this.CheckOutNumber() - b.CheckOutNumber()) : -1;
 }

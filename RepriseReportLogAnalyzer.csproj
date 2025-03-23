@@ -26,6 +26,7 @@
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="ScottPlot.WPF" Version="5.0.54" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2" />
   </ItemGroup>
 
 </Project>
