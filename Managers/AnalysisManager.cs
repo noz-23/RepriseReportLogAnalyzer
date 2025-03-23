@@ -21,7 +21,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RepriseReportLogAnalyzer.Managers;
 
@@ -154,7 +153,6 @@ class AnalysisManager : INotifyPropertyChanged
         ListUserHost.Clear();
         ListDate.Clear();
         ListDateTime.Clear();
-
         //
         _listStartShutdown.Clear();
         _listCheckOutIn.Clear();
@@ -176,7 +174,6 @@ class AnalysisManager : INotifyPropertyChanged
         //
         _clear();
         //
-
         _runStartTime = DateTime.Now;
 
         _listFile.AddRange(listFile);
@@ -184,7 +181,6 @@ class AnalysisManager : INotifyPropertyChanged
         _analysis(); // 解析
 
         _runEndTime = DateTime.Now;
-
     }
 
     /// <summary>
@@ -216,7 +212,7 @@ class AnalysisManager : INotifyPropertyChanged
         ListDateTime.AddRange(_convertReportLog.ListDateTime);
         //
         _listStartShutdown.Analysis(_convertReportLog);
-        _listCheckOutIn.AnalysisExEx(_convertReportLog, _listStartShutdown.ListNoIncludeSkip()); //
+        _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListNoIncludeSkip()); //
         _listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
         //
         _listUserDuration.Analysis(ListUser, _listCheckOutIn);

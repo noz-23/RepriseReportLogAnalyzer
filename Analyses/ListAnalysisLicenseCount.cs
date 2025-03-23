@@ -165,7 +165,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 {
                     _add(eventCheckOut);
                 }
-            }else
+            } else
             if (ev is LogEventCheckIn eventCheckIn)
             {
                 // チェックインの場合、カウント減少
@@ -173,8 +173,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 if (string.IsNullOrEmpty(eventCheckIn.Product) == false)    
                 {
                     flg = _setCountDown(eventCheckIn.Product, eventCheckIn.CountCurrent);
-                }
-                else
+                } else
                 {
                     // チェックインにはプロダクトの情報がない場合があるため
                     //LogFile.Instance.WriteLine($"CheckIn: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
@@ -195,13 +194,13 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 {
                     _add(eventCheckIn);
                 }
-            }else
+            } else
             if (ev is LogEventShutdown eventShutdown)
             {
                 // シャットダウン時に、一旦クリア
                 _clearCount();
                 _add(eventShutdown);
-            }else
+            } else
             if (ev is LogEventTimeStamp eventTimeStamp)
             {
                 _add(eventTimeStamp);
@@ -312,7 +311,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 Max = 0,
             };
 
-            if (list.Count() > 0)
+            if (list.Any()==true)
             {
                 // ない場合は0入れ
                 view.Count = list.Select(x_ => x_.CountProduct[product]).Max();
@@ -421,6 +420,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         var rtn = new ListStringStringPair();
         rtn.Add(new("Date", ToDataBase.GetDatabaseType(typeof(DateTime))));
         rtn.Add(new("Time", ToDataBase.GetDatabaseType(typeof(DateTime))));
+        //
         foreach (var product in _listProduct)
         {
             rtn.Add(new($"{product}[Use]", ToDataBase.GetDatabaseType(typeof(long))));

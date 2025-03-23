@@ -152,8 +152,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
         foreach (var group in listGroup_)
         {
-            var list = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
-            this[group] = list;
+            this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
 
             ProgressCount?.Invoke(++count, max);
         }
