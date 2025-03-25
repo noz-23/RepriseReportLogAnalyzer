@@ -53,11 +53,14 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     {
         var listSkipNumber = new SortedSet<long>();
 
+        var listStart = log_.ListEvent<LogEventStart>();
+        var listShutdown = log_.ListEvent<LogEventShutdown>();
+
         AnalysisStartShutdown? last = null;
-        foreach (var start in log_.ListStart)
+        foreach (var start in listStart)
         {
             // 同じ終了データが続いた場合、二つ目はスキップ(利用しない)
-            LogEventBase? shutdown = log_.ListShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber);
+            var shutdown = listShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber);
 
             var startShutdown = new AnalysisStartShutdown(start, shutdown);
             this.Add(startShutdown);

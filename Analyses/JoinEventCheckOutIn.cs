@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Files;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 

@@ -127,7 +127,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     private DateTime _eventDateTime;
 
 
-    [Column("Format", Order = 999)]
+    [Column("Format", Order = ToDataBase.NO_OUPUT_DATA)]
     public LogFormat LogFormat { get; set; } = LogFormat.NONE;
 
     /// <summary>

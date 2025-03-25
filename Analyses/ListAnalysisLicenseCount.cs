@@ -17,7 +17,6 @@ using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
-using System.Windows.Controls;
 
 namespace RepriseReportLogAnalyzer.Analyses;
 
@@ -52,27 +51,30 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     };
 
 
-    public int Max 
-    {
-        get
-        {
-            //return this.SelectMany(x_ => x_.MaxProduct).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value);
-            int rtn = 0;
-            foreach (var list in this)
-            {
-                foreach (var product in list.MaxProduct.Keys)
-                {
-                    if (AnalysisManager.Instance.IsProductChecked(product) == false)
-                    {
-                        continue;
-                    }
-                    rtn = Math.Max(rtn, list.MaxProduct[product]);
-                }
-            }
-            return rtn;
-        }
+    //public int Max 
+    //{
+    //    get
+    //    {
+    //        return (this.Any()==true) ? this.SelectMany(x_ => x_.MaxProduct).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value):0;
 
-    }
+    //        //return this.SelectMany(x_ => x_.MaxProduct).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value);
+    //        int rtn = 0;
+    //        foreach (var list in this)
+    //        {
+    //            foreach (var product in list.MaxProduct.Keys)
+    //            {
+    //                if (AnalysisManager.Instance.IsProductChecked(product) == false)
+    //                {
+    //                    continue;
+    //                }
+    //                rtn = Math.Max(rtn, list.MaxProduct[product]);
+    //            }
+    //        }
+    //        return rtn;
+    //    }
+
+    //}
+    public int Max { get => (this.Any() == true) ? this.SelectMany(x_ => x_.MaxProduct).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value):0; }
 
     /// <summary>
     /// 解析内容
@@ -125,19 +127,101 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="log_">イベント ログ情報</param>
     /// <param name="listCheckOutIn_">チェックアウト チェックイン 結合情報</param>
-    public void Analysis(ConvertReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
+    //public void Analysis(ConvertReportLog log_, ListAnalysisCheckOutIn listCheckOutIn_)
+    //{
+    //    if (listCheckOutIn_.Any() == false)
+    //    {
+    //        return;
+    //    }
+
+    //    // プロダクトのコピー
+    //    _listProduct.UnionWith(log_.ListProduct);
+
+    //    _clearCount();
+
+    //    var listBase = log_.ListEvent<LogEventBase>();
+
+    //    int count = 0;
+    //    int max = listBase.Count();
+
+    //    ProgressCount?.Invoke(0, max, _ANALYSIS);
+    //    foreach (var ev in listBase)
+    //    {
+    //        if (ev.EventDateTime ==LogEventBase.NotAnalysisEventTime)
+    //        {
+    //            // 時間が定まってないため処理しない
+    //            continue;
+    //        } else
+    //        if (ev is LogEventProduct eventProduct)
+    //        {
+    //            // プロダクト の場合 プロダクトの最大数を更新
+    //            if (_setHave(eventProduct.Product, eventProduct.Count) == true)
+    //            {
+    //                _add(eventProduct);
+    //            }
+    //        } else
+    //        if (ev is LogEventCheckOut eventCheckOut)
+    //        {
+    //            // チェックアウトの場合、カウント増加
+    //            if (_setCountUp(eventCheckOut.Product, eventCheckOut.CountCurrent) == true)
+    //            {
+    //                _add(eventCheckOut);
+    //            }
+    //        } else
+    //        if (ev is LogEventCheckIn eventCheckIn)
+    //        {
+    //            // チェックインの場合、カウント減少
+    //            var flg = true;
+    //            if (string.IsNullOrEmpty(eventCheckIn.Product) == false)    
+    //            {
+    //                flg = _setCountDown(eventCheckIn.Product, eventCheckIn.CountCurrent);
+    //            } else
+    //            {
+    //                // チェックインにはプロダクトの情報がない場合があるため
+    //                //LogFile.Instance.WriteLine($"CheckIn: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
+
+    //                var checkOut = listCheckOutIn_.Find(eventCheckIn);
+    //                if (checkOut != null)
+    //                {
+    //                    LogFile.Instance.WriteLine($"CheckOut: {checkOut.ToString()}");
+    //                    flg = _setCountDown(checkOut.Product, eventCheckIn.CountCurrent);
+    //                }
+    //                else
+    //                {
+    //                    LogFile.Instance.WriteLine($"Not Fount: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
+    //                }
+
+    //            }
+    //            if (flg == true)
+    //            {
+    //                _add(eventCheckIn);
+    //            }
+    //        } else
+    //        if (ev is LogEventShutdown eventShutdown)
+    //        {
+    //            // シャットダウン時に、一旦クリア
+    //            _clearCount();
+    //            _add(eventShutdown);
+    //        } else
+    //        if (ev is LogEventTimeStamp eventTimeStamp)
+    //        {
+    //            _add(eventTimeStamp);
+    //        }
+    //        ProgressCount?.Invoke(++count, max);
+    //    }
+    //}
+
+    public void Analysis(ConvertReportLog log_)
     {
-        if (listCheckOutIn_.Any() == false)
+        var listBase = log_.ListEvent<ILicenseCount>();
+        if (listBase.Any() == false)
         {
             return;
         }
-
         // プロダクトのコピー
         _listProduct.UnionWith(log_.ListProduct);
-
         _clearCount();
 
-        var listBase = log_.ListEvent<LogEventBase>();
 
         int count = 0;
         int max = listBase.Count();
@@ -145,68 +229,13 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         ProgressCount?.Invoke(0, max, _ANALYSIS);
         foreach (var ev in listBase)
         {
-            if (ev.EventDateTime ==LogEventBase.NotAnalysisEventTime)
+            if (ev.SetCount(_listCount, _listHave, _listCountOutIn) == true)
             {
-                // 時間が定まってないため処理しない
-                continue;
-            } else
-            if (ev is LogEventProduct eventProduct)
-            {
-                // プロダクト の場合 プロダクトの最大数を更新
-                if (_setHave(eventProduct.Product, eventProduct.Count) == true)
-                {
-                    _add(eventProduct);
-                }
-            } else
-            if (ev is LogEventCheckOut eventCheckOut)
-            {
-                // チェックアウトの場合、カウント増加
-                if (_setCountUp(eventCheckOut.Product, eventCheckOut.CountCurrent) == true)
-                {
-                    _add(eventCheckOut);
-                }
-            } else
-            if (ev is LogEventCheckIn eventCheckIn)
-            {
-                // チェックインの場合、カウント減少
-                var flg = true;
-                if (string.IsNullOrEmpty(eventCheckIn.Product) == false)    
-                {
-                    flg = _setCountDown(eventCheckIn.Product, eventCheckIn.CountCurrent);
-                } else
-                {
-                    // チェックインにはプロダクトの情報がない場合があるため
-                    //LogFile.Instance.WriteLine($"CheckIn: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
-
-                    var checkOut = listCheckOutIn_.Find(eventCheckIn);
-                    if (checkOut != null)
-                    {
-                        LogFile.Instance.WriteLine($"CheckOut: {checkOut.ToString()}");
-                        flg = _setCountDown(checkOut.Product, eventCheckIn.CountCurrent);
-                    }
-                    else
-                    {
-                        LogFile.Instance.WriteLine($"Not Fount: {eventCheckIn.EventNumber} {eventCheckIn.EventDateTime} {eventCheckIn.Product}");
-                    }
-
-                }
-                if (flg == true)
-                {
-                    _add(eventCheckIn);
-                }
-            } else
-            if (ev is LogEventShutdown eventShutdown)
-            {
-                // シャットダウン時に、一旦クリア
-                _clearCount();
-                _add(eventShutdown);
-            } else
-            if (ev is LogEventTimeStamp eventTimeStamp)
-            {
-                _add(eventTimeStamp);
+                _add(ev as LogEventBase);
             }
             ProgressCount?.Invoke(++count, max);
         }
+        this.Sort((a_,b_)=>(int)(a_.EventBase.EventNumber- b_.EventBase.EventNumber));
     }
 
     /// <summary>
@@ -228,15 +257,15 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="product_">プロダクト</param>
     /// <param name="count_">数値</param>
     /// <returns></returns>
-    private bool _setHave(string product_, int count_)
-    {
-        if (string.IsNullOrEmpty(product_) == true)
-        {
-            return false;
-        }
-        _listHave[product_] = count_;
-        return true;
-    }
+    //private bool _setHave(string product_, int count_)
+    //{
+    //    if (string.IsNullOrEmpty(product_) == true)
+    //    {
+    //        return false;
+    //    }
+    //    _listHave[product_] = count_;
+    //    return true;
+    //}
 
     /// <summary>
     /// カウンタの増加
@@ -244,22 +273,22 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="product_">プロダクト</param>
     /// <param name="count_">サーバでの数値</param>
     /// <returns></returns>
-    private bool _setCountUp(string product_, int count_)
-    {
-        if (string.IsNullOrEmpty(product_) == true)
-        {
-            return false;
-        }
-        if (_listCountOutIn[product_] == count_)
-        {
-            // 重複チェック
-            return false;
-        }
+    //private bool _setCountUp(string product_, int count_)
+    //{
+    //    if (string.IsNullOrEmpty(product_) == true)
+    //    {
+    //        return false;
+    //    }
+    //    if (_listCountOutIn[product_] == count_)
+    //    {
+    //        // 重複チェック
+    //        return false;
+    //    }
 
-        _listCount[product_]++;
-        _listCountOutIn[product_] = count_;
-        return true;
-    }
+    //    _listCount[product_]++;
+    //    _listCountOutIn[product_] = count_;
+    //    return true;
+    //}
 
     /// <summary>
     /// カウンタの減少
@@ -267,27 +296,35 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="product_">プロダクト</param>
     /// <param name="count_">サーバでの数値</param>
     /// <returns></returns>
-    private bool _setCountDown(string product_, int count_)
-    {
-        if (string.IsNullOrEmpty(product_) == true)
-        {
-            return false;
-        }
-        if (_listCountOutIn[product_] == count_)
-        {
-            // 重複チェック
-            return false;
-        }
-        _listCount[product_]--;
-        _listCountOutIn[product_] = count_;
-        return true;
-    }
+    //private bool _setCountDown(string product_, int count_)
+    //{
+    //    if (string.IsNullOrEmpty(product_) == true)
+    //    {
+    //        return false;
+    //    }
+    //    if (_listCountOutIn[product_] == count_)
+    //    {
+    //        // 重複チェック
+    //        return false;
+    //    }
+    //    _listCount[product_]--;
+    //    _listCountOutIn[product_] = count_;
+    //    return true;
+    //}
 
     /// <summary>
     /// 結果の追加
     /// </summary>
     /// <param name="logEventBase_">ログ イベント</param>
-    public void _add(LogEventBase logEventBase_) => this.Add(new AnalysisLicenseCount(logEventBase_, _listCount, _listHave, _listCountOutIn));
+    public void _add(LogEventBase? logEventBase_)
+    {
+        if (logEventBase_ == null)
+        {
+            return;
+        }
+
+        this.Add(new AnalysisLicenseCount(logEventBase_, _listCount, _listHave, _listCountOutIn));
+    }
 
     /// <summary>
     /// リスト表示するライセンス数
@@ -295,7 +332,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="date_">指定日付(null:一覧)</param>
     /// <param name="timeSpan_">表示間隔</param>
     /// <returns></returns>
-    public List<LicenseView> ListView(DateTime? date_, long timeSpan_ = TimeSpan.TicksPerDay)
+    public async Task <List<LicenseView>> ListView(DateTime? date_, long timeSpan_ = TimeSpan.TicksPerDay)
     {
         var rtn = new List<LicenseView>();
 
@@ -330,7 +367,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="listX_">対応する時間リスト</param>
     /// <param name="timeSpan_">時間間隔</param>
     /// <returns>Key:データ内容/Value:対応するデータ</returns>
-    public SortedDictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
+    public async Task<SortedDictionary<string, List<double>>> ListPlot(List<DateTime> listX_, long timeSpan_)
     {
         var rtn = new SortedDictionary<string, List<double>>();
 
@@ -348,7 +385,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         // データ入れ
         foreach (var time in listX_)
         {
-            var listView = ListView(time, timeSpan_);
+            var listView = await ListView(time, timeSpan_);
 
             foreach (var product in _listProduct)
             {
@@ -391,8 +428,10 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     {
         var rtn = new SortedSet<DateTime>();
 
-        var minDate = this.Select(x => x.EventBase.EventDate()).Min();
-        var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
+        //var minDate = this.Select(x => x.EventBase.EventDate()).Min();
+        //var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
+        var minDate = this.First().EventBase.EventDate();
+        var maxDate = this.Last().EventBase.EventDate();
 
         for (var date = minDate; date < maxDate.AddTicks(TimeSpan.TicksPerDay); date = date.AddTicks(timeSpan_))
         {
@@ -451,17 +490,17 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         //
         foreach (var time in _getListTimeSpan(timeSpan_))
         {
-            var add = new List<string>();
-            add.Add(time.Date.ToShortDateString());
-            add.Add(time.TimeOfDay.ToString());
+            var list = new List<string>();
+            list.Add(time.Date.ToShortDateString());
+            list.Add(time.TimeOfDay.ToString());
             // 分割した時間内のデータを追加
             var listTime = this.Where(d_ => d_.EventBase.EventDateTimeUnit(timeSpan_) == time);
             foreach (var product in _listProduct)
             {
                 if ((listTime?.Count() ?? 0) == 0)
                 {
-                    add.Add("0");
-                    add.Add("0");
+                    list.Add("0");
+                    list.Add("0");
                     //add.Add("0");
                     continue;
                 }
@@ -469,11 +508,11 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 var haveMax = listTime?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
                 var outInMax = listTime?.Select(x_ => x_.OutInProduct[product]).Max() ?? 0;
 
-                add.Add(countMax.ToString());
-                add.Add(haveMax.ToString());
+                list.Add(countMax.ToString());
+                list.Add(haveMax.ToString());
                 //add.Add(outInMax.ToString());
             }
-            rtn.Add(add);
+            rtn.Add(list);
         }
 
         return rtn;

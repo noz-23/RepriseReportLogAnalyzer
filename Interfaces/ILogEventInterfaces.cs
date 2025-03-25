@@ -74,3 +74,8 @@ interface IAnalysisOutputFile
     IEnumerable<List<string>> ListValue(long select_);
 
 }
+
+interface ILicenseCount
+{
+    bool SetCount(IDictionary<string, int> listCount_,IDictionary<string,int> listHave_, IDictionary<string, int> listOutIn_);
+}

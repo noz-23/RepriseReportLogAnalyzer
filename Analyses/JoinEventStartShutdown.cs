@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
-using RepriseReportLogAnalyzer.Files;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -24,17 +23,18 @@ internal sealed class JoinEventStartShutdown
     /// </summary>
     /// <param name="start_">スタート イベント</param>
     /// <param name="shutdown_">シャットダウン イベント</param>
-    public JoinEventStartShutdown(LogEventStart start_, LogEventBase? shutdown_)
+    public JoinEventStartShutdown(LogEventStart start_, LogEventShutdown? shutdown_)
     {
         StartNumber = start_.EventNumber;
-        if (shutdown_ is LogEventShutdown shutdown)
-        {
-            ShutdownNumber = shutdown.EventNumber;
-        }
-        else
-        {
-            LogFile.Instance.WriteLine($"{shutdown_?.EventNumber} {shutdown_?.GetType()}");
-        }
+        ShutdownNumber = shutdown_?.EventNumber ?? -1;
+        //if (shutdown_ is LogEventShutdown shutdown)
+        //{
+        //    ShutdownNumber = shutdown.EventNumber;
+        //}
+        //else
+        //{
+        //    LogFile.Instance.WriteLine($"{shutdown_?.EventNumber} {shutdown_?.GetType()}");
+        //}
     }
 
     /// <summary>

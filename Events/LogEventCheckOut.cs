@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -26,7 +27,7 @@ internal sealed partial class LogEventRegist
 /// checkout
 /// </summary>
 [Sort(11)][Table("TbCheckOut")]
-internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEventCountCurrent
+internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEventCountCurrent, ILicenseCount
 {
     /// <summary>
     /// コンストラクタ
@@ -155,5 +156,23 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
 
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);
+
+    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    {
+        if (string.IsNullOrEmpty(Product) == true)
+        {
+            return false;
+        }
+        if (listOutIn_[Product] == CountCurrent)
+        {
+            // 重複チェック
+            return false;
+        }
+
+        listCount_[Product]++;
+        listOutIn_[Product] = CountCurrent;
+
+        return true;
+    }
 
 }

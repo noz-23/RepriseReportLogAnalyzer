@@ -19,6 +19,8 @@ namespace RepriseReportLogAnalyzer.Data
     /// </summary>
     internal class ToDataBase
     {
+        public const int NO_OUPUT_DATA = 999;
+
         /// <summary>
         /// ヘッダー
         /// </summary>
@@ -34,7 +36,7 @@ namespace RepriseReportLogAnalyzer.Data
         public static ListStringStringPair ListHeader(Type classType_)
         {
             var rtn = new ListStringStringPair();
-            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => ((Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order ?? 0) != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => ((Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order ?? 0) != NO_OUPUT_DATA).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
 
             foreach(var prop in listPropetyInfo)
             { 
@@ -62,7 +64,7 @@ namespace RepriseReportLogAnalyzer.Data
             classType_ ??= this.GetType();
             //
             var rtn = new List<string>();
-            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != 999).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != NO_OUPUT_DATA).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
 
             foreach(var prop in listPropetyInfo)
             {

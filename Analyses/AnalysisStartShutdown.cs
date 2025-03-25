@@ -25,7 +25,7 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     /// </summary>
     /// <param name="start_">スタート イベント</param>
     /// <param name="shutdown_">シャットダウン イベント</param>
-    public AnalysisStartShutdown(LogEventStart start_, LogEventBase? shutdown_)
+    public AnalysisStartShutdown(LogEventStart start_, LogEventShutdown? shutdown_)
     {
         _start = start_;
         _shutdown = shutdown_;
@@ -71,7 +71,7 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     /// <summary>
     /// シャットダウン イベント
     /// </summary>
-    private readonly LogEventBase? _shutdown;
+    private readonly LogEventShutdown? _shutdown;
 
     /// <summary>
     /// スタートとシャットダウンの結合情報

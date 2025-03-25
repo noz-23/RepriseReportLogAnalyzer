@@ -25,7 +25,7 @@ internal sealed partial class LogEventRegist
 /// check-in
 /// </summary>
 [Sort(12)][Table("TbCheckIn")]
-internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEventCountCurrent, ILogEventWhy
+internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEventCountCurrent, ILogEventWhy, ILicenseCount
 {
     /// <summary>
     /// コンストラクタ
@@ -119,4 +119,26 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     //private int _handleServerNum = 1;
     //public int HandleServerNum { get; private set; } = -1;
 
+    private LogEventCheckOut? _checkOut = null;
+    public void SetLogEventCheckOut(LogEventCheckOut? checkOut_) => _checkOut = checkOut_;
+
+    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    {
+        string product = (string.IsNullOrEmpty(Product) == false) ? Product: (_checkOut!=null) ?_checkOut.Product :string.Empty;
+
+        if (string.IsNullOrEmpty(product) == true)
+        {
+            return false;
+        }
+        if (listOutIn_[product] == CountCurrent)
+        {
+            // 重複チェック
+            return false;
+        }
+
+        listCount_[product]--;
+        listOutIn_[product] = CountCurrent;
+
+        return true;
+    }
 }

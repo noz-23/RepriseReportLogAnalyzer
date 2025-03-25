@@ -25,7 +25,7 @@ internal sealed partial class LogEventRegist
 /// server shutdown
 /// </summary>
 [Sort(2)][Table("TbShutdown")]
-internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
+internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicenseCount
 {
     /// <summary>
     /// コンストラクタ
@@ -66,4 +66,22 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost
     [Column("User@Host", Order =23)]
     public string UserHost { get => User + "@" + Host; }
     //
+
+    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    {
+        foreach (var product in listCount_.Keys.ToList())
+        {
+            listCount_[product] = 0;
+        }
+        foreach (var product in listHave_.Keys.ToList())
+        {
+            listHave_[product] = 0;
+        }
+        foreach (var product in listOutIn_.Keys.ToList())
+        {
+            listOutIn_[product] = 0;
+        }
+        return true;
+    }
+
 }

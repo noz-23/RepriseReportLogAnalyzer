@@ -175,10 +175,11 @@ class AnalysisManager : INotifyPropertyChanged
         _clear();
         //
         _runStartTime = DateTime.Now;
-
+        // 処理ファイル
         _listFile.AddRange(listFile);
+        //
         await _convert(); // 変換
-        _analysis(); // 解析
+        await _analysis(); // 解析
 
         _runEndTime = DateTime.Now;
     }
@@ -200,7 +201,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// 解析処理
     /// </summary>
-    private void _analysis()
+    private async Task _analysis()
     {
         ListProduct.AddRange(_convertReportLog.ListProduct);
         ListProductVersion.AddRange(_convertReportLog.ListProductEvent.Select(x_=>(x_.Product,x_.Version)));
@@ -213,15 +214,20 @@ class AnalysisManager : INotifyPropertyChanged
         //
         _listStartShutdown.Analysis(_convertReportLog);
         _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListNoIncludeSkip()); //
-        _listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
+        //_listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
+        _listLicenseCount.Analysis(_convertReportLog);
         //
-        _listUserDuration.Analysis(ListUser, _listCheckOutIn);
-        _listHostDuration.Analysis(ListHost, _listCheckOutIn);
-        _listUserHostDuration.Analysis(ListUserHost, _listCheckOutIn);
+        //_listUserDuration.Analysis(ListUser, _listCheckOutIn);
+        //_listHostDuration.Analysis(ListHost, _listCheckOutIn);
+        //_listUserHostDuration.Analysis(ListUserHost, _listCheckOutIn);
+        _listUserDuration.Analysis(_listCheckOutIn);
+        _listHostDuration.Analysis( _listCheckOutIn);
+        _listUserHostDuration.Analysis(_listCheckOutIn);
 
         //
         _notifyPropertyChanged("StartDate");
         _notifyPropertyChanged("EndDate");
+
     }
 
     /// <summary>
@@ -310,7 +316,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="classType_"></param>
     /// <param name="selected_"></param>
     /// <returns></returns>
-    public string EventHeader(Type classType_, long selected_) => _listAnalysis.Find(f_ => f_.GetType() == classType_)?.Header(selected_) ?? default;
+    public string EventHeader(Type classType_, long selected_) => _listAnalysis.Find(f_ => f_.GetType() == classType_)?.Header(selected_) ?? string.Empty;
 
     /// <summary>
     /// 解析系のリスト化したヘッダー
@@ -318,7 +324,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="classType_"></param>
     /// <param name="selected_"></param>
     /// <returns></returns>
-    public ListStringStringPair ListEventHeader(Type classType_, long selected_)=> _listAnalysis.Find(f_ => f_.GetType() == classType_)?.ListHeader(selected_) ?? default;
+    public ListStringStringPair ListEventHeader(Type classType_, long selected_)=> _listAnalysis.Find(f_ => f_.GetType() == classType_)?.ListHeader(selected_) ?? new ();
 
 
     /// <summary>
@@ -347,10 +353,12 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="date_"></param>
     /// <param name="group_"></param>
 
-    public void SetData(DateTime? date_, AnalysisGroup group_)
+    public async Task SetData(DateTime? date_, AnalysisGroup group_)
     {
         // Product は使いまわし(チェックのため)
-        foreach (var view in _listLicenseCount.ListView(date_))
+
+        var list = await _listLicenseCount.ListView(date_);
+        foreach (var view in list)
         {
             ListResultProduct.SetView(view);
         }
@@ -359,9 +367,9 @@ class AnalysisManager : INotifyPropertyChanged
         ListResultGroup.Clear();
         switch (group_)
         {
-            case AnalysisGroup.USER: ListResultGroup.AddRange(_listUserDuration.ListView(date_)); break;
-            case AnalysisGroup.HOST: ListResultGroup.AddRange(_listHostDuration.ListView(date_)); break;
-            case AnalysisGroup.USER_HOST: ListResultGroup.AddRange(_listUserHostDuration.ListView(date_)); break;
+            case AnalysisGroup.USER: ListResultGroup.AddRange(await _listUserDuration.ListView(date_)); break;
+            case AnalysisGroup.HOST: ListResultGroup.AddRange(await _listHostDuration.ListView(date_)); break;
+            case AnalysisGroup.USER_HOST: ListResultGroup.AddRange(await _listUserHostDuration.ListView(date_)); break;
             default: break;
         }
         //
@@ -375,37 +383,27 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="plot_"></param>
     /// <param name="date_"></param>
     /// <param name="group_"></param>
-    public void SetPlot(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
+    public async Task SetPlot(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
     {
         plot_.Plot.Clear();
         _setPlotLabel(plot_, date_, group_);
 
-        long timeSpan = TimeSpan.TicksPerDay;
-        var listX = new List<DateTime>();
-        if (date_ == null)
-        {
-            listX.AddRange(ListDate);
-        }
-        else
-        {
-            timeSpan = 30 * TimeSpan.TicksPerMinute;
-            DateTime date = date_ ?? DateTime.Now;
-            for (var time = date; time < date.AddTicks(TimeSpan.TicksPerDay); time = time.AddTicks(timeSpan))
-            {
-                listX.Add(time);
-            }
-        }
+        long timeSpan =(date_==null) ? TimeSpan.TicksPerDay: 30 * TimeSpan.TicksPerMinute;
+        // x 軸の値
+        var listX = _listX(date_);
 
+        // y 軸の値
         var listY = new SortedDictionary<string, List<double>>();
         switch (group_)
         {
-            case AnalysisGroup.USER: listY = _listUserDuration.ListPlot(listX, timeSpan); break;
-            case AnalysisGroup.HOST: listY = _listHostDuration.ListPlot(listX, timeSpan); break;
-            case AnalysisGroup.USER_HOST: listY = _listUserHostDuration.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.USER: listY = await _listUserDuration.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.HOST: listY = await _listHostDuration.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.USER_HOST: listY = await _listUserHostDuration.ListPlot(listX, timeSpan); break;
             default:
-            case AnalysisGroup.NONE: listY = _listLicenseCount.ListPlot(listX, timeSpan); break;
+            case AnalysisGroup.NONE: listY = await _listLicenseCount.ListPlot(listX, timeSpan); break;
         }
 
+        // Key にプロットタイトル
         foreach (var key in listY.Keys)
         {
             var plotCount = plot_.Plot.Add.Scatter(listX.ToArray(), listY[key].ToArray());
@@ -414,7 +412,22 @@ class AnalysisManager : INotifyPropertyChanged
 
         plot_.Plot.Axes.DateTimeTicksBottom();
         plot_.Refresh();
+    }
 
+    private List<DateTime> _listX(DateTime? date_)
+    {
+        if (date_ == null)
+        {
+            return new List<DateTime>(ListDate);
+        }
+        var rtn = new List<DateTime>();
+
+        var date = date_ ?? DateTime.Now;
+        for (var time = date; time < date.AddTicks(TimeSpan.TicksPerDay); time = time.AddTicks(30 * TimeSpan.TicksPerMinute))
+        {
+            rtn.Add(time);
+        }
+        return rtn;
     }
 
     private void _setPlotLabel(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
@@ -422,6 +435,7 @@ class AnalysisManager : INotifyPropertyChanged
         var title = string.Empty;
         var xlabel = (date_ == null) ? $"Date" : $"[{date_.GetValueOrDefault().ToShortDateString()}] Time (30 Minute)";
         var ylabel = string.Empty;
+        //
         var pos = Alignment.LowerRight;
         switch (group_)
         {
@@ -441,12 +455,18 @@ class AnalysisManager : INotifyPropertyChanged
                 plot_.Plot.Axes.SetLimitsY(0, _listLicenseCount.Max);
                 break;
         }
+
+        title +=(date_==null) ? "" : $" [{date_.GetValueOrDefault().ToShortDateString()}]";
         plot_.Plot.Title(title);
 
         plot_.Plot.XLabel(xlabel);
         plot_.Plot.YLabel(ylabel);
         //plot_.Plot.ShowLegend(Edge.Right); // なぜか二重に表示されるので見合わせ
         plot_.Plot.ShowLegend(pos);
+
+
+        LogFile.Instance.WriteLine($"Title [{title}] Y Label{ylabel}");
+
 
     }
 

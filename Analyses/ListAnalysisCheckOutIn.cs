@@ -8,18 +8,15 @@
  */
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
-using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Events;
+using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using ScottPlot;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.ComponentModel.DataAnnotations;
 
 namespace RepriseReportLogAnalyzer.Analyses;
 
@@ -111,6 +108,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
 
                 if (checkIn is LogEventCheckIn delIn)
                 {
+                    delIn.SetLogEventCheckOut(checkOut);
                     listCheckIn.Remove(delIn.EventNumber);
                 }
 
@@ -134,50 +132,65 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
         ProgressCount?.Invoke(0, max, _ANALYSIS + "Duplication");
         Parallel.ForEach(listOutIn_, new() { MaxDegreeOfParallelism = 4 }, dataGroup_ =>
         {
-            var listNoCheck = new List<long>();
-            var listValue = dataGroup_.OrderBy(x_=>x_.CheckOutNumber());
+            // long より AnalysisCheckOutIn の方が速い
+            //var listNoCheck = new List<long>();
+            var listNoCheck = new List<AnalysisCheckOutIn>();
+            //var listValue = dataGroup_.OrderBy(x_=>x_.CheckOutNumber());
+            var listValue = new SortedSet<AnalysisCheckOutIn>();
+            foreach (var add in dataGroup_)
+            {
+                listValue.Add(add);
 
-            if (listValue.Any() ==false)
+            }
+
+            if (listValue.Any() == false)
+            //if (listValue.Count()<=1)
             {
                 Interlocked.Increment(ref count);
                 return;
             }
             foreach (var data in listValue)
             {
-                if (listNoCheck.Contains(data.CheckOutNumber()) == true)
+                //if (listNoCheck.Contains(data.CheckOutNumber()) == true)
+                if(listNoCheck.Contains(data) == true)
                 {
                     continue;
                 }
                 // 時間内に含まれるデータは除外
-                var list = listValue.AsParallel().Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && data.IsWithInRange(x_.CheckInNumber()));
-                list.ForAll(x_ =>
+                var list = listValue.Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && data.IsWithInRange(x_.CheckInNumber()));
+                list.ToList().ForEach(x_ =>
                 {
                     x_.JoinEvent().SetDuplication();
-                    listNoCheck.Add(x_.CheckOutNumber()); 
+                    //listNoCheck.Add(x_.CheckOutNumber());
+                    listNoCheck.Add(x_); 
                 });
             }
             //
             foreach (var data in listValue)
             {
-                if (listNoCheck.Contains(data.CheckOutNumber()) == true)
+                //if (listNoCheck.Contains(data.CheckOutNumber()) == true)
+                if (listNoCheck.Contains(data) == true)
                 {
                     //チェック対象外は見ない
                     continue;
                 }
 
                 // チェックアウト時間のみが範囲
-                var list = listValue.AsParallel().Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_.CheckOutNumber()) == false)).OrderBy(x_ => x_.CheckInNumber());
+                //var list = listValue.Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_.CheckOutNumber()) == false)).OrderBy(x_ => x_.CheckInNumber());
+                var list = listValue.Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_) == false)).OrderBy(x_ => x_.CheckInNumber());
+
                 if (list.Any() ==true)
+                //if (list.Count()>0)
                 {
                     // 時間(最後)を更新して追加
                     var renew = list.Last();
                     data.JoinEvent().SetDuplication(renew.CheckIn());
 
-                    list.ForAll(x_ =>
+                    list.ToList().ForEach(x_ =>
                     {
                         x_.JoinEvent().SetDuplication();
-                        listNoCheck.Add(x_.CheckOutNumber());
-
+                        //listNoCheck.Add(x_.CheckOutNumber());
+                        listNoCheck.Add(x_);
                     });
                 }
             }
@@ -191,7 +204,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// </summary>
     /// <param name="checkIn_">チェックイン</param>
     /// <returns></returns>
-    public LogEventCheckOut? Find(LogEventCheckIn checkIn_) => this.ToList().Find(x_ => x_.IsSame(checkIn_))?.CheckOut() ?? null;
+    //public LogEventCheckOut? Find(LogEventCheckIn checkIn_) => this.ToList().Find(x_ => x_.IsSame(checkIn_))?.CheckOut() ?? null;
 
     /// <summary>
     /// ファイル保存(チェックアウト-チェックイン)

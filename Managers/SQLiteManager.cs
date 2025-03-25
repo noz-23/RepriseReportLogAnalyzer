@@ -46,6 +46,8 @@ namespace RepriseReportLogAnalyzer.Managers
 
         public void Open(string path_)
         {
+            LogFile.Instance.WriteLine($"Open [{path_}]");
+
             var config = new SQLiteConnectionStringBuilder()
             {
                 DataSource = path_
@@ -75,6 +77,7 @@ namespace RepriseReportLogAnalyzer.Managers
 
             using (var tran = _connection?.BeginTransaction())
             {
+                // トランザクションしないと遅い
                 try
                 {
                     _connection?.Insert(classType_,header_, list_, tran);

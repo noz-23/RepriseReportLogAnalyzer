@@ -102,14 +102,13 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// </summary>
     private const string _ANALYSIS = "[License Group Duration]";
 
-    protected static ListStringLongPair _ListSelect
+    protected static ListStringLongPair _ListSelect { get => liistSelect; }
+    private static ListStringLongPair liistSelect = new()
     {
-        get => new()
-        {
-            new("By Product",(long)SelectData.ECLUSION),
-            new("All In One", (long)SelectData.ALL),
-        };
-    }
+        new("By Product",(long)SelectData.ECLUSION),
+        new("All In One", (long)SelectData.ALL),
+    };
+
 
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
@@ -131,7 +130,8 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// </summary>
     private SortedSet<string> _listGroup =new();
 
-    public void Analysis(IEnumerable<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
+    //public void Analysis(IEnumerable<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
+    public void Analysis(ListAnalysisCheckOutIn listCheckOutIn_)
     {
         if (listCheckOutIn_.Any() == false)
         {
@@ -141,21 +141,36 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         // プロダクトのコピー
         _listProduct.UnionWith(listCheckOutIn_.Select(x_=>x_.Product));
         // グループのコピー
-        _listGroup.UnionWith(listGroup_);
+        //_listGroup.UnionWith(listGroup_);
+        _listGroup.UnionWith(listCheckOutIn_.Select(x_ => x_.GroupName(_group)));
 
-        var minDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Min();
-        var maxDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Max();
+        // 1日で集計
+        //var minDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Min();
+        //var maxDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Max();
+        var minDate = listCheckOutIn_.First().CheckOut().EventDate();
+        var maxDate = listCheckOutIn_.Last().CheckOut().EventDate();
+
+        var listGroup = listCheckOutIn_.ListNoDuplication().GroupBy(x_ => x_.GroupName(_group));
 
         int count = 0;
-        int max = listGroup_.Count();
+        //int max = _listGroup.Count();
+        int max = listGroup.Count();
 
         ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
-        foreach (var group in listGroup_)
-        {
-            this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
+        //foreach (var group in _listGroup)
+        //{
+        //    this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
 
+        //    ProgressCount?.Invoke(++count, max);
+        //}
+        foreach (var group in listGroup)
+        {
+            this[group.Key] = new ListAnalysisCheckOutIn(group);
             ProgressCount?.Invoke(++count, max);
         }
+
+        //this.(listCheckOutIn_.ListNoDuplication().ToDictionary(x_=>x_.GroupName(_group)));
+        //this.AddRange(listCheckOutIn_.ListNoDuplication().ToDictionary(x_ => x_.GroupName(_group)));
     }
 
      /// <summary>
@@ -164,7 +179,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <param name="date_">指定日付(null:一覧)</param>
     /// <returns></returns>
 
-    public List<LicenseView> ListView(DateTime? date_)
+    public async Task<List<LicenseView>> ListView(DateTime? date_)
     {
         var rtn = new List<LicenseView>();
 
@@ -195,7 +210,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <param name="listX_">対応する時間リスト</param>
     /// <param name="timeSpan_">時間間隔</param>
     /// <returns>Key:データ内容/Value:対応するデータ</returns>
-    public SortedDictionary<string, List<double>> ListPlot(List<DateTime> listX_, long timeSpan_)
+    public async Task<SortedDictionary<string, List<double>>> ListPlot(List<DateTime> listX_, long timeSpan_)
     {
         var rtn = new SortedDictionary<string, List<double>>();
 
@@ -289,18 +304,18 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         {
             var listCount = this[key];
 
-            var add = new List<string>();
-            add.Add($"{key}");
+            var list = new List<string>();
+            list.Add($"{key}");
             if (product_ == (long)SelectData.ALL)
             {
                 // 全て
                 var sum = new TimeSpan(listCount.Sum(x => x.DurationDuplication().Ticks));
                 var days = new HashSet<DateTime>(listCount.Select(x => x.CheckOutDateTime.Date));
 
-                add.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
-                add.Add($"{days.Count}");
-                add.Add($"{listCount.Count}");
-                rtn.Add(add);
+                list.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
+                list.Add($"{days.Count}");
+                list.Add($"{listCount.Count}");
+                rtn.Add(list);
 
                 continue;
             }
@@ -311,11 +326,11 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
                 var sum = new TimeSpan(listProduct.Sum(x => x.DurationDuplication().Ticks));
                 var days = new HashSet<DateTime>(listProduct.Select(x => x.CheckOutDateTime.Date));
 
-                add.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
-                add.Add($"{days.Count}");
-                add.Add($"{listProduct.Count()}");
+                list.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
+                list.Add($"{days.Count}");
+                list.Add($"{listProduct.Count()}");
             }
-            rtn.Add(add);
+            rtn.Add(list);
 
         }
         return rtn;

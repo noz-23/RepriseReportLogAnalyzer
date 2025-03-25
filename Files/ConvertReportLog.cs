@@ -87,12 +87,12 @@ internal sealed class ConvertReportLog
     /// <summary>
     /// スタート イベント
     /// </summary>
-    public IEnumerable<LogEventStart> ListStart { get => ListEvent<LogEventStart>(); }
+    //public IEnumerable<LogEventStart> ListStart { get => ListEvent<LogEventStart>(); }
 
     /// <summary>
     /// シャットダウン イベント
     /// </summary>
-    public IEnumerable<LogEventShutdown> ListShutdown { get => ListEvent<LogEventShutdown>(); }
+    //public IEnumerable<LogEventShutdown> ListShutdown { get => ListEvent<LogEventShutdown>(); }
 
     /// <summary>
     /// プロダクト
@@ -135,7 +135,9 @@ internal sealed class ConvertReportLog
     /// </summary>
     /// <param name="classType_"></param>
     /// <returns></returns>
-    public IEnumerable<LogEventBase> ListEvent(Type classType_)=> _listEvent.AsParallel().AsOrdered().Where(e_ => e_.GetType() == classType_);
+    public IEnumerable<LogEventBase> ListEvent(Type classType_)=> _listEvent.Where(e_ => e_.GetType() == classType_);
+
+    public IEnumerable<T> ListEvent<T>() => _listEvent.OfType<T>();
 
     /// <summary>
     /// イベント リスト抽出
@@ -143,16 +145,7 @@ internal sealed class ConvertReportLog
     /// <typeparam name="T"></typeparam>
     /// <param name="ss_"></param>
     /// <returns></returns>
-    public IEnumerable<T> ListEvent<T>(AnalysisStartShutdown? ss_ = null) where T : LogEventBase
-    {
-        if (ss_ == null)
-        { 
-            //return _listEvent.AsParallel().AsOrdered().Where(e_ => e_ is T).Select(e_ => e_ as T);
-            return _listEvent.AsParallel().AsOrdered().OfType<T>();
-        }
-        //return _listEvent.AsParallel().Where(e_ => (e_ is T) && (ss_.IsWithInRange(e_.EventNumber) == true)).Select(e_ => e_ as T);
-        return _listEvent.AsParallel().OfType<T>().Where(e_=>ss_.IsWithInRange(e_.EventNumber) == true).Select(e_ => e_ as T);
-    }
+    public IEnumerable<T> ListEvent<T>(AnalysisStartShutdown ss_) where T : LogEventBase => _listEvent.OfType<T>().Where(e_ => ss_.IsWithInRange(e_.EventNumber) == true);
 
     /// <summary>
     /// データ文字列変換

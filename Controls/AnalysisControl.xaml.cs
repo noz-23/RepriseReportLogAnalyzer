@@ -82,10 +82,7 @@ public partial class AnalysisControl : UserControl
         {
             list.Add(path_);
         }
-        await Task.Run(async () =>
-        {
-            await AnalysisManager.Instance.Analysis(list);
-        });
+        await Task.Run(async () => await AnalysisManager.Instance.Analysis(list));
 
         _buttonAnalysis.IsEnabled = true;
 

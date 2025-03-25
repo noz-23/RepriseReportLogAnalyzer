@@ -18,7 +18,14 @@ namespace RepriseReportLogAnalyzer.Views
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// プロパティの変更通知を一時無効化
+        /// </summary>
         public bool SuspendedPropertyChanged { get; set; } = false;
+        /// <summary>
+        /// プロパティの変更を通知する
+        /// </summary>
+        /// <param name="propertyName_"></param>
         protected void _NotifyPropertyChanged([CallerMemberName] String propertyName_ = "")
         {
             if (SuspendedPropertyChanged == true)
@@ -47,7 +54,5 @@ namespace RepriseReportLogAnalyzer.Views
             _NotifyPropertyChanged(propertyName_);
             return true;
         }
-
-
     }
 }

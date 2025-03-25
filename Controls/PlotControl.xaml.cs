@@ -40,10 +40,10 @@ public partial class ResultControl : UserControl
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private void _datePickerSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
+    private async void _datePickerSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Selected [{_dataPicker.SelectedDate}]");
-        SetDate();
+        Task.Run(async () => await SetDate());
     }
 
     /// <summary>
@@ -51,34 +51,38 @@ public partial class ResultControl : UserControl
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
+    private async void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Selected [{_comboBox.SelectedIndex}]");
-        SetDate();
+        Task.Run(async () => await SetDate());
     }
-    
+
     /// <summary>
     /// プロダクト表 チェック変更処理
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private void _sourceUpdated(object sender_, System.Windows.Data.DataTransferEventArgs e_)
+    private async void _sourceUpdated(object sender_, System.Windows.Data.DataTransferEventArgs e_)
     {
         LogFile.Instance.WriteLine($"DataGrid Updated");
-        SetDate();
+        Task.Run(async () => await SetDate());
     }
 
     /// <summary>
     /// データ表示処理
     /// </summary>
-    public void SetDate()
+    public async Task SetDate()
     {
-        var date = _dataPicker.SelectedDate;
-        var index = _comboBox.SelectedIndex;
+        await App.Current.Dispatcher.Invoke(async () =>
+        {
 
-        LogFile.Instance.WriteLine($"[{date}] [{index}]");
+            var date = _dataPicker.SelectedDate;
+            var index = _comboBox.SelectedIndex;
 
-        AnalysisManager.Instance.SetData(date, (AnalysisGroup)index);
-        AnalysisManager.Instance.SetPlot(_scottPlot, date, (AnalysisGroup)index);
+            LogFile.Instance.WriteLine($"[{date}] [{index}]");
+
+            await AnalysisManager.Instance.SetData(date, (AnalysisGroup)index);
+            await AnalysisManager.Instance.SetPlot(_scottPlot, date, (AnalysisGroup)index);
+        });
     }
 }

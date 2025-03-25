@@ -126,8 +126,8 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// </summary>
     /// <param name="checkIn_">チェックイン イベント</param>
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsSame(LogEventCheckIn checkIn_) => _checkIn == checkIn_;
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public bool IsSame(LogEventCheckIn checkIn_) => _checkIn == checkIn_;
 
     /// <summary>
     /// チェックアウトとチェックインの間のイベントか？
@@ -186,7 +186,7 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// 文字列化したデータ
     /// </summary>
     /// <param name="duplication_">重複除去</param>
-    public string ToString(long duplication_) => (duplication_ == (long)SelectData.ALL) ? ToString():string.Join(",", ListDuplicationValue()) ;
+    //public string ToString(long duplication_) => (duplication_ == (long)SelectData.ALL) ? ToString():string.Join(",", ListDuplicationValue()) ;
 
     /// <summary>
     /// リスト化したデータ(重複除去)

@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.Metrics;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -25,7 +26,7 @@ internal sealed partial class LogEventRegist
 /// support for a product
 /// </summary>
 [Sort(30)][Table("TbProduct")]
-internal sealed class LogEventProduct : LogEventBase, ILogEventProduct
+internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicenseCount
 {
     /// <summary>
     /// コンストラクタ
@@ -136,4 +137,15 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct
     [Column("Meter Period Decrement", Order =119)]
     public int MeterPeriodDecrement { get; private set; } = -1;
     //
+    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    {
+        if (string.IsNullOrEmpty(Product) == true)
+        {
+            return false;
+        }
+        listHave_[Product] = Count;
+
+        return true;
+    }
+
 }
