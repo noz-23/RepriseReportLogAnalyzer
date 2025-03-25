@@ -15,6 +15,7 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
@@ -24,8 +25,9 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// 出力のためグループを分けクラス化(User)
 /// </summary>
-[Sort(11)][Table("TbAnalysisLicenseUseUser")]
-
+[Sort(11)]
+[Table("TbAnalysisLicenseUseUser")]
+[Description("User Usage(Duration/Days)"), Category("Analyses")]
 internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseUser() : base(AnalysisGroup.USER)
@@ -41,7 +43,10 @@ internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnaly
 /// <summary>
 /// 出力のためグループを分けクラス化(Host)
 /// </summary>
-[Sort(12)][Table("TbAnalysisLicenseUseHost")]
+[Sort(12)]
+[Table("TbAnalysisLicenseUseHost")]
+[Description("Host Usage(Duration/Days)"), Category("Analyses")]
+
 internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseHost() : base(AnalysisGroup.HOST)
@@ -56,7 +61,9 @@ internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnaly
 /// <summary>
 /// 出力のためグループを分けクラス化(User@Host)
 /// </summary>
-[Sort(13)][Table("TbAnalysisLicenseUseUserHost")]
+[Sort(13)]
+[Table("TbAnalysisLicenseUseUserHost")]
+[Description("User@Host Usage(Duration/Days)"), Category("Analyses")]
 internal sealed class ListAnalysisLicenseUserHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseUserHost() : base(AnalysisGroup.USER_HOST)
@@ -76,6 +83,7 @@ internal sealed class ListAnalysisLicenseUserHost : ListAnalysisLicenseGroup, IA
 ///  Value:一致するチェックアウト チェックイン結合情報リスト
 /// </summary>
 [Sort(10)]
+[Description("Base Usage(Duration/Days)"), Category("Analyses")]
 internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOutIn>
 {
     /// <summary>
@@ -130,7 +138,10 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// </summary>
     private SortedSet<string> _listGroup =new();
 
-    //public void Analysis(IEnumerable<string> listGroup_, ListAnalysisCheckOutIn listCheckOutIn_)
+    /// <summary>
+    /// 解析
+    /// </summary>
+    /// <param name="listCheckOutIn_"></param>
     public void Analysis(ListAnalysisCheckOutIn listCheckOutIn_)
     {
         if (listCheckOutIn_.Any() == false)
@@ -141,36 +152,24 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         // プロダクトのコピー
         _listProduct.UnionWith(listCheckOutIn_.Select(x_=>x_.Product));
         // グループのコピー
-        //_listGroup.UnionWith(listGroup_);
         _listGroup.UnionWith(listCheckOutIn_.Select(x_ => x_.GroupName(_group)));
 
         // 1日で集計
-        //var minDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Min();
-        //var maxDate = listCheckOutIn_.Select(x => x.CheckOut().EventDate()).Max();
         var minDate = listCheckOutIn_.First().CheckOut().EventDate();
         var maxDate = listCheckOutIn_.Last().CheckOut().EventDate();
 
+        /// グループ化
         var listGroup = listCheckOutIn_.ListNoDuplication().GroupBy(x_ => x_.GroupName(_group));
 
         int count = 0;
-        //int max = _listGroup.Count();
         int max = listGroup.Count();
 
         ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
-        //foreach (var group in _listGroup)
-        //{
-        //    this[group] = new ListAnalysisCheckOutIn(listCheckOutIn_.ListNoDuplication().Where(x_ => x_.GroupName(_group) == group));
-
-        //    ProgressCount?.Invoke(++count, max);
-        //}
         foreach (var group in listGroup)
         {
             this[group.Key] = new ListAnalysisCheckOutIn(group);
             ProgressCount?.Invoke(++count, max);
         }
-
-        //this.(listCheckOutIn_.ListNoDuplication().ToDictionary(x_=>x_.GroupName(_group)));
-        //this.AddRange(listCheckOutIn_.ListNoDuplication().ToDictionary(x_ => x_.GroupName(_group)));
     }
 
      /// <summary>

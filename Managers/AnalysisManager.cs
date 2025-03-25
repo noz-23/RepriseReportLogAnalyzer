@@ -283,11 +283,12 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="path_"></param>
     /// <param name="classType_"></param>
 
-    public async Task WriteText(string path_, Type classType_)
-    {
-        await _convertReportLog.WriteEventText(path_, classType_);
-    }
+    public async Task WriteText(string path_, Type classType_)=> await _convertReportLog.WriteEventText(path_, classType_);
 
+    public async Task WriteJoinStartShutdownText(string path_)=> await _listStartShutdown.WriteJoinText(path_);
+
+    public async Task WriteJoinCheckOutInText(string path_) => await _listCheckOutIn.WriteJoinText(path_);
+    
     /// <summary>
     /// 解析系のテキストファイル出力
     /// </summary>

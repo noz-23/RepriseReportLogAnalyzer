@@ -7,11 +7,13 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Text;
@@ -21,7 +23,9 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// スタート シャットダウン結合情報のリスト化 
 /// </summary>
-[Sort(3)][Table("TbAnalysisStartShutdown")]
+[Sort(3)]
+[Table("TbAnalysisStartShutdown")]
+[Description("Join Start And Shutdown"), Category("Analyses")]
 internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, IAnalysisOutputFile
 {
     /// <summary>
@@ -129,4 +133,22 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
         var list = (skip_ == (long)(SelectData.ALL)) ? this : ListNoIncludeSkip();
         return list.Select(x_ =>  x_.ListValue());
     }
+
+
+    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
+    public IEnumerable<List<string>> ListJoinValue()
+    {
+        return this.Select(x_ => x_.JoinEvent().ListValue());
+    }
+
+    public async Task WriteJoinText(string path_)
+    {
+        var list = new List<string>();
+        // ヘッダー
+        list.Add(JoinHeader());
+        // データ
+        list.AddRange(ListJoinValue().Select(x_ => string.Join(",", x_)));
+        await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
+    }
+
 }

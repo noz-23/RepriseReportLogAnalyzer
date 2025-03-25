@@ -122,14 +122,6 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     public long CheckInNumber() => _checkIn?.EventNumber ?? LogEventBase.NowEventNumber;
 
     /// <summary>
-    /// 同一のチェックインのか？
-    /// </summary>
-    /// <param name="checkIn_">チェックイン イベント</param>
-
-    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //public bool IsSame(LogEventCheckIn checkIn_) => _checkIn == checkIn_;
-
-    /// <summary>
     /// チェックアウトとチェックインの間のイベントか？
     /// </summary>
     /// <param name="number_">イベント番号</param>
@@ -181,12 +173,6 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// </summary>
     /// <returns></returns>
     public static ListStringStringPair ListHeader()=> ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
-
-    /// <summary>
-    /// 文字列化したデータ
-    /// </summary>
-    /// <param name="duplication_">重複除去</param>
-    //public string ToString(long duplication_) => (duplication_ == (long)SelectData.ALL) ? ToString():string.Join(",", ListDuplicationValue()) ;
 
     /// <summary>
     /// リスト化したデータ(重複除去)

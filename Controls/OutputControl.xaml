@@ -27,6 +27,7 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="*" MaxHeight="200"/>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Label 
             Grid.Row="0" Grid.Column="0"
@@ -74,8 +75,6 @@
                         >
                         <CheckBox 
                             IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                            Checked="_changeEvent"
-                            Unchecked="_changeEvent"
                         />
                         <TextBlock 
                             Text="{Binding Name,Mode=OneWay}"
@@ -115,8 +114,6 @@
                         >
                         <CheckBox 
                             IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                            Checked="_changeAnalysis"
-                            Unchecked="_changeAnalysis"
                         />
                         <TextBlock 
                             Text="{Binding Name,Mode=OneWay}" Width="100"
@@ -136,8 +133,17 @@
         <CheckBox
             Grid.Row="7" Grid.Column="0"
             Content="Summy"
-            IsThreeState="True"
             IsChecked="{Binding IsSaveSummy,ElementName=_userControl, Mode=TwoWay}"
+        />
+        <CheckBox
+            Grid.Row="7" Grid.Column="2"
+            Content="Join Start - Shutdown"
+            IsChecked="{Binding IsSaveJoinStartShutdown,ElementName=_userControl, Mode=TwoWay}"
+        />
+        <CheckBox
+            Grid.Row="8" Grid.Column="2"
+            Content="Join CheckOut - Checkin"
+            IsChecked="{Binding IsSaveJoinCheckOutIn,ElementName=_userControl, Mode=TwoWay}"
         />
         <Button 
             x:Name="_saveCsv"

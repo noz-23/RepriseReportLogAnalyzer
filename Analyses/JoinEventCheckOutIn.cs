@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,14 +18,14 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// チェックアウト チェックイン 結合情報
 /// 重複情報
 /// </summary>
-internal sealed class JoinEventCheckOutIn
+internal sealed class JoinEventCheckOutIn:ToDataBase
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="checkOut_">チェックアウト イベント</param>
     /// <param name="checkIn_">チェックイン or シャットダウン イベント</param>
-    public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventBase? checkIn_)
+    public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventBase checkIn_)
     {
         CheckOutNumber = checkOut_.EventNumber;
         if (checkIn_ is LogEventCheckIn checkIn)
@@ -35,10 +36,6 @@ internal sealed class JoinEventCheckOutIn
         {
             ShutdownNumber = shutdown.EventNumber;
         }
-        //else
-        //{
-            //LogFile.Instance.WriteLine($"{checkOut_.EventNumber} {checkIn_?.EventNumber} {checkIn_?.GetType()}");
-        //}
         _checkIn = checkIn_;
     }
 
@@ -72,8 +69,8 @@ internal sealed class JoinEventCheckOutIn
     /// <summary>
     /// 重複取り除いた場合のイベント
     /// </summary>
-    private LogEventBase? _checkIn = null;
-    public LogEventBase? CheckIn() => _checkIn;
+    private LogEventBase _checkIn;
+    public LogEventBase CheckIn() => _checkIn;
 
     /// <summary>
     /// 
@@ -86,17 +83,19 @@ internal sealed class JoinEventCheckOutIn
     {
         if (checkIn_ == null)
         {
+            // 重複(別のチェックイン-チェックアウト内)
             DuplicationNumber = (long)SelectData.ECLUSION;
         }
         else
         {
+            // 重複(チェックアウトが別のチェックイン-チェックアウト内)
             _checkIn = checkIn_;
-            DuplicationNumber = _checkIn?.EventNumber ?? (long)SelectData.ALL;
+            DuplicationNumber = _checkIn.EventNumber;
         }
     }
 
     /// <summary>
     /// 文字列化
     /// </summary>
-    public override string ToString()=> $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
+    //public override string ToString()=> $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
 }

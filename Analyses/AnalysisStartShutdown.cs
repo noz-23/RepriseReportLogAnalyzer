@@ -129,6 +129,4 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     /// </summary>
     /// <returns></returns>
     public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisStartShutdown));
-
-
 }

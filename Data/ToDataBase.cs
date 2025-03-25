@@ -7,6 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Enums;
+using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
@@ -36,11 +37,13 @@ namespace RepriseReportLogAnalyzer.Data
         public static ListStringStringPair ListHeader(Type classType_)
         {
             var rtn = new ListStringStringPair();
-            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => ((Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order ?? 0) != NO_OUPUT_DATA).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
+            //var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => ((Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order ?? 0) != NO_OUPUT_DATA).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (s_.GetAttribute<ColumnAttribute>()?.Order ?? 0) != NO_OUPUT_DATA).OrderBy(s_ => s_.GetAttribute < ColumnAttribute>()?.Order);
 
-            foreach(var prop in listPropetyInfo)
-            { 
-                var name = (Attribute.GetCustomAttribute(prop, typeof(ColumnAttribute)) as ColumnAttribute)?.Name ?? prop.Name;
+            foreach (var prop in listPropetyInfo)
+            {
+                //var name = (Attribute.GetCustomAttribute(prop, typeof(ColumnAttribute)) as ColumnAttribute)?.Name ?? prop.Name;
+                var name = prop.GetAttribute<ColumnAttribute>()?.Name ?? prop.Name;
 
                 rtn.Add(new($"{name}", $"{GetDatabaseType(prop.PropertyType)}"));
             }
@@ -64,7 +67,7 @@ namespace RepriseReportLogAnalyzer.Data
             classType_ ??= this.GetType();
             //
             var rtn = new List<string>();
-            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order != NO_OUPUT_DATA).OrderBy(s_ => (Attribute.GetCustomAttribute(s_, typeof(ColumnAttribute)) as ColumnAttribute)?.Order);
+            var listPropetyInfo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public)?.Where(s_ => s_.GetAttribute<ColumnAttribute>()?.Order != NO_OUPUT_DATA).OrderBy(s_ => s_.GetAttribute<ColumnAttribute>()?.Order);
 
             foreach(var prop in listPropetyInfo)
             {

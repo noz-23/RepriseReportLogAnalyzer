@@ -22,6 +22,28 @@ namespace RepriseReportLogAnalyzer.Extensions;
 public static class DbConnectionExtension
 {
     /// <summary>
+    /// データベースにテーブル作成(単一)
+    /// </summary>
+    /// <param name="src_"></param>
+    /// <param name="name_"></param>
+    public static void CreateTable(this DbConnection src_, string name_)
+    {
+        var table ="Tb"+ name_;
+        string query = $"CREATE TABLE '{table}' ('{name_}' TEXT);";
+
+        LogFile.Instance.WriteLine($"[{query}]");
+
+        try
+        {
+            src_.Execute(query);
+        }
+        catch (Exception ex_)
+        {
+            LogFile.Instance.WriteLine(ex_.Message);
+        }
+    }
+
+    /// <summary>
     /// データベースにテーブル作成
     /// </summary>
     /// <param name="src_"></param>
@@ -40,6 +62,37 @@ public static class DbConnectionExtension
         catch (Exception ex_)
         {
             LogFile.Instance.WriteLine(ex_.Message);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="src_"></param>
+    /// <param name="listValue_"></param>
+    /// <param name="tran_"></param>
+    public static void Insert(this DbConnection src_, string name_, IEnumerable<string> listValue_)
+    {
+        var table = "Tb" + name_;
+        var query = $"INSERT INTO '{table}' ('{name_}') VALUES('{string.Join("') ('", listValue_)}');";
+
+        LogFile.Instance.WriteLine($"[{query}]");
+
+        if (listValue_.Any() == false)
+        {
+            return;
+        }
+
+        foreach (var lv in listValue_)
+        {
+            try
+            {
+                src_.Execute(query, null);
+            }
+            catch (Exception ex_)
+            {
+                LogFile.Instance.WriteLine(ex_.Message);
+            }
         }
     }
 
@@ -73,7 +126,7 @@ public static class DbConnectionExtension
         }
     }
 
-    private static string _tableName(Type classType_) =>(Attribute.GetCustomAttribute(classType_, typeof(TableAttribute)) as TableAttribute)?.Name?? classType_.Name;
+    private static string _tableName(Type classType_) =>classType_.GetAttribute<TableAttribute>()?.Name?? classType_.Name;
 
     /// <summary>
     /// テーブル作成処理クエリ
@@ -102,7 +155,6 @@ public static class DbConnectionExtension
     private static string _insert(Type classType_, string header_, List<string> listValue)
     {
         var rtn = $"INSERT INTO {_tableName(classType_)} ({header_}) VALUES('{string.Join("','", listValue)}');";
-        //LogFile.Instance.WriteLine(rtn);
         return rtn;
     }
 }
