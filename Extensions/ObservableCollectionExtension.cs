@@ -39,7 +39,7 @@ internal static class ObservableCollectionExtension
         else
         {
             find.Count = view_.Count;
-            find.Max = view_.Max;
+            find.Have = view_.Have;
         }
     }
 }

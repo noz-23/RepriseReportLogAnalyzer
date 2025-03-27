@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -67,20 +68,29 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicen
     public string UserHost { get => User + "@" + Host; }
     //
 
-    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
     {
+        //foreach (var product in listCount_.Keys.ToList())
+        //{
+        //    listCount_[product] = 0;
+        //}
+        //foreach (var product in listHave_.Keys.ToList())
+        //{
+        //    listHave_[product] = 0;
+        //}
+        //foreach (var product in listOutIn_.Keys.ToList())
+        //{
+        //    listOutIn_[product] = 0;
+        //}
         foreach (var product in listCount_.Keys.ToList())
         {
-            listCount_[product] = 0;
+            //var data = listCount_[product];
+            listCount_[product].Count = 0;
+            listCount_[product].ServerHave = 0;
+            listCount_[product].CheckOutInCurrent = 0;
         }
-        foreach (var product in listHave_.Keys.ToList())
-        {
-            listHave_[product] = 0;
-        }
-        foreach (var product in listOutIn_.Keys.ToList())
-        {
-            listOutIn_[product] = 0;
-        }
+
         return true;
     }
 

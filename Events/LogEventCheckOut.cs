@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -157,20 +158,24 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);
 
-    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
     {
         if (string.IsNullOrEmpty(Product) == true)
         {
             return false;
         }
-        if (listOutIn_[Product] == CountCurrent)
+        //if (listOutIn_[Product] == CountCurrent)
+        if (listCount_[Product].CheckOutInCurrent == CountCurrent)
         {
             // 重複チェック
             return false;
         }
 
-        listCount_[Product]++;
-        listOutIn_[Product] = CountCurrent;
+        //listCount_[Product]++;
+        //listOutIn_[Product] = CountCurrent;
+        listCount_[Product].Count++;
+        listCount_[Product].CheckOutInCurrent = CountCurrent;
 
         return true;
     }

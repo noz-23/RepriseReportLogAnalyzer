@@ -69,7 +69,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <summary>
     /// 各イベントの文字とデリゲートを紐づけるリスト
     /// </summary>
-    private static SortedDictionary<string, NewLogEvent> _listEventData = new ();
+    private static SortedList<string, NewLogEvent> _listEventData = new ();
 
     /// <summary>
     /// 登録関数

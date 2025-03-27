@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,13 +83,19 @@ public partial class AnalysisControl : UserControl
         {
             list.Add(path_);
         }
-        await Task.Run(async () => await AnalysisManager.Instance.Analysis(list));
+
+        //await Task.Run(async () => await AnalysisManager.Instance.Analysis(list));
+        var win = new WaitWindow()
+        {
+            Run = async () => await AnalysisManager.Instance.Analysis(list)
+        };
+        win.ShowDialog();
 
         _buttonAnalysis.IsEnabled = true;
 
         if (App.Current.MainWindow is MainWindow mainWindow)
         {
-            mainWindow._resultControl.SetDate();
+            await mainWindow._resultControl.SetDate();
             _textLabel.Text = $"Runing [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
     }
@@ -122,7 +129,6 @@ public partial class AnalysisControl : UserControl
                 _progressBar.Maximum = max_;
             }
 
-            //_textLabel.Text = $"Runing {_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
             StringBuilder str = new StringBuilder("Runing ");
             str.Append($"{ _resultTitle} [{ (DateTime.Now - _startDateTime):hh\\:mm\\:ss}]");
             _textLabel.Text = str.ToString();

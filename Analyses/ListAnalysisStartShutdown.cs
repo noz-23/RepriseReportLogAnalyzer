@@ -134,13 +134,11 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
         return list.Select(x_ =>  x_.ListValue());
     }
 
-
-    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
-    public IEnumerable<List<string>> ListJoinValue()
-    {
-        return this.Select(x_ => x_.JoinEvent().ListValue());
-    }
-
+    /// <summary>
+    /// ファイル保存(結合情報)
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <returns></returns>
     public async Task WriteJoinText(string path_)
     {
         var list = new List<string>();
@@ -150,5 +148,14 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
         list.AddRange(ListJoinValue().Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
     }
-
+    /// <summary>
+    /// 結合情報ヘッダー項目
+    /// </summary>
+    /// <returns></returns>
+    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
+    /// <summary>
+    /// 結合情報データ項目
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<List<string>> ListJoinValue()=> this.Select(x_ => x_.JoinEvent().ListValue());
 }

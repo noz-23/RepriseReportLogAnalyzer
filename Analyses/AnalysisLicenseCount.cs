@@ -12,8 +12,47 @@ using RepriseReportLogAnalyzer.Events;
 namespace RepriseReportLogAnalyzer.Analyses;
 
 /// <summary>
+/// ライセンスのカウント処理
+/// </summary>
+internal class LicenseCount:ICloneable
+
+{
+    /// <summary>
+    /// 集計カウント
+    /// </summary>
+    public int Count = 0;
+    /// <summary>
+    /// サーバーの保有数
+    /// </summary>
+    public int ServerHave  = 0;
+    /// <summary>
+    /// サーバの貸出数(=集計カウント)
+    /// </summary>
+    public int CheckOutInCurrent  = 0;
+
+    public LicenseCount()
+    {
+    }
+
+    public LicenseCount(LicenseCount c_)
+    {
+        Count =c_.Count;
+        ServerHave = c_.ServerHave;
+        CheckOutInCurrent = c_.CheckOutInCurrent;
+    }
+
+    public object Clone()
+    {
+        return new LicenseCount(this);
+    }
+}
+
+
+
+/// <summary>
 /// ライセンスの利用数計算
 /// </summary>
+/// 
 internal sealed class AnalysisLicenseCount:ToDataBase
 {
     /// <summary>
@@ -23,12 +62,17 @@ internal sealed class AnalysisLicenseCount:ToDataBase
     /// <param name="countProduct_">利用数(アウト+1/イン-1)</param>
     /// <param name="maxProduct_">ライセンス数</param>
     /// <param name="outInProduct_">利用数(サーバ計算)</param>
-    public AnalysisLicenseCount(LogEventBase eventBase_, SortedDictionary<string, int> countProduct_, SortedDictionary<string, int> maxProduct_, SortedDictionary<string, int> outInProduct_)
+    public AnalysisLicenseCount(LogEventBase eventBase_, SortedList<string, LicenseCount> listCount_)
     {
         EventBase = eventBase_;
-        CountProduct = new (countProduct_);
-        MaxProduct = new (maxProduct_);
-        OutInProduct = new (outInProduct_);
+        // 参照されるためコピー
+        ListCount = new();
+        foreach (var key in listCount_.Keys)
+        {
+            ListCount.Add(key, new (listCount_[key]));
+        }
+
+        //LogFile.Instance.WriteLine($"{eventBase_.GetType()}{string.Join(",", ListCount.Values.Select(x_ => $"[{x_.Count}][{x_.ServerHave}][{x_.CheckOutInCurrent}]"))}");
     }
 
     /// <summary>
@@ -36,20 +80,11 @@ internal sealed class AnalysisLicenseCount:ToDataBase
     /// </summary>
     public LogEventBase EventBase { get; private set; }
 
-    /// <summary>
-    /// 利用数(アウト+1/イン-1) Key:プロダクト
-    /// </summary>
-    public SortedDictionary<string, int> CountProduct { get; private set; }
 
     /// <summary>
-    /// ライセンス数 Key:プロダクト
+    /// ライセンスカウント情報
     /// </summary>
-    public SortedDictionary<string, int> MaxProduct { get; private set; }
-
-    /// <summary>
-    /// 利用数(サーバ計算) Key:プロダクト
-    /// </summary>
-    public SortedDictionary<string, int> OutInProduct { get; private set; }
+    public SortedList<string, LicenseCount> ListCount { get; private set; } 
 
     /// <summary>
     /// 文字列化
@@ -67,10 +102,11 @@ internal sealed class AnalysisLicenseCount:ToDataBase
         rtn.Add($"{EventBase.EventDateTime.ToShortDateString()}");
         rtn.Add($"{EventBase.EventDateTime.ToShortTimeString()}");
 
-        foreach (var key in CountProduct.Keys)
+        foreach (var key in ListCount.Keys)
         {
-            rtn.Add($"{CountProduct[key]}");
-            rtn.Add($"{MaxProduct[key]}");
+            rtn.Add($"{ListCount[key].Count}");
+            rtn.Add($"{ListCount[key].ServerHave}");
+            //rtn.Add($"{ListCount[key].CheckOutInCurrent}");
         }
 
         return rtn;

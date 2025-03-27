@@ -60,7 +60,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <summary>
     /// 全体の最大カウント(プロット用)
     /// </summary>
-    public int Max { get => (this.Any() == true) ? this.SelectMany(x_ => x_.MaxProduct).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value):0; }
+    public int Max { get => (this.Any() == true) ? (this.SelectMany(x_ => x_.ListCount).Where(x_ => AnalysisManager.Instance.IsProductChecked(x_.Key) == true).Max(x_ => x_.Value.ServerHave)) : (0); }
 
     /// <summary>
     /// 解析内容
@@ -75,7 +75,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <summary>
     /// プロット用最大数文字
     /// </summary>
-    private const string _PLOT_MAX = "[ Max ]";
+    private const string _PLOT_HAVE = "[Have ]";
 
     /// <summary>
     /// 基本的な ログ イベント
@@ -88,19 +88,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     private SortedSet<string> _listProduct = new();
 
     /// <summary>
-    /// 集計処理でのカウント
-    /// </summary>
-    private SortedDictionary<string, int> _listCount = new();
-
-    /// <summary>
-    /// 最大数
-    /// </summary>
-    private SortedDictionary<string, int> _listHave = new();
-
-    /// <summary>
     /// ログの数値(=_listCount)
     /// </summary>
-    private SortedDictionary<string, int> _listCountOutIn = new();
+    private SortedList<string, LicenseCount> _listCount = new();
 
 
     /// <summary>
@@ -125,7 +115,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         ProgressCount?.Invoke(0, max, _ANALYSIS);
         foreach (var ev in listBase)
         {
-            if (ev.SetCount(_listCount, _listHave, _listCountOutIn) == true)
+            if (ev.SetCount(_listCount) == true)
             {
                 _add(ev as LogEventBase);
             }
@@ -141,9 +131,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     {
         foreach (var product in _listProduct)
         {
-            _listCount[product] = 0;
-            _listHave[product] = 0;
-            _listCountOutIn[product] = 0;
+            _listCount[product] =new();
         }
     }
 
@@ -158,7 +146,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             return;
         }
 
-        this.Add(new AnalysisLicenseCount(logEventBase_, _listCount, _listHave, _listCountOutIn));
+        this.Add(new AnalysisLicenseCount(logEventBase_, _listCount));
     }
 
     /// <summary>
@@ -180,14 +168,14 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             {
                 Name = product,
                 Count = 0,
-                Max = 0,
+                Have = 0,
             };
 
             if (list.Any()==true)
             {
                 // ない場合は0入れ
-                view.Count = list.Select(x_ => x_.CountProduct[product]).Max();
-                view.Max = list.Select(x_ => x_.MaxProduct[product]).Max();
+                view.Count = list.Select(x_ => x_.ListCount[product].Count).Max();
+                view.Have = list.Select(x_ => x_.ListCount[product].ServerHave).Max();
             }
 
             rtn.Add(view);
@@ -202,9 +190,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="listX_">対応する時間リスト</param>
     /// <param name="timeSpan_">時間間隔</param>
     /// <returns>Key:データ内容/Value:対応するデータ</returns>
-    public async Task<SortedDictionary<string, List<double>>> ListPlot(List<DateTime> listX_, long timeSpan_)
+    public async Task<SortedList<string, List<double>>> ListPlot(List<DateTime> listX_, long timeSpan_)
     {
-        var rtn = new SortedDictionary<string, List<double>>();
+        var rtn = new SortedList<string, List<double>>();
 
         // 初期化
         foreach (var product in _listProduct)
@@ -213,7 +201,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             {
                 continue;
             }
-            rtn[product + _PLOT_MAX] = new();
+            rtn[product + _PLOT_HAVE] = new();
             rtn[product + _PLOT_COUNT] = new();
         }
 
@@ -229,7 +217,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                     continue;
                 }
 
-                rtn[product + _PLOT_MAX].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Max).Max());
+                rtn[product + _PLOT_HAVE].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Have).Max());
                 rtn[product + _PLOT_COUNT].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count).Max());
             }
         }
@@ -263,8 +251,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     {
         var rtn = new SortedSet<DateTime>();
 
-        //var minDate = this.Select(x => x.EventBase.EventDate()).Min();
-        //var maxDate = this.Select(x => x.EventBase.EventDate()).Max();
         var minDate = this.First().EventBase.EventDate();
         var maxDate = this.Last().EventBase.EventDate();
 
@@ -320,7 +306,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
 
         var rtn = new List<List<string>>();
         //
-        var listNowMax = new SortedDictionary<string, int>();
+        var listNowMax = new SortedList<string, int>();
         _listProduct.ToList().ForEach(product => listNowMax[product] = 0);
         //
         foreach (var time in _getListTimeSpan(timeSpan_))
@@ -339,9 +325,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                     //add.Add("0");
                     continue;
                 }
-                var countMax = listTime?.Select(x_ => x_.CountProduct[product]).Max() ?? 0;
-                var haveMax = listTime?.Select(x_ => x_.MaxProduct[product]).Max() ?? 0;
-                var outInMax = listTime?.Select(x_ => x_.OutInProduct[product]).Max() ?? 0;
+                var countMax = listTime?.Select(x_ => x_.ListCount[product].Count).Max() ?? 0;
+                var haveMax = listTime?.Select(x_ => x_.ListCount[product].ServerHave).Max() ?? 0;
+                var outInMax = listTime?.Select(x_ => x_.ListCount[product].CheckOutInCurrent).Max() ?? 0;
 
                 list.Add(countMax.ToString());
                 list.Add(haveMax.ToString());

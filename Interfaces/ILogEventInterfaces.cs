@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Enums;
 
 namespace RepriseReportLogAnalyzer.Interfaces;
@@ -77,5 +78,6 @@ interface IAnalysisOutputFile
 
 interface ILicenseCount
 {
-    bool SetCount(IDictionary<string, int> listCount_,IDictionary<string,int> listHave_, IDictionary<string, int> listOutIn_);
+    //bool SetCount(IDictionary<string, int> listCount_,IDictionary<string,int> listHave_, IDictionary<string, int> listOutIn_);
+    bool SetCount(IDictionary<string, LicenseCount> listCount_);
 }

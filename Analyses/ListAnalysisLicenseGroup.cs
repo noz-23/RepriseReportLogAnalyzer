@@ -209,9 +209,9 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <param name="listX_">対応する時間リスト</param>
     /// <param name="timeSpan_">時間間隔</param>
     /// <returns>Key:データ内容/Value:対応するデータ</returns>
-    public async Task<SortedDictionary<string, List<double>>> ListPlot(List<DateTime> listX_, long timeSpan_)
+    public async Task<SortedList<string, List<double>>> ListPlot(List<DateTime> listX_, long timeSpan_)
     {
-        var rtn = new SortedDictionary<string, List<double>>();
+        var rtn = new SortedList<string, List<double>>();
 
         // 期間順にするため
         var listGroup = AnalysisManager.Instance.ListResultGroup.Select(x_ => x_.Name).Take(TOP_PLOT_USE);

@@ -253,11 +253,11 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
         return list.Select(x_ => (duplication_ == (long)(SelectData.ALL)) ? x_.ListValue() : x_.ListDuplicationValue());
     }
 
-    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventCheckOutIn));
-    public IEnumerable<List<string>> ListJoinValue()
-    {
-        return this.Select(x_ => x_.JoinEvent().ListValue());
-    }
+    /// <summary>
+    /// ファイル保存(結合情報)
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <returns></returns>
     public async Task WriteJoinText(string path_)
     {
         var list = new List<string>();
@@ -268,4 +268,17 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
     }
 
+    /// <summary>
+    /// 結合情報ヘッダー項目
+    /// </summary>
+    /// <returns></returns>
+    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventCheckOutIn));
+    /// <summary>
+    /// 結合所法データ項目
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<List<string>> ListJoinValue()
+    {
+        return this.Select(x_ => x_.JoinEvent().ListValue());
+    }
 }

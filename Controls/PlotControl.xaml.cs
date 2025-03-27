@@ -10,6 +10,8 @@ using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
+using RepriseReportLogAnalyzer.Windows;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace RepriseReportLogAnalyzer.Controls;
@@ -40,10 +42,20 @@ public partial class ResultControl : UserControl
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private async void _datePickerSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
+    private void _datePickerSelected(object sender_, System.Windows.Controls.SelectionChangedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Selected [{_dataPicker.SelectedDate}]");
-        Task.Run(async () => await SetDate());
+        if (AnalysisManager.Instance.StartDate == null)
+        {
+            return;
+        }
+
+        var win = new WaitWindow()
+        {
+            Run = async () => await SetDate()
+        };
+        win.ShowDialog();
+        //Task.Run(async () => await SetDate());
     }
 
     /// <summary>
@@ -51,10 +63,21 @@ public partial class ResultControl : UserControl
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
+    private void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Selected [{_comboBox.SelectedIndex}]");
-        Task.Run(async () => await SetDate());
+        if (AnalysisManager.Instance.StartDate == null)
+        {
+            return;
+        }
+
+        var win =new WaitWindow()
+        {
+            Run =async ()=> await SetDate()
+        };
+        win.ShowDialog();
+
+        //Task.Run(async () => await SetDate());
     }
 
     /// <summary>
@@ -62,10 +85,20 @@ public partial class ResultControl : UserControl
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private async void _sourceUpdated(object sender_, System.Windows.Data.DataTransferEventArgs e_)
+    private void _sourceUpdated(object sender_, System.Windows.Data.DataTransferEventArgs e_)
     {
         LogFile.Instance.WriteLine($"DataGrid Updated");
-        Task.Run(async () => await SetDate());
+        if (AnalysisManager.Instance.StartDate == null)
+        {
+            return;
+        }
+
+        var win = new WaitWindow()
+        {
+            Run = async () => await SetDate()
+        };
+        win.ShowDialog();
+        //Task.Run(async () => await SetDate());
     }
 
     /// <summary>

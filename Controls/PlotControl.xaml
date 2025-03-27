@@ -55,8 +55,8 @@
                 <DataGridTextColumn
                     Width="Auto"
                     IsReadOnly="True"
-                    Binding="{Binding Max}"
-                    Header="Max"
+                    Binding="{Binding Have}"
+                    Header="Have"
                 />
             </DataGrid.Columns>
         </DataGrid>

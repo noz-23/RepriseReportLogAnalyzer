@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -122,7 +123,8 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     private LogEventCheckOut? _checkOut = null;
     public void SetLogEventCheckOut(LogEventCheckOut? checkOut_) => _checkOut = checkOut_;
 
-    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
     {
         string product = (string.IsNullOrEmpty(Product) == false) ? Product: (_checkOut!=null) ?_checkOut.Product :string.Empty;
 
@@ -130,14 +132,19 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
         {
             return false;
         }
-        if (listOutIn_[product] == CountCurrent)
+        //var data = listCount_[product];
+
+        //if (listOutIn_[product] == CountCurrent)
+        if (listCount_[product].CheckOutInCurrent == CountCurrent)
         {
             // 重複チェック
             return false;
         }
 
-        listCount_[product]--;
-        listOutIn_[product] = CountCurrent;
+        //listCount_[product]--;
+        //listOutIn_[product] = CountCurrent;
+        listCount_[product].Count--;
+        listCount_[product].CheckOutInCurrent = CountCurrent;
 
         return true;
     }

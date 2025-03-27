@@ -22,13 +22,18 @@ namespace RepriseReportLogAnalyzer.Extensions;
 public static class DbConnectionExtension
 {
     /// <summary>
-    /// データベースにテーブル作成(単一)
+    /// 単一/Summy テーブル
+    /// </summary>
+    private const string _TABLE_SUMMY = "TbSummy";
+
+    /// <summary>
+    /// データベースにテーブル作成(単一/Summy)
     /// </summary>
     /// <param name="src_"></param>
     /// <param name="name_"></param>
     public static void CreateTable(this DbConnection src_, string name_)
     {
-        var table ="Tb"+ name_;
+        var table = _TABLE_SUMMY + name_;
         string query = $"CREATE TABLE '{table}' ('{name_}' TEXT);";
 
         LogFile.Instance.WriteLine($"[{query}]");
@@ -66,15 +71,15 @@ public static class DbConnectionExtension
     }
 
     /// <summary>
-    /// 
+    /// ータベースにデータ挿入(単一/Summy)
     /// </summary>
     /// <param name="src_"></param>
     /// <param name="listValue_"></param>
     /// <param name="tran_"></param>
     public static void Insert(this DbConnection src_, string name_, IEnumerable<string> listValue_)
     {
-        var table = "Tb" + name_;
-        var query = $"INSERT INTO '{table}' ('{name_}') VALUES('{string.Join("') ('", listValue_)}');";
+        var table = _TABLE_SUMMY + name_;
+        var query = $"INSERT INTO '{table}' ('{name_}') VALUES('{string.Join("'),('", listValue_)}');";
 
         LogFile.Instance.WriteLine($"[{query}]");
 

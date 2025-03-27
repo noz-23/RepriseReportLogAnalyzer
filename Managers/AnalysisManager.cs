@@ -282,11 +282,20 @@ class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     /// <param name="path_"></param>
     /// <param name="classType_"></param>
-
     public async Task WriteText(string path_, Type classType_)=> await _convertReportLog.WriteEventText(path_, classType_);
 
+    /// <summary>
+    /// 結合情報(Start Shutdown)のテキストファイル出力
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <returns></returns>
     public async Task WriteJoinStartShutdownText(string path_)=> await _listStartShutdown.WriteJoinText(path_);
 
+    /// <summary>
+    /// 結合情報(CheckOut CheckIn)のテキストファイル出力
+    /// </summary>
+    /// <param name="path_"></param>
+    /// <returns></returns>
     public async Task WriteJoinCheckOutInText(string path_) => await _listCheckOutIn.WriteJoinText(path_);
     
     /// <summary>
@@ -353,7 +362,6 @@ class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     /// <param name="date_"></param>
     /// <param name="group_"></param>
-
     public async Task SetData(DateTime? date_, AnalysisGroup group_)
     {
         // Product は使いまわし(チェックのため)
@@ -394,7 +402,7 @@ class AnalysisManager : INotifyPropertyChanged
         var listX = _listX(date_);
 
         // y 軸の値
-        var listY = new SortedDictionary<string, List<double>>();
+        var listY = new SortedList<string, List<double>>();
         switch (group_)
         {
             case AnalysisGroup.USER: listY = await _listUserDuration.ListPlot(listX, timeSpan); break;
@@ -415,6 +423,11 @@ class AnalysisManager : INotifyPropertyChanged
         plot_.Refresh();
     }
 
+    /// <summary>
+    /// プロットのx軸
+    /// </summary>
+    /// <param name="date_"></param>
+    /// <returns></returns>
     private List<DateTime> _listX(DateTime? date_)
     {
         if (date_ == null)
@@ -431,6 +444,12 @@ class AnalysisManager : INotifyPropertyChanged
         return rtn;
     }
 
+    /// <summary>
+    /// プロットのラベル
+    /// </summary>
+    /// <param name="plot_"></param>
+    /// <param name="date_"></param>
+    /// <param name="group_"></param>
     private void _setPlotLabel(WpfPlot plot_, DateTime? date_, AnalysisGroup group_)
     {
         var title = string.Empty;

@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -137,13 +138,16 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
     [Column("Meter Period Decrement", Order =119)]
     public int MeterPeriodDecrement { get; private set; } = -1;
     //
-    public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
     {
         if (string.IsNullOrEmpty(Product) == true)
         {
             return false;
         }
-        listHave_[Product] = Count;
+        //listHave_[Product] = Count;
+        //var data = listCount_[Product];
+        listCount_[Product].ServerHave = Count;
 
         return true;
     }

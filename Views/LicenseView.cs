@@ -53,12 +53,12 @@ internal class LicenseView :BaseView
     /// <summary>
     /// 最大値
     /// </summary>
-    public int Max
+    public int Have
     {
-        get => _max;
-        set => _SetValue(ref _max, value);
+        get => _have;
+        set => _SetValue(ref _have, value);
     }
-    public int _max = 0;
+    public int _have = 0;
 
     /// <summary>
     /// 期間
