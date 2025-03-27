@@ -28,7 +28,8 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// 　MaxProduct  :プロダクト-最大数
 /// 　OutInProduct:プロダクト-ログの数値
 /// </summary>
-[Sort(2)][Table("TbAnalysisLicenseCount")]
+[Sort(2)]
+[Table("TbAnalysisLicenseCount")]
 [Description("Product License Usage(Count)"), Category("Analyses")]
 internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAnalysisOutputFile
 {
@@ -87,11 +88,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     private SortedSet<string> _listProduct = new();
 
-    /// <summary>
-    /// ログの数値(=_listCount)
-    /// </summary>
-    private SortedList<string, LicenseCount> _listCount = new();
-
 
     /// <summary>
     /// 解析
@@ -106,7 +102,11 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         }
         // プロダクトのコピー
         _listProduct.UnionWith(log_.ListProduct);
-        _clearCount();
+
+        // ログの数値
+        var listCount =new SortedList<string, AnalysisLicenseCount.LicenseCount> ();
+
+        _clearCount(listCount);
 
 
         int count = 0;
@@ -115,9 +115,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         ProgressCount?.Invoke(0, max, _ANALYSIS);
         foreach (var ev in listBase)
         {
-            if (ev.SetCount(_listCount) == true)
+            if (ev.SetCount(listCount) == true)
             {
-                _add(ev as LogEventBase);
+                _add(ev as LogEventBase, listCount);
             }
             ProgressCount?.Invoke(++count, max);
         }
@@ -127,11 +127,11 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <summary>
     /// 各種カウンタのクリア
     /// </summary>
-    private void _clearCount()
+    private void _clearCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         foreach (var product in _listProduct)
         {
-            _listCount[product] =new();
+            listCount_[product] =new();
         }
     }
 
@@ -139,14 +139,14 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// 結果の追加
     /// </summary>
     /// <param name="logEventBase_">ログ イベント</param>
-    public void _add(LogEventBase? logEventBase_)
+    public void _add(LogEventBase? logEventBase_, IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         if (logEventBase_ == null)
         {
             return;
         }
 
-        this.Add(new AnalysisLicenseCount(logEventBase_, _listCount));
+        this.Add(new AnalysisLicenseCount(logEventBase_, listCount_));
     }
 
     /// <summary>
@@ -267,7 +267,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
-
     public string Header(long timeSpan_ ) => "'"+string.Join("','", ListHeader(timeSpan_).Select(x_=>x_.Key))+"'";
 
     /// <summary>
@@ -338,5 +337,4 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
 
         return rtn;
     }
-
 }

@@ -37,7 +37,6 @@ public partial class EventControl : UserControl
         var _assembly = Assembly.GetExecutingAssembly();
 
         // Why を持っているイベントの抽出
-        //var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass&&t_.Namespace== _NAME_SPACE_EVENT).Distinct().OrderBy(t_ => (Attribute.GetCustomAttribute(t_, typeof(SortAttribute)) as SortAttribute)?.Sort);
         var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass && t_.Namespace == _NAME_SPACE_EVENT).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
         foreach (var t in tyepInNamespace)
         {

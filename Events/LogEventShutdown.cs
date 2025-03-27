@@ -69,7 +69,7 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicen
     //
 
     //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
-    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
+    public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         //foreach (var product in listCount_.Keys.ToList())
         //{

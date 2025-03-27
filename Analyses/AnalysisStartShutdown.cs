@@ -71,7 +71,7 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     /// <summary>
     /// シャットダウン イベント
     /// </summary>
-    private readonly LogEventShutdown? _shutdown;
+    private readonly LogEventShutdown _shutdown;
 
     /// <summary>
     /// スタートとシャットダウンの結合情報
@@ -109,11 +109,13 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     {
         if (number_ < _start.EventNumber)
         {
+            // 範囲外
             return false;
         }
 
         if (number_ > ShudownNumber())
         {
+            // 範囲外
             return false;
         }
         return true;

@@ -52,7 +52,8 @@ public partial class ResultControl : UserControl
 
         var win = new WaitWindow()
         {
-            Run = async () => await SetDate()
+            Run = async () => await SetDate(),
+            Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
         //Task.Run(async () => await SetDate());
@@ -73,7 +74,8 @@ public partial class ResultControl : UserControl
 
         var win =new WaitWindow()
         {
-            Run =async ()=> await SetDate()
+            Run = async () => await SetDate(),
+            Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
 
@@ -95,7 +97,8 @@ public partial class ResultControl : UserControl
 
         var win = new WaitWindow()
         {
-            Run = async () => await SetDate()
+            Run = async()=>await SetDate(),
+            Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
         //Task.Run(async () => await SetDate());

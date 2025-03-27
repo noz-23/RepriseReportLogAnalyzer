@@ -321,6 +321,16 @@ class AnalysisManager : INotifyPropertyChanged
     public IEnumerable<List<string>> ListEventValue(Type classType_)=> _convertReportLog.ListEvent(classType_).Select(x => x.ListValue(classType_));
 
     /// <summary>
+    /// 結合情報(Start Shutdown)のリスト化したデータ
+    /// </summary>
+    public IEnumerable<List<string>> ListJoinStartShutdownValeu() => _listStartShutdown.ListJoinValue();
+
+    /// <summary>
+    /// 結合情報(CheckOut CheckIn)のリスト化したデータ
+    /// </summary>
+    public IEnumerable<List<string>> ListJoinCheckOutInValeu() => _listCheckOutIn.ListJoinValue();
+
+    /// <summary>
     /// 解析系のヘッダー
     /// </summary>
     /// <param name="classType_"></param>

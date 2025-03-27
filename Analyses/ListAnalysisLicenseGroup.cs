@@ -167,7 +167,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
         foreach (var group in listGroup)
         {
-            this[group.Key] = new ListAnalysisCheckOutIn(group);
+            this[group.Key] = new (group);
             ProgressCount?.Invoke(++count, max);
         }
     }

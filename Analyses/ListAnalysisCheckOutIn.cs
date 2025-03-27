@@ -25,7 +25,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックイン結合情報のリスト化 
 /// </summary>
-[Sort(1)]
+[Sort(2)]
 [Table("TbAnalysisCheckOutCheckIn")]
 [Description("Join Check-Out And Check-In"),Category("Analyses")]
 internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IAnalysisOutputFile
@@ -146,25 +146,18 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
         Parallel.ForEach(listOutIn_, new() { MaxDegreeOfParallelism = 4 }, dataGroup_ =>
         {
             // long より AnalysisCheckOutIn の方が速い
-            //var listNoCheck = new List<long>();
             var listNoCheck = new List<AnalysisCheckOutIn>();
             //
             var listValue = new SortedSet<AnalysisCheckOutIn>();
-            //foreach (var add in dataGroup_)
-            //{
-            //    listValue.Add(add);
-            //}
             listValue.AddRange(dataGroup_);
 
             if (listValue.Any() == false)
-            //if (listValue.Count()<=1)
             {
                 Interlocked.Increment(ref count);
                 return;
             }
             foreach (var data in listValue)
             {
-                //if (listNoCheck.Contains(data.CheckOutNumber()) == true)
                 if(listNoCheck.Contains(data) == true)
                 {
                     continue;
@@ -174,14 +167,12 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
                 list.ToList().ForEach(x_ =>
                 {
                     x_.JoinEvent().SetDuplication();
-                    //listNoCheck.Add(x_.CheckOutNumber());
                     listNoCheck.Add(x_); 
                 });
             }
             //
             foreach (var data in listValue)
             {
-                //if (listNoCheck.Contains(data.CheckOutNumber()) == true)
                 if (listNoCheck.Contains(data) == true)
                 {
                     //チェック対象外は見ない
@@ -189,11 +180,9 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
                 }
 
                 // チェックアウト時間のみが範囲
-                //var list = listValue.Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_.CheckOutNumber()) == false)).OrderBy(x_ => x_.CheckInNumber());
                 var list = listValue.Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_) == false)).OrderBy(x_ => x_.CheckInNumber());
 
                 if (list.Any() ==true)
-                //if (list.Count()>0)
                 {
                     // 時間(最後)を更新して追加
                     var renew = list.Last();
@@ -202,7 +191,6 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
                     list.ToList().ForEach(x_ =>
                     {
                         x_.JoinEvent().SetDuplication();
-                        //listNoCheck.Add(x_.CheckOutNumber());
                         listNoCheck.Add(x_);
                     });
                 }

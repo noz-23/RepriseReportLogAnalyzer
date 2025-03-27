@@ -23,7 +23,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// スタート シャットダウン結合情報のリスト化 
 /// </summary>
-[Sort(3)]
+[Sort(1)]
 [Table("TbAnalysisStartShutdown")]
 [Description("Join Start And Shutdown"), Category("Analyses")]
 internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, IAnalysisOutputFile
@@ -34,7 +34,6 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     public ListAnalysisStartShutdown()
     {
     }
-
 
     public static ListStringLongPair ListSelect { get => _listSelect; }
     private static ListStringLongPair _listSelect = new()

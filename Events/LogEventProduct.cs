@@ -139,7 +139,7 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
     public int MeterPeriodDecrement { get; private set; } = -1;
     //
     //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
-    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
+    public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         if (string.IsNullOrEmpty(Product) == true)
         {

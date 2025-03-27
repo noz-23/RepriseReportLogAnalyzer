@@ -18,6 +18,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// チェックアウト チェックイン 結合情報
 /// 重複情報
 /// </summary>
+[Table("TbJoinEventCheckOutIn")]
 internal sealed class JoinEventCheckOutIn:ToDataBase
 {
     /// <summary>
@@ -28,6 +29,7 @@ internal sealed class JoinEventCheckOutIn:ToDataBase
     public JoinEventCheckOutIn(LogEventCheckOut checkOut_, LogEventBase checkIn_)
     {
         CheckOutNumber = checkOut_.EventNumber;
+        _checkIn = checkIn_;
         if (checkIn_ is LogEventCheckIn checkIn)
         {
             CheckInNumber = checkIn.EventNumber;
@@ -36,7 +38,6 @@ internal sealed class JoinEventCheckOutIn:ToDataBase
         {
             ShutdownNumber = shutdown.EventNumber;
         }
-        _checkIn = checkIn_;
     }
 
     /// <summary>
@@ -93,9 +94,4 @@ internal sealed class JoinEventCheckOutIn:ToDataBase
             DuplicationNumber = _checkIn.EventNumber;
         }
     }
-
-    /// <summary>
-    /// 文字列化
-    /// </summary>
-    //public override string ToString()=> $"{CheckOutNumber},{CheckInNumber},{ShutdownNumber},{DuplicationNumber}";
 }

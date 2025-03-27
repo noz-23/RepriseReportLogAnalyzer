@@ -124,7 +124,7 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     public void SetLogEventCheckOut(LogEventCheckOut? checkOut_) => _checkOut = checkOut_;
 
     //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
-    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
+    public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         string product = (string.IsNullOrEmpty(Product) == false) ? Product: (_checkOut!=null) ?_checkOut.Product :string.Empty;
 

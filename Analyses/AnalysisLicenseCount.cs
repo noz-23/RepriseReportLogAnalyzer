@@ -12,49 +12,45 @@ using RepriseReportLogAnalyzer.Events;
 namespace RepriseReportLogAnalyzer.Analyses;
 
 /// <summary>
-/// ライセンスのカウント処理
-/// </summary>
-internal class LicenseCount:ICloneable
-
-{
-    /// <summary>
-    /// 集計カウント
-    /// </summary>
-    public int Count = 0;
-    /// <summary>
-    /// サーバーの保有数
-    /// </summary>
-    public int ServerHave  = 0;
-    /// <summary>
-    /// サーバの貸出数(=集計カウント)
-    /// </summary>
-    public int CheckOutInCurrent  = 0;
-
-    public LicenseCount()
-    {
-    }
-
-    public LicenseCount(LicenseCount c_)
-    {
-        Count =c_.Count;
-        ServerHave = c_.ServerHave;
-        CheckOutInCurrent = c_.CheckOutInCurrent;
-    }
-
-    public object Clone()
-    {
-        return new LicenseCount(this);
-    }
-}
-
-
-
-/// <summary>
 /// ライセンスの利用数計算
 /// </summary>
 /// 
 internal sealed class AnalysisLicenseCount:ToDataBase
 {
+    /// <summary>
+    /// ライセンスのカウント処理
+    /// </summary>
+    internal class LicenseCount : ICloneable
+
+    {
+        /// <summary>
+        /// 集計カウント
+        /// </summary>
+        public int Count = 0;
+        /// <summary>
+        /// サーバーの保有数
+        /// </summary>
+        public int ServerHave = 0;
+        /// <summary>
+        /// サーバの貸出数(=集計カウント)
+        /// </summary>
+        public int CheckOutInCurrent = 0;
+
+        public LicenseCount()
+        {
+        }
+
+        public LicenseCount(LicenseCount c_)
+        {
+            Count = c_.Count;
+            ServerHave = c_.ServerHave;
+            CheckOutInCurrent = c_.CheckOutInCurrent;
+        }
+
+        public object Clone() => new LicenseCount(this);
+    }
+
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -62,7 +58,7 @@ internal sealed class AnalysisLicenseCount:ToDataBase
     /// <param name="countProduct_">利用数(アウト+1/イン-1)</param>
     /// <param name="maxProduct_">ライセンス数</param>
     /// <param name="outInProduct_">利用数(サーバ計算)</param>
-    public AnalysisLicenseCount(LogEventBase eventBase_, SortedList<string, LicenseCount> listCount_)
+    public AnalysisLicenseCount(LogEventBase eventBase_, IDictionary<string, LicenseCount> listCount_)
     {
         EventBase = eventBase_;
         // 参照されるためコピー
@@ -110,6 +106,5 @@ internal sealed class AnalysisLicenseCount:ToDataBase
         }
 
         return rtn;
-
     }
 }

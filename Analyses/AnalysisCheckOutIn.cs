@@ -200,18 +200,7 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// <param name="a_"></param>
     /// <param name="b_"></param>
     /// <returns></returns>
-    public int Compare(object? a_, object? b_)
-    {
-        if (a_ is AnalysisCheckOutIn a)
-        {
-            //if (b_ is AnalysisCheckOutIn b)
-            //{
-            //    return (int)(a.CheckOutNumber() - b.CheckOutNumber());
-            //}
-            return a.CompareTo(b_);
-        }
-        return -1;
-    }
+    public int Compare(object? a_, object? b_)=> (a_ is AnalysisCheckOutIn a) ? a.CompareTo(b_) : -1;
 
     /// <summary>
     /// 比較処理

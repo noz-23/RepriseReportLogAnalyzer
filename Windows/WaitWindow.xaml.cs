@@ -1,4 +1,12 @@
-﻿using System.Windows;
+﻿/*
+ * Reprise Report Log Analyzer
+ * Copyright (c) 2025 noz-23
+ *  https://github.com/noz-23/
+ * 
+ * Licensed under the MIT License 
+ * 
+ */
+using System.Windows;
 
 namespace RepriseReportLogAnalyzer.Windows;
 
@@ -18,7 +26,7 @@ public partial class WaitWindow : Window
 
     private async void _loaded(object sender, RoutedEventArgs e)
     {
-        await Task.Run(async () => await Run?.Invoke());
+        await Task.Run( async() => {await Run?.Invoke(); });
 
         Close();
     }

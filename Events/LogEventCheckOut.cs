@@ -159,7 +159,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     //public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);
 
     //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
-    public bool SetCount(IDictionary<string, LicenseCount> listCount_)
+    public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         if (string.IsNullOrEmpty(Product) == true)
         {

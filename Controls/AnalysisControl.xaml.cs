@@ -84,10 +84,10 @@ public partial class AnalysisControl : UserControl
             list.Add(path_);
         }
 
-        //await Task.Run(async () => await AnalysisManager.Instance.Analysis(list));
         var win = new WaitWindow()
         {
-            Run = async () => await AnalysisManager.Instance.Analysis(list)
+            Run = async () => await AnalysisManager.Instance.Analysis(list),
+            Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
 

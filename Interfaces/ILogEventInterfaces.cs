@@ -78,6 +78,5 @@ interface IAnalysisOutputFile
 
 interface ILicenseCount
 {
-    //bool SetCount(IDictionary<string, int> listCount_,IDictionary<string,int> listHave_, IDictionary<string, int> listOutIn_);
-    bool SetCount(IDictionary<string, LicenseCount> listCount_);
+    bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_);
 }

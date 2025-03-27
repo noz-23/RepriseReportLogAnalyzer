@@ -17,6 +17,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 ///  スタートとシャットダウンの結合情報
 ///  重複情報
 /// </summary>
+[Table("TbJoinJoinEventStartShutdown")]
 internal sealed class JoinEventStartShutdown:ToDataBase
 {
     /// <summary>
@@ -54,11 +55,5 @@ internal sealed class JoinEventStartShutdown:ToDataBase
     /// <summary>
     /// スキップ セット
     /// </summary>
-    public void SetSkip()=> IsSkip = (long)SelectData.ECLUSION;
-    
-
-    /// <summary>
-    /// 文字列化
-    /// </summary>
-    //public override string ToString()=> $"{StartNumber},{ShutdownNumber},{IsSkip}";
+    public void SetSkip()=> IsSkip = (long)SelectData.ECLUSION;    
 }
