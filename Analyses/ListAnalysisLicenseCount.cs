@@ -39,13 +39,14 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     public ListAnalysisLicenseCount()
     {
+        ProgressCount = null;
     }
 
     /// <summary>
     /// コンボボックスの項目
     /// </summary>
     public static ListStringLongPair ListSelect { get => _listSelect; }
-    private static ListStringLongPair _listSelect= new ()
+    private static ListStringLongPair _listSelect = new()
     {
         new("Interval Event", _NO_TIME_STAMP),
         new("Interval 1 Day", TimeSpan.TicksPerDay),
@@ -56,7 +57,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    public ProgressCountDelegate? ProgressCount = null;
+    public ProgressCountCallBack? ProgressCount;
 
     /// <summary>
     /// 全体の最大カウント(プロット用)
@@ -66,17 +67,17 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <summary>
     /// 解析内容
     /// </summary>
-    private const string _ANALYSIS = "[License Count]";
+    private readonly string _ANALYSIS = "[License Count]";
 
     /// <summary>
     /// プロット用カウント数文字
     /// </summary>
-    private const string _PLOT_COUNT = "[Count]";
+    private readonly string _PLOT_COUNT = "[Count]";
 
     /// <summary>
     /// プロット用最大数文字
     /// </summary>
-    private const string _PLOT_HAVE = "[Have ]";
+    private readonly string _PLOT_HAVE = "[Have ]";
 
     /// <summary>
     /// 基本的な ログ イベント
@@ -104,7 +105,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
         _listProduct.UnionWith(log_.ListProduct);
 
         // ログの数値
-        var listCount =new SortedList<string, AnalysisLicenseCount.LicenseCount> ();
+        var listCount = new SortedList<string, AnalysisLicenseCount.LicenseCount>();
 
         _clearCount(listCount);
 
@@ -121,17 +122,17 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             }
             ProgressCount?.Invoke(++count, max);
         }
-        this.Sort((a_,b_)=>(int)(a_.EventBase.EventNumber- b_.EventBase.EventNumber));
+        Sort((a_, b_) => (int)(a_.EventBase.EventNumber - b_.EventBase.EventNumber));
     }
 
     /// <summary>
     /// 各種カウンタのクリア
     /// </summary>
-    private void _clearCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
+    private void _clearCount(SortedList<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         foreach (var product in _listProduct)
         {
-            listCount_[product] =new();
+            listCount_[product] = new();
         }
     }
 
@@ -146,7 +147,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
             return;
         }
 
-        this.Add(new AnalysisLicenseCount(logEventBase_, listCount_));
+        Add(new AnalysisLicenseCount(logEventBase_, listCount_));
     }
 
     /// <summary>
@@ -155,7 +156,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="date_">指定日付(null:一覧)</param>
     /// <param name="timeSpan_">表示間隔</param>
     /// <returns></returns>
-    public async Task <List<LicenseView>> ListView(DateTime? date_, long timeSpan_ = TimeSpan.TicksPerDay)
+    public async Task<List<LicenseView>> ListView(DateTime? date_, long timeSpan_ = TimeSpan.TicksPerDay)
     {
         var rtn = new List<LicenseView>();
 
@@ -171,7 +172,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 Have = 0,
             };
 
-            if (list.Any()==true)
+            if (list.Any() == true)
             {
                 // ない場合は0入れ
                 view.Count = list.Select(x_ => x_.ListCount[product].Count).Max();
@@ -180,6 +181,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
 
             rtn.Add(view);
         }
+        await Task.Delay(0);
 
         return rtn;
     }
@@ -217,8 +219,8 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                     continue;
                 }
 
-                rtn[product + _PLOT_HAVE].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Have).Max());
-                rtn[product + _PLOT_COUNT].Add( (listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count).Max());
+                rtn[product + _PLOT_HAVE].Add((listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Have).Max());
+                rtn[product + _PLOT_COUNT].Add((listView.Count == 0) ? double.NaN : listView.Where(x_ => x_.Name == product).Select(x_ => (double)x_.Count).Max());
             }
         }
 
@@ -230,13 +232,13 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="path_">パス</param>
     /// <param name="timeSpan_">間隔時間</param>
-    public async Task WriteText(string path_, long timeSpan_= _NO_TIME_STAMP)
+    public async Task WriteText(string path_, long timeSpan_ = _NO_TIME_STAMP)
     {
         var list = new List<string>();
         // ヘッダー
         list.Add(Header(timeSpan_));
         // データ
-        list.AddRange(ListValue(timeSpan_).Select(x_=>string.Join(",",x_)));
+        list.AddRange(ListValue(timeSpan_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
@@ -267,7 +269,7 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
-    public string Header(long timeSpan_ ) => "'"+string.Join("','", ListHeader(timeSpan_).Select(x_=>x_.Key))+"'";
+    public string Header(long timeSpan_) => "'" + string.Join("','", ListHeader(timeSpan_).Select(x_ => x_.Key)) + "'";
 
     /// <summary>
     /// リスト化したヘッダー
@@ -295,12 +297,12 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
-    public IEnumerable<List<string>> ListValue(long timeSpan_) 
+    public IEnumerable<List<string>> ListValue(long timeSpan_)
     {
         if (timeSpan_ == _NO_TIME_STAMP)
         {
             // 集計なしに出力
-            return this.Select(x_ =>x_.ListValue());
+            return this.Select(x_ => x_.ListValue());
         }
 
         var rtn = new List<List<string>>();

@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// dequeue
 /// </summary>
-[Sort(14)][Table("TbDequeue")]
+[Sort(14)]
+[Table("TbDequeue")]
 internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEventProduct, ILogEventWhy
 {
     /// <summary>
@@ -33,7 +34,8 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventDequeue(string[] list_) : base()
     {
-        if (list_.Count() < 4)
+        //if (list_.Count() < 4)
+        if (list_.Length < 4)
         {
             // small
             //Why = int.Parse(list_[1]);
@@ -61,7 +63,7 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
             HandleServer = list_[8];
             //
             EventDateTime = _GetDateTime(list_[9], list_[10]);
-            LogFormat = (list_[10].Contains(".") == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+            LogFormat = (list_[10].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
         }
     }
 
@@ -70,34 +72,34 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     //DEQUE why product version       user  host “isv_def” count server_handle mm/dd hh:mm:ss.tenths_of_msec
     //DEQUE why count   server_handle hh:mm
     //0     1   2       3             4     5     6          7     8             9     10
-    [Column("Product", Order =11)]
+    [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order =12)]
+    [Column("Version", Order = 12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order =13)]
+    [Column("Product Version", Order = 13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
 
-    [Column("Why", Order =101)]
+    [Column("Why", Order = 101)]
     public StatusValue Why { get; private set; } = StatusValue.Success;
 
-    [Column("Isv Def", Order =102)]
+    [Column("Isv Def", Order = 102)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Count", Order =103)]
+    [Column("Count", Order = 103)]
     public int Count { get; private set; } = -1;
 
-    [Column("Server Handle", Order =104)]
+    [Column("Server Handle", Order = 104)]
     public string HandleServer { get; private set; } = string.Empty;
     //
 }

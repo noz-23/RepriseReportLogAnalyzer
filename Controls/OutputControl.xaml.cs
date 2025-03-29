@@ -10,6 +10,7 @@ using Microsoft.Win32;
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Data;
+using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
@@ -17,6 +18,7 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,32 +35,38 @@ public partial class OutputControl : UserControl
     /// </summary>
     public OutputControl()
     {
+        IsSaveSummy = false;
+        IsSaveJoinStartShutdown = false;
+        IsSaveJoinCheckOutIn = false;
+
         InitializeComponent();
+        //
         _init();
+        //
     }
 
     /// <summary>
     /// ログ イベント クラスの先頭文字
     /// </summary>
-    private const string _CLASS_NAME_EVENT = "LogEvent";
-    private const string _CLASS_NAME_ANALYSIS = "ListAnalysis";
+    private readonly string _CLASS_NAME_EVENT = "LogEvent";
+    private readonly string _CLASS_NAME_ANALYSIS = "ListAnalysis";
 
-    private const string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
-    private const string _NAME_SPACE_ANALYSES = "RepriseReportLogAnalyzer.Analyses";
+    private readonly string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
+    private readonly string _NAME_SPACE_ANALYSES = "RepriseReportLogAnalyzer.Analyses";
 
     /// <summary>
     /// 総合ファイルの出力
     /// </summary>
-    public bool IsSaveSummy { get; set; } = false;
+    public bool IsSaveSummy { get; set; }
 
     /// <summary>
     /// 結合情報ファイル(Start Shutdown)の出力
     /// </summary>
-    public bool IsSaveJoinStartShutdown { get; set; } = false;
+    public bool IsSaveJoinStartShutdown { get; set; }
     /// <summary>
     /// 結合情報ファイル(CheckOut CheckIn)の出力
     /// </summary>
-    public bool IsSaveJoinCheckOutIn { get; set; } = false;
+    public bool IsSaveJoinCheckOutIn { get; set; }
     /// <summary>
     /// 各イベントの出力確認
     /// </summary>
@@ -79,87 +87,54 @@ public partial class OutputControl : UserControl
         var _assembly = Assembly.GetExecutingAssembly();
 
         // イベントの追加
-        var listEventClass = _assembly.GetTypes().Where(t_ => t_.IsClass && t_.Namespace == _NAME_SPACE_EVENT && t_.IsSubclassOf(typeof(LogEventBase)) == true).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
+        //var listEventClass = _assembly.GetTypes().Where(t_ => t_.IsClass && t_.Namespace == _NAME_SPACE_EVENT && t_.IsSubclassOf(typeof(LogEventBase)) == true).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
+        var listEventClass = _assembly.GetTypes().Where(t_ => t_.IsSubclassOf(typeof(LogEventBase)) == true).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
         foreach (var t in listEventClass)
         {
-            var find = ListEvent.Where(x_ => x_.ClassType.Name == t.Name);
-            if (find.Any() == false)
-            {
+            //var find = ListEvent.Where(x_ => (x_.ClassType == null) ? false : x_.ClassType.Name == t.Name);
+            //if (find.Any() == false)
+            //{
                 var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_EVENT, string.Empty));
                 ListEvent.Add(view);
 
                 _listSavetEvent[view.Name] = view.IsChecked;
                 LogFile.Instance.WriteLine($"{t.Name}");
-            }
+            //}
         }
         // 解析の追加
-        var listAnalysisClass = _assembly.GetTypes().Where(t_ => t_.IsClass && t_.Namespace == _NAME_SPACE_ANALYSES && t_.GetInterfaces().Where(t_ => t_.Name == typeof(IAnalysisOutputFile).Name).Any() == true).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
+        var listAnalysisClass = _assembly.GetTypes().Where(t_ => t_.GetInterfaces().Where(t_ => t_.Name == typeof(IAnalysisOutputFile).Name).Any() == true).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
         foreach (var t in listAnalysisClass)
         {
-            var find = ListAnalysis.Where(x_ => x_.ClassType.Name == t.Name);
-            if (find.Any() == false)
-            {
-                var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
+            //var find = ListAnalysis.Where(x_ => (x_.ClassType == null) ? false : x_.ClassType.Name == t.Name);
+            //if (find.Any() == false)
+            //{
+                //var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
 
-                foreach (var p in listPropetyInfo)
+                //foreach (var p in listPropetyInfo)
+                //{
+                //    // コンボボックスのリストを取得
+                //    if (p.GetValue(null) is ListStringLongPair list)
+                //    {
+                //        var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty), list);
+                //        ListAnalysis.Add(view);
+
+                //        _listSavetAnalysis[view.Name] = view.IsChecked;
+                //        LogFile.Instance.WriteLine($"{t.Name}");
+                //        break;
+                //    }
+                //}
+                var listCombo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static).Select(p_=>p_.GetValue(null)).OfType<ListStringLongPair>();
+                if (listCombo.Any())
                 {
-                    if (p.GetValue(null) is ListStringLongPair list)
-                    {
-                        var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty), list);
-                        ListAnalysis.Add(view);
+                    var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty), listCombo.First());
+                    ListAnalysis.Add(view);
 
-                        _listSavetAnalysis[view.Name] = view.IsChecked;
-                        LogFile.Instance.WriteLine($"{t.Name}");
-                        break;
-                    }
+                    _listSavetAnalysis[view.Name] = view.IsChecked;
+                    LogFile.Instance.WriteLine($"{t.Name}");
                 }
-            }
+
+            //}
         }
-
-        //var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
-        //foreach (var t in tyepInNamespace)
-        //{
-        //    if (t.Namespace == _NAME_SPACE_EVENT)
-        //    {
-        //        if (t.IsSubclassOf(typeof(LogEventBase)) == true)
-        //        {
-        //            var find = ListEvent.Where(x_ => x_.ClassType.Name == t.Name);
-        //            if (find.Count() == 0)
-        //            {
-        //                var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_EVENT, string.Empty));
-        //                ListEvent.Add(view);
-
-        //                _listSavetEvent[view.Name] = view.IsChecked;
-        //                LogFile.Instance.WriteLine($"{t.Name}");
-        //            }
-        //        }
-        //    }
-
-        //    if (t.Namespace == _NAME_SPACE_ANALYSES)
-        //    {
-        //        if (t.GetInterfaces().Where(t_ => t_.Name == typeof(IAnalysisOutputFile).Name).Count() > 0)
-        //        {
-        //            var find = ListAnalysis.Where(x_ => x_.ClassType.Name == t.Name);
-        //            if (find.Count() == 0)
-        //            {
-        //                var listPropetyInfo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
-
-        //                foreach (var p in listPropetyInfo)
-        //                {
-        //                    if (p.GetValue(null) is ListStringLongPair list)
-        //                    {
-        //                        var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty), list);
-        //                        ListAnalysis.Add(view);
-
-        //                        _listSavetAnalysis[view.Name] = view.IsChecked;
-        //                        LogFile.Instance.WriteLine($"{t.Name}");
-        //                        break;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
     }
 
     private void _loaded(object sender_, RoutedEventArgs e_)
@@ -181,6 +156,10 @@ public partial class OutputControl : UserControl
         _selectOutFolder();
     }
 
+    /// <summary>
+    /// 出力フォルダ 選択
+    /// </summary>
+    /// <returns></returns>
     private bool _selectOutFolder()
     {
         var dlg = new OpenFolderDialog()
@@ -191,6 +170,7 @@ public partial class OutputControl : UserControl
         if (dlg.ShowDialog() == true)
         {
             _textBoxFolder.Text = dlg.FolderName;
+            LogFile.Instance.WriteLine($"Selected {dlg.FolderName}");
         }
 
         return (string.IsNullOrEmpty(_textBoxFolder.Text));
@@ -201,7 +181,7 @@ public partial class OutputControl : UserControl
     /// </summary>
     /// <param name="sender_"></param>
     /// <param name="e_"></param>
-    private async void _saveCsvClick(object sender_, RoutedEventArgs e_)
+    private void _saveCsvClick(object sender_, RoutedEventArgs e_)
     {
         // フォルダ選択
         if (string.IsNullOrEmpty(_textBoxFolder.Text) == true)
@@ -212,18 +192,24 @@ public partial class OutputControl : UserControl
         _saveCsv.IsEnabled = false;
 
         var outputFolder = _textBoxFolder.Text;
+        LogFile.Instance.WriteLine($"output {outputFolder}");
 
         var win = new WaitWindow()
         {
-            Run = async ()=>await _saveCsvFile(outputFolder),
-            Owner =Application.Current.MainWindow
+            Run = async () => await _saveCsvFile(outputFolder),
+            Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
         _saveCsv.IsEnabled = true;
 
     }
 
-    private async void _saveSqliteClick(object sender_, RoutedEventArgs e_)
+    /// <summary>
+    /// Sqlite 出力 開始
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _saveSqliteClick(object sender_, RoutedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Write : {sender_}");
         if (string.IsNullOrEmpty(_textBoxFolder.Text) == true)
@@ -234,10 +220,11 @@ public partial class OutputControl : UserControl
         _saveSql.IsEnabled = false;
         _textBoxFolder.IsEnabled = false;
         var outputFolder = _textBoxFolder.Text;
+        LogFile.Instance.WriteLine($"output {outputFolder}");
 
         var win = new WaitWindow()
         {
-            Run = async ()=> await _saveSqlFile(outputFolder + @"\ReportLog.db"),
+            Run = async () => await _saveSqlFile(outputFolder + @"\ReportLog.db"),
             Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
@@ -250,7 +237,6 @@ public partial class OutputControl : UserControl
         //var flg = _isCheckedAllEvent();
         if (sender_ is CheckBox checkbox)
         {
-
             LogFile.Instance.WriteLine($"{checkbox.Content} {checkbox.IsChecked}");
             switch (checkbox.IsChecked)
             {
@@ -289,6 +275,11 @@ public partial class OutputControl : UserControl
         }
     }
 
+    /// <summary>
+    /// Csv 出力
+    /// </summary>
+    /// <param name="outputFoloder_"></param>
+    /// <returns></returns>
     private async Task _saveCsvFile(string outputFoloder_)
     {
         // 総合情報
@@ -307,6 +298,11 @@ public partial class OutputControl : UserControl
             {
                 continue;
             }
+            if (view.ClassType == null)
+            {
+                continue;
+            }
+
             var outPath = outputFoloder_ + @"\" + view.Name + @".csv";
             LogFile.Instance.WriteLine($"Write : {outPath}");
 
@@ -336,6 +332,10 @@ public partial class OutputControl : UserControl
             {
                 continue;
             }
+            if (view.ClassType == null)
+            {
+                continue;
+            }
 
             string outPath = outputFoloder_ + @"\" + view.Name + @".csv";
             LogFile.Instance.WriteLine($"Write : {outPath}");
@@ -344,62 +344,77 @@ public partial class OutputControl : UserControl
         }
     }
 
+    /// <summary>
+    /// Sqlite 出力
+    /// </summary>
+    /// <param name="outputFile"></param>
+    /// <returns></returns>
     private async Task _saveSqlFile(string outputFile)
     {
         LogFile.Instance.WriteLine($"Write : {outputFile}");
 
-        var sql = new SQLiteManager(outputFile);
-        // 総合情報
-        if (IsSaveSummy == true)
+        using (var sql = new SQLiteManager(outputFile))
         {
-            sql.CreateTable("Product");
-            sql.Insert("Product", AnalysisManager.Instance.ListProduct);
-
-            sql.CreateTable("User");
-            sql.Insert("User", AnalysisManager.Instance.ListUser);
-
-            sql.CreateTable("Host");
-            sql.Insert("Host", AnalysisManager.Instance.ListHost);
-
-            sql.CreateTable("User@Host");
-            sql.Insert("User@Host", AnalysisManager.Instance.ListUserHost);
-        }
-
-        // 各イベント
-        foreach (var view in ListEvent)
-        {
-            if (view.IsChecked == false)
+            // 総合情報
+            if (IsSaveSummy == true)
             {
-                continue;
+                sql.CreateTable("Product");
+                sql.Insert("Product", AnalysisManager.Instance.ListProduct);
+
+                sql.CreateTable(AnalysisGroup.USER.Description());
+                sql.Insert(AnalysisGroup.USER.Description(), AnalysisManager.Instance.ListUser);
+
+                sql.CreateTable(AnalysisGroup.HOST.Description());
+                sql.Insert(AnalysisGroup.HOST.Description(), AnalysisManager.Instance.ListHost);
+
+                sql.CreateTable(AnalysisGroup.USER_HOST.Description());
+                sql.Insert(AnalysisGroup.USER_HOST.Description(), AnalysisManager.Instance.ListUserHost);
             }
-            sql.CreateTable(view.ClassType);
-            sql.Insert(view.ClassType, ToDataBase.Header(view.ClassType), AnalysisManager.Instance.ListEventValue(view.ClassType));
-        }
 
-        // 結合系
-        if (IsSaveJoinStartShutdown == true)
-        {
-            sql.CreateTable(typeof(JoinEventStartShutdown));
-            sql.Insert(typeof(JoinEventStartShutdown), ToDataBase.Header(typeof(JoinEventStartShutdown)), AnalysisManager.Instance.ListJoinStartShutdownValeu());
-        }
-
-        if (IsSaveJoinCheckOutIn == true)
-        {
-            sql.CreateTable(typeof(JoinEventCheckOutIn));
-            sql.Insert(typeof(JoinEventCheckOutIn), ToDataBase.Header(typeof(JoinEventCheckOutIn)), AnalysisManager.Instance.ListJoinCheckOutInValeu());
-        }
-        // 解析情報
-        foreach (var view in ListAnalysis)
-        {
-            if (view.IsChecked == false)
+            // 各イベント
+            foreach (var view in ListEvent)
             {
-                continue;
+                if (view.IsChecked == false)
+                {
+                    continue;
+                }
+                if (view.ClassType == null)
+                {
+                    continue;
+                }
+                sql.CreateTable(view.ClassType);
+                sql.Insert(view.ClassType, ToDataBase.Header(view.ClassType), AnalysisManager.Instance.ListEventValue(view.ClassType));
             }
-            sql.CreateTable(view.ClassType, AnalysisManager.Instance.ListEventHeader(view.ClassType, view.SelectedValue));
-            sql.Insert(view.ClassType, AnalysisManager.Instance.EventHeader(view.ClassType, view.SelectedValue), AnalysisManager.Instance.ListEventValue(view.ClassType, view.SelectedValue));
 
+            // 結合系
+            if (IsSaveJoinStartShutdown == true)
+            {
+                sql.CreateTable(typeof(JoinEventStartShutdown));
+                sql.Insert(typeof(JoinEventStartShutdown), ToDataBase.Header(typeof(JoinEventStartShutdown)), AnalysisManager.Instance.ListJoinStartShutdownValeu());
+            }
 
+            if (IsSaveJoinCheckOutIn == true)
+            {
+                sql.CreateTable(typeof(JoinEventCheckOutIn));
+                sql.Insert(typeof(JoinEventCheckOutIn), ToDataBase.Header(typeof(JoinEventCheckOutIn)), AnalysisManager.Instance.ListJoinCheckOutInValeu());
+            }
+
+            // 解析情報
+            foreach (var view in ListAnalysis)
+            {
+                if (view.IsChecked == false)
+                {
+                    continue;
+                }
+                if (view.ClassType == null)
+                {
+                    continue;
+                }
+                sql.CreateTable(view.ClassType, AnalysisManager.Instance.ListEventHeader(view.ClassType, view.SelectedValue));
+                sql.Insert(view.ClassType, AnalysisManager.Instance.EventHeader(view.ClassType, view.SelectedValue), AnalysisManager.Instance.ListEventValue(view.ClassType, view.SelectedValue));
+            }
+            sql.Close();
         }
-        sql.Close();
+        await Task.Delay(0);
     }
 }

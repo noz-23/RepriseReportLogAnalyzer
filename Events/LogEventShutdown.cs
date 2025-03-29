@@ -25,7 +25,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// server shutdown
 /// </summary>
-[Sort(2)][Table("TbShutdown")]
+[Sort(2)]
+[Table("TbShutdown")]
 internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicenseCount
 {
     /// <summary>
@@ -57,14 +58,14 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicen
     //server shutdown
     //SHUTDOWN user host mm/dd hh:mm:ss
     //0        1    2    3     4
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
     //
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
     //
 

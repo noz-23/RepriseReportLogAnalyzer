@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// log file start
 /// </summary>
 
-[Sort(1)][Table("TbStart")]
+[Sort(1)]
+[Table("TbStart")]
 internal sealed class LogEventStart : LogEventBase
 {
     /// <summary>
@@ -44,6 +45,6 @@ internal sealed class LogEventStart : LogEventBase
 
     //START hostname mm/dd/yyyy hh:mm
     //0     1        2          3
-    [Column("Host Name", Order =101)]
+    [Column("Host Name", Order = 101)]
     public string HostName { get; private set; } = string.Empty;
 }

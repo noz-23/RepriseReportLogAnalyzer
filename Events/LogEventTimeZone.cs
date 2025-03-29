@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file start
 /// </summary>
-[Sort(98)][Table("TbTimeZone")]
+[Sort(98)]
+[Table("TbTimeZone")]
 internal sealed class LogEventTimeZone : LogEventBase
 {
     /// <summary>
@@ -45,12 +46,12 @@ internal sealed class LogEventTimeZone : LogEventBase
 
     //TIMEZONE minutes-west-of-UTC daylight rules # readable version of data
     //0        1                   2        3     
-    [Column("Minutes West Of UTC", Order =101)]
+    [Column("Minutes West Of UTC", Order = 101)]
     public string MinutesWestOfUTC { get; private set; } = string.Empty;
 
-    [Column("DayLight", Order =102)]
+    [Column("DayLight", Order = 102)]
     public string DayLight { get; private set; } = string.Empty;
 
-    [Column("Rules", Order =103)]
+    [Column("Rules", Order = 103)]
     public string Rules { get; private set; } = string.Empty;
 }

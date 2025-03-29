@@ -28,7 +28,8 @@ public partial class ResultControl : UserControl
     {
         InitializeComponent();
 
-        foreach (AnalysisGroup group in Enum.GetValues(typeof(AnalysisGroup)))
+        //foreach (AnalysisGroup group in Enum.GetValues(typeof(AnalysisGroup)))
+        foreach (AnalysisGroup group in Enum.GetValues<AnalysisGroup>())
         {
             var item = group.Description();
             LogFile.Instance.WriteLine($"Selected [{item}]");
@@ -72,7 +73,7 @@ public partial class ResultControl : UserControl
             return;
         }
 
-        var win =new WaitWindow()
+        var win = new WaitWindow()
         {
             Run = async () => await SetDate(),
             Owner = Application.Current.MainWindow
@@ -97,7 +98,7 @@ public partial class ResultControl : UserControl
 
         var win = new WaitWindow()
         {
-            Run = async()=>await SetDate(),
+            Run = async () => await SetDate(),
             Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
@@ -111,7 +112,6 @@ public partial class ResultControl : UserControl
     {
         await App.Current.Dispatcher.Invoke(async () =>
         {
-
             var date = _dataPicker.SelectedDate;
             var index = _comboBox.SelectedIndex;
 

@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// isv-specific data
 /// </summary>
-[Sort(83)][Table("TbIsvSpecificData")]
+[Sort(83)]
+[Table("TbIsvSpecificData")]
 internal sealed class LogEventIsvSpecificData : LogEventBase
 {
     /// <summary>
@@ -44,7 +45,7 @@ internal sealed class LogEventIsvSpecificData : LogEventBase
     //isv-specific data
     //log mm/dd hh:mm:ss isv-specific-data-here
     //0   1     2        3
-    [Column("Isv Specific Data Here", Order =101)]
+    [Column("Isv Specific Data Here", Order = 101)]
     public string IsvSpecificData { get; private set; } = string.Empty;
 
 }

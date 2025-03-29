@@ -11,7 +11,6 @@ using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -40,7 +39,7 @@ public partial class AnalysisControl : UserControl
     /// </summary>
     private string _resultTitle = string.Empty;
 
-    private DateTime _startDateTime =DateTime.Now;
+    private DateTime _startDateTime = DateTime.Now;
 
     /// <summary>
     /// レポートログ を開く
@@ -73,7 +72,7 @@ public partial class AnalysisControl : UserControl
         _buttonAnalysis.IsEnabled = false;
         _startDateTime = DateTime.Now;
 
-        if (_dataGrid.Items.Count ==0)
+        if (_dataGrid.Items.Count == 0)
         {
             return;
         }
@@ -83,6 +82,7 @@ public partial class AnalysisControl : UserControl
         {
             list.Add(path_);
         }
+        LogFile.Instance.WriteLine($"Analysis Start");
 
         var win = new WaitWindow()
         {
@@ -98,6 +98,7 @@ public partial class AnalysisControl : UserControl
             await mainWindow._resultControl.SetDate();
             _textLabel.Text = $"Runing [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
+        LogFile.Instance.WriteLine($"Analysis End");
     }
 
     /// <summary>
@@ -110,6 +111,7 @@ public partial class AnalysisControl : UserControl
         var select = _dataGrid.SelectedItem;
 
         _dataGrid.Items.Remove(select);
+        LogFile.Instance.WriteLine($"{select.ToString()}");
     }
 
     /// <summary>
@@ -130,7 +132,7 @@ public partial class AnalysisControl : UserControl
             }
 
             StringBuilder str = new StringBuilder("Runing ");
-            str.Append($"{ _resultTitle} [{ (DateTime.Now - _startDateTime):hh\\:mm\\:ss}]");
+            str.Append($"{_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]");
             _textLabel.Text = str.ToString();
 
             _progressBar.Value = count_;
@@ -142,7 +144,7 @@ public partial class AnalysisControl : UserControl
     /// <summary>
     /// ドラッグアンドドロップ開始位置
     /// </summary>
-    private System.Windows.Point _startPoint = new System.Windows.Point();
+    private System.Windows.Point _startPoint;
     /// <summary>
     /// マウスドラッグ
     /// </summary>
@@ -151,6 +153,7 @@ public partial class AnalysisControl : UserControl
     private void _mouseDown(object sender_, MouseButtonEventArgs e_)
     {
         _startPoint = e_.GetPosition(null);
+        LogFile.Instance.WriteLine($"{_startPoint.ToString()}");
     }
 
     /// <summary>
@@ -161,6 +164,7 @@ public partial class AnalysisControl : UserControl
     private void _mouseMove(object sender_, System.Windows.Input.MouseEventArgs e_)
     {
         var nowPoint = e_.GetPosition(null);
+
         if (e_.LeftButton == MouseButtonState.Released == true)
         {
             return;
@@ -197,21 +201,29 @@ public partial class AnalysisControl : UserControl
             var hit = VisualTreeHelper.HitTest(_dataGrid, dropPositon);
             if (hit.VisualHit.GetParentOfType<ItemsControl>() is ItemsControl dropItem)
             {
+                var str = (_dataGrid.Items.Count > 0) ? _dataGrid.Items[_dataGrid.Items.Count - 1].ToString() : string.Empty;
+
                 // ドロップ先のViewを取得
-                var dropView = (dropItem.DataContext as string)?? _dataGrid.Items[_dataGrid.Items.Count-1].ToString();
+                var dropView = (dropItem.DataContext as string) ?? str;
 
                 var listItem = new List<string>();
                 foreach (var item in _dataGrid.Items)
                 {
-                    listItem.Add(item.ToString());
+                    if (item is string add)
+                    {
+                        listItem.Add(add);
+                    }
                 }
 
                 var oldIndex = listItem.IndexOf(dragView);
-                var newIndex = listItem.IndexOf(dropView);
+                var newIndex = (string.IsNullOrEmpty(dropView) == false) ? listItem.IndexOf(dropView) : _dataGrid.Items.Count;
 
                 var temp = _dataGrid.Items[newIndex];
                 _dataGrid.Items[newIndex] = _dataGrid.Items[oldIndex];
                 _dataGrid.Items[oldIndex] = temp;
+
+
+                LogFile.Instance.WriteLine($"{oldIndex} {newIndex}");
             }
         }
     }

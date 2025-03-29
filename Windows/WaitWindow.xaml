@@ -11,7 +11,7 @@
     ResizeMode="NoResize" 
     WindowStyle="ToolWindow" 
     Background="LightGreen"
-    Loaded="_loaded" 
+    Loaded="_loaded" Topmost="True" 
     >
     <Grid>
         <TextBlock

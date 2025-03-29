@@ -11,7 +11,7 @@ namespace RepriseReportLogAnalyzer.Attributes;
 /// <summary>
 /// リフレクションの順序用
 /// </summary>
-
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
 internal sealed class SortAttribute : Attribute
 {
     /// <summary>

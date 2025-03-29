@@ -11,7 +11,6 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -27,8 +26,9 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// checkout
 /// </summary>
-[Sort(11)][Table("TbCheckOut")]
-internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEventCountCurrent, ILicenseCount
+[Sort(11)]
+[Table("TbCheckOut")]
+internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicenseCount
 {
     /// <summary>
     /// コンストラクタ
@@ -36,7 +36,8 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     /// <param name="list_">スペースで分割した文字列リスト</param>
     public LogEventCheckOut(string[] list_) : base()
     {
-        if (list_.Count() < 10)
+        //if (list_.Count() < 10)
+        if (list_.Length < 10)
         {
             // smail
             Product = list_[1];
@@ -78,7 +79,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
 
             //
             EventDateTime = _GetDateTime(list_[16], list_[17]);
-            LogFormat = (list_[17].Contains(".") == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+            LogFormat = (list_[17].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
         }
     }
 
@@ -87,40 +88,40 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     //OUT product version pool# user  host      “isv_def” count         cur_use      cur_resuse server_handle share_handle process_id “project” “requested product” “requested version” mm/dd hh:mm:ss.tenths_of_msec “client_machine_os_info” “application argv0” roam_days roam_handle client-ip-address
     //OUT product version user  host “isv_def” count      server_handle share_handle hh:mm
     //0   1       2       3     4     5          6          7             8            9          10            11           12          13          14                    15                   16    17                       18                         19                   20        21          22
-    [Column("Product", Order =11)]
+    [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order =12)]
+    [Column("Version", Order = 12)]
     public string Version { get; private set; } = string.Empty;
- 
-    [Column("Product Version", Order =13)]
+
+    [Column("Product Version", Order = 13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Isv Def", Order =101)]
+    [Column("Isv Def", Order = 101)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Pool", Order =102)]
+    [Column("Pool", Order = 102)]
     public string Pool { get; private set; } = string.Empty;
     //
-    [Column("Count", Order =103)]
+    [Column("Count", Order = 103)]
     public int Count { get; private set; } = -1;
 
-    [Column("Current Count", Order =104)]
+    [Column("Current Count", Order = 104)]
     public int CountCurrent { get; private set; } = -1;
- 
-    [Column("Current Resuse", Order =105)]
+
+    [Column("Current Resuse", Order = 105)]
     public int ResuseCurrent { get; private set; } = -1;
     //
-    [Column("Server Handle", Order =106)]
+    [Column("Server Handle", Order = 106)]
     public string HandleServer { get; private set; } = string.Empty;
 
     //public int HandleServerNum()=> _handleServerNum;
@@ -128,19 +129,19 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     //public int HandleServerNum { get; private set; } = -1;
 
 
-    [Column("Share Handle", Order =107)]
+    [Column("Share Handle", Order = 107)]
     public string HandleShare { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order =108)]
+    [Column("Process ID", Order = 108)]
     public string ProcessId { get; private set; } = string.Empty;
     //
-    [Column("Project", Order =109)]
+    [Column("Project", Order = 109)]
     public string Project { get; private set; } = string.Empty;
 
-    [Column("Requested Product", Order =110)]
+    [Column("Requested Product", Order = 110)]
     public string RequestedProduct { get; private set; } = string.Empty;
 
-    [Column("Requested Version", Order =111)]
+    [Column("Requested Version", Order = 111)]
     public string RequestedVersion { get; private set; } = string.Empty;
     //
 
@@ -150,10 +151,10 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILogEv
     /// <param name="checkIn_"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsFindCheckIn(LogEventCheckIn checkIn_)=> IsFindCheckIn(checkIn_.HandleServer, checkIn_.EventNumber);
+    public bool IsFindCheckIn(LogEventCheckIn checkIn_) => IsFindCheckIn(checkIn_.HandleServer, checkIn_.EventNumber);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsFindCheckIn(string hande_,long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
+    public bool IsFindCheckIn(string hande_, long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
 
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);

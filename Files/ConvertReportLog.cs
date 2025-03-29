@@ -11,7 +11,6 @@ using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Windows;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace RepriseReportLogAnalyzer.Files;
@@ -26,18 +25,22 @@ internal sealed class ConvertReportLog
     /// </summary>
     public ConvertReportLog()
     {
-        LogEventBase.Clear();
+        ProgressCount = null;
+        Clear();
     }
 
     /// <summary>
     /// 変換内容
     /// </summary>
-    private const string _CONVERT = "[File Read]";
+    private readonly string _CONVERT = "[File Read]";
 
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    public ProgressCountDelegate? ProgressCount = null;
+    public ProgressCountCallBack? ProgressCount;
+
+
+    public static void Clear() => LogEventBase.Clear();
 
     /// <summary>
     /// 解析開始
@@ -65,7 +68,7 @@ internal sealed class ConvertReportLog
             }
             ProgressCount?.Invoke(max, max, $"{_CONVERT}[{Path.GetFileName(filePath_)}]");
             //
-            LogFile.Instance.WriteLine($"Read:{_listEvent.Count()}");
+            LogFile.Instance.WriteLine($"Read:{_listEvent.Count}");
         }
     }
 
@@ -85,57 +88,46 @@ internal sealed class ConvertReportLog
     private List<LogEventBase> _listEvent = new();
 
     /// <summary>
-    /// スタート イベント
-    /// </summary>
-    //public IEnumerable<LogEventStart> ListStart { get => ListEvent<LogEventStart>(); }
-
-    /// <summary>
-    /// シャットダウン イベント
-    /// </summary>
-    //public IEnumerable<LogEventShutdown> ListShutdown { get => ListEvent<LogEventShutdown>(); }
-
-    /// <summary>
     /// プロダクト
     /// </summary>
-    public IEnumerable<string> ListProduct{get => ListProductEvent.Select(x_ => x_.Product).Distinct();}
+    public IEnumerable<string> ListProduct { get => ListProductEvent.Select(x_ => x_.Product).Distinct(); }
 
     /// <summary>
     /// プロダクトを持ってる イベント
     /// </summary>
-    //public IEnumerable<ILogEventProduct> ListProductEvent{get => _listEvent.AsParallel().Where(e_ => e_ is ILogEventProduct).Select(e_ => e_ as ILogEventProduct).Where(e_ => string.IsNullOrEmpty(e_?.Product ??string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version);}
     public IEnumerable<ILogEventProduct> ListProductEvent { get => _listEvent.AsParallel().OfType<ILogEventProduct>().Where(e_ => string.IsNullOrEmpty(e_?.Product ?? string.Empty) == false).Distinct(new CompareProduct()).OrderBy(p_ => p_.Product).ThenBy(p_ => p_.Version); }
 
     /// <summary>
     /// ユーザー
     /// </summary>
-    public IEnumerable<string> ListUser{get => _listEvent.AsParallel().OfType<ILogEventUser>().Select(e_ => e_?.User ??string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct(); }
+    public IEnumerable<string> ListUser { get => _listEvent.AsParallel().OfType<ILogEventUser>().Select(e_ => e_?.User ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct(); }
 
     /// <summary>
     /// ホスト
     /// </summary>
-    public IEnumerable<string> ListHost{ get => _listEvent.AsParallel().OfType<ILogEventHost>().Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct();}
+    public IEnumerable<string> ListHost { get => _listEvent.AsParallel().OfType<ILogEventHost>().Select(e_ => e_?.Host ?? string.Empty).Where(e_ => string.IsNullOrEmpty(e_) == false).Distinct(); }
 
     /// <summary>
     /// ユーザーホスト
     /// </summary>
-    public IEnumerable<string> ListUserHost{get => _listEvent.AsParallel().OfType<ILogEventUserHost>().Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct();}
+    public IEnumerable<string> ListUserHost { get => _listEvent.AsParallel().OfType<ILogEventUserHost>().Select(e_ => e_?.UserHost ?? "@").Where(e_ => e_ != "@").Distinct(); }
 
     /// <summary>
     /// 時間
     /// </summary>
-    public IEnumerable<DateTime> ListDateTime{get => _listEvent.AsParallel().Select(e_ => e_.EventDateTime).Where(e_ => e_ != LogEventBase.NotAnalysisEventTime).Distinct().OrderBy(x_ => x_);}
+    public IEnumerable<DateTime> ListDateTime { get => _listEvent.AsParallel().Select(e_ => e_.EventDateTime).Where(e_ => e_ != LogEventBase.NotAnalysisEventTime).Distinct().OrderBy(x_ => x_); }
 
     /// <summary>
     /// 日付
     /// </summary>
-    public IEnumerable<DateTime> ListDate{get => ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct();}
+    public IEnumerable<DateTime> ListDate { get => ListDateTime.AsParallel().Select(t_ => t_.Date).Distinct(); }
 
     /// <summary>
     /// イベント リスト抽出(出力系で利用)
     /// </summary>
     /// <param name="classType_"></param>
     /// <returns></returns>
-    public IEnumerable<LogEventBase> ListEvent(Type classType_)=> _listEvent.Where(e_ => e_.GetType() == classType_);
+    public IEnumerable<LogEventBase> ListEvent(Type classType_) => _listEvent.Where(e_ => e_.GetType() == classType_);
 
     public IEnumerable<T> ListEvent<T>() => _listEvent.OfType<T>();
 
@@ -154,7 +146,7 @@ internal sealed class ConvertReportLog
     /// <returns></returns>
     private IEnumerable<string> _listToString(Type classType_) => ListEvent(classType_).Select(e_ => e_.ToString());
 
-    private IEnumerable<string> _listToString<T>() where T : LogEventBase=> ListEvent<T>().Select(e_ => e_.ToString());
+    private IEnumerable<string> _listToString<T>() where T : LogEventBase => ListEvent<T>().Select(e_ => e_.ToString());
 
     /// <summary>
     /// 各イベントのCsv保存
@@ -188,7 +180,7 @@ internal sealed class ConvertReportLog
     /// <summary>
     /// プロダクトの比較
     /// </summary>
-    private class CompareProduct : IEqualityComparer<ILogEventProduct>
+    private sealed class CompareProduct : IEqualityComparer<ILogEventProduct>
     {
         public bool Equals(ILogEventProduct? a_, ILogEventProduct? b_)
         {
@@ -212,6 +204,6 @@ internal sealed class ConvertReportLog
 
             return true;
         }
-        public int GetHashCode(ILogEventProduct codeh_)=> codeh_.Product.GetHashCode() ^ codeh_.Version.GetHashCode();
+        public int GetHashCode(ILogEventProduct codeh_) => codeh_.Product.GetHashCode() ^ codeh_.Version.GetHashCode();
     }
 }

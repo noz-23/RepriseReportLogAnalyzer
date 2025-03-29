@@ -10,23 +10,28 @@ using System.Windows;
 
 namespace RepriseReportLogAnalyzer.Windows;
 
-public delegate Task RunDelegate();
+public delegate Task RunCallBack();
 
 /// <summary>
 /// WaitWindow.xaml の相互作用ロジック
 /// </summary>
 public partial class WaitWindow : Window
 {
-    public RunDelegate? Run = null;
-
     public WaitWindow()
     {
         InitializeComponent();
+        Run = null;
     }
+
+    public RunCallBack? Run { get; set; }
 
     private async void _loaded(object sender, RoutedEventArgs e)
     {
-        await Task.Run( async() => {await Run?.Invoke(); });
+        await Task.Run(async () =>
+        {
+            if (Run != null) { await Run.Invoke(); }
+
+        });
 
         Close();
     }

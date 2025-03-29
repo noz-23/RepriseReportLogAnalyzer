@@ -18,14 +18,14 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// スタートとシャットダウンの時間帯
 /// (ログ集計の最後はシャットダウンとする)
 /// </summary>
-internal sealed class AnalysisStartShutdown:ToDataBase
+internal sealed class AnalysisStartShutdown : ToDataBase
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="start_">スタート イベント</param>
     /// <param name="shutdown_">シャットダウン イベント</param>
-    public AnalysisStartShutdown(LogEventStart start_, LogEventShutdown? shutdown_)
+    public AnalysisStartShutdown(LogEventStart start_, LogEventShutdown shutdown_)
     {
         _start = start_;
         _shutdown = shutdown_;
@@ -64,40 +64,32 @@ internal sealed class AnalysisStartShutdown:ToDataBase
     public TimeSpan Duration { get => (ShutdownDateTime - StartDateTime); }
 
     /// <summary>
-    /// スタート イベント
-    /// </summary>
-    private readonly LogEventStart _start;
-
-    /// <summary>
-    /// シャットダウン イベント
-    /// </summary>
-    private readonly LogEventShutdown _shutdown;
-
-    /// <summary>
-    /// スタートとシャットダウンの結合情報
-    /// </summary>
-    private readonly JoinEventStartShutdown _joinEvent;
-
-    /// <summary>
     /// スタート イベント(リフレクションで呼び出さないため関数化)
     /// </summary>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogEventStart EventStart() => _start;
+    private readonly LogEventStart _start;
 
     /// <summary>
     /// シャットダウン イベント(リフレクションで呼び出さないため関数化)
     /// </summary>
-    public LogEventBase? EventShutdown() => _shutdown;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public LogEventBase EventShutdown() => _shutdown;
+    private readonly LogEventShutdown _shutdown;
 
     /// <summary>
     /// 結合情報 (リフレクションで呼び出さないため関数化)
     /// </summary>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public JoinEventStartShutdown JoinEvent() => _joinEvent;
+    private readonly JoinEventStartShutdown _joinEvent;
 
     /// <summary>
     /// シャットダウン イベント番号
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public long ShudownNumber() => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber;
 
     /// <summary>

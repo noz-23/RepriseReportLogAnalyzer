@@ -16,15 +16,15 @@ namespace RepriseReportLogAnalyzer.Extensions;
 /// </summary>
 public static class VisualHeplerExtensionc
 {
-    public static T? GetParentOfType<T>( this DependencyObject src_) where T : DependencyObject
+    public static T? GetParentOfType<T>(this DependencyObject src) where T : DependencyObject
     {
-        while(src_ != null)
+        while (src != null)
         {
-            if(src_ is T rtn)
+            if (src is T rtn)
             {
                 return rtn;
             }
-            src_ = VisualTreeHelper.GetParent(src_);
+            src = VisualTreeHelper.GetParent(src);
         }
 
         return null;

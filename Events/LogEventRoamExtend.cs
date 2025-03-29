@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// roam extend
 /// </summary>
-[Sort(73)][Table("TbRoamExtend")]
+[Sort(73)]
+[Table("TbRoamExtend")]
 internal sealed class LogEventRoamExtend : LogEventBase, ILogEventUserHost, ILogEventProduct
 {
     /// <summary>
@@ -54,37 +55,37 @@ internal sealed class LogEventRoamExtend : LogEventBase, ILogEventUserHost, ILog
     //roam extend
     //ROAM_EXTEND product version pool# user host “isv_def” #days_extended server_handle process_id mm/dd hh:mm:ss
     //0           1       2       3     4    5     6          7              8             9          10    11
-    [Column("Product", Order =11)]
+    [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order =12)]
+    [Column("Version", Order = 12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order =13)]
+    [Column("Product Version", Order = 13)]
     public string ProductVersion { get => Product + " " + Version; }
 
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Pool", Order =101)]
+    [Column("Pool", Order = 101)]
     public string Pool { get; private set; } = string.Empty;
     //
-    [Column("Isv Def", Order =102)]
+    [Column("Isv Def", Order = 102)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Days Extended", Order =103)]
+    [Column("Days Extended", Order = 103)]
     public string DaysExtended { get; private set; } = string.Empty;
 
-    [Column("Server Handle", Order =104)]
+    [Column("Server Handle", Order = 104)]
     public string HandleServer { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order =105)]
+    [Column("Process ID", Order = 105)]
     public string ProcessId { get; private set; } = string.Empty;
     //
 }

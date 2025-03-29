@@ -18,7 +18,7 @@ namespace RepriseReportLogAnalyzer.Managers
     /// <summary>
     /// SQL 操作処理
     /// </summary>
-    internal class SQLiteManager
+    internal sealed class SQLiteManager : IDisposable
     {
         /// <summary>
         /// コンストラクタ
@@ -36,12 +36,13 @@ namespace RepriseReportLogAnalyzer.Managers
             Open(path_);
         }
 
-        private SQLiteConnection? _connection = null;
+        private SQLiteConnection? _connection;
 
         public void Close()
         {
             _connection?.Close();
             _connection?.Dispose();
+            _connection = null;
         }
 
         public void Open(string path_)
@@ -62,16 +63,16 @@ namespace RepriseReportLogAnalyzer.Managers
         /// テーブル作成処理(単一)
         /// </summary>
         /// <param name="name_"></param>
-        public void CreateTable(string name_)=> _connection?.CreateTable(name_);
+        public void CreateTable(string name_) => _connection?.CreateTable(name_);
 
-        public void Insert(string name_, IEnumerable<string> listValue_) =>_connection?.Insert(name_, listValue_);
+        public void Insert(string name_, IEnumerable<string> listValue_) => _connection?.Insert(name_, listValue_);
 
 
         /// <summary>
         /// テーブル作成処理
         /// </summary>
         /// <param name="classType_"></param>
-        public void CreateTable(Type classType_)=>_connection?.CreateTable(classType_);
+        public void CreateTable(Type classType_) => _connection?.CreateTable(classType_);
         public void CreateTable(Type classType_, ListStringStringPair list_) => _connection?.CreateTable(classType_, list_);
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace RepriseReportLogAnalyzer.Managers
                 // トランザクションしないと遅い
                 try
                 {
-                    _connection?.Insert(classType_,header_, list_, tran);
+                    _connection?.Insert(classType_, header_, list_, tran);
                 }
                 catch (Exception ex_)
                 {
@@ -97,6 +98,11 @@ namespace RepriseReportLogAnalyzer.Managers
                 }
                 tran?.Commit();
             }
+        }
+
+        public void Dispose()
+        {
+            Close();
         }
     }
 }

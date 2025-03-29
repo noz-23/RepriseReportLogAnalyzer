@@ -15,39 +15,38 @@ namespace RepriseReportLogAnalyzer.Interfaces;
 public class ListStringLongPair : List<KeyValuePair<string, long>>;
 public class ListStringStringPair : List<KeyValuePair<string, string>>;
 
-interface ILogEventHost
+internal interface ILogEventHost
 {
     string Host { get; }
 }
-interface ILogEventUser
+internal interface ILogEventUser
 {
     string User { get; }
 }
 
-interface ILogEventUserHost : ILogEventUser, ILogEventHost
+internal interface ILogEventUserHost : ILogEventUser, ILogEventHost
 {
     string UserHost { get; }
 }
 
-interface ILogEventProduct
+internal interface ILogEventProduct
 {
     string Product { get; }
     string Version { get; }
     string ProductVersion { get; }
 }
 
-interface ILogEventCountCurrent : ILogEventProduct
-{
-    int CountCurrent { get; }
-}
+//interface ILogEventCountCurrent : ILogEventProduct
+//{
+//    int CountCurrent { get; }
+//}
 
-interface ILogEventWhy
+internal interface ILogEventWhy
 {
-    //int Why { get; }
     StatusValue Why { get; }
 }
 
-interface IAnalysisOutputFile
+internal interface IAnalysisOutputFile
 {
     /// <summary>
     /// 書き出しヘッダー
@@ -73,10 +72,14 @@ interface IAnalysisOutputFile
     /// <param name="select_"></param>
     /// <returns></returns>
     IEnumerable<List<string>> ListValue(long select_);
-
 }
 
-interface ILicenseCount
+internal interface ILicenseCount
 {
+    /// <summary>
+    /// ライセンスのカウント処理をするイベント
+    /// </summary>
+    /// <param name="listCount_"></param>
+    /// <returns></returns>
     bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_);
 }

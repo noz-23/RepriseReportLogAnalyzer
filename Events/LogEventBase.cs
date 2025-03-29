@@ -12,13 +12,14 @@ using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
 
 /// <summary>
 /// 文字列 と イベントの紐づけ登録クラス
 /// </summary>
-internal sealed partial class LogEventRegist 
+internal sealed partial class LogEventRegist
 {
     /// <summary>
     /// コンストラクタ
@@ -42,14 +43,14 @@ internal sealed partial class LogEventRegist
     /// <param name="key_"></param>
     /// <param name="event_"></param>
     /// <returns></returns>
-    public static bool Regist(string key_, LogEventBase.NewLogEvent event_)=> LogEventBase.Regist(key_, event_);
+    public static bool Regist(string key_, LogEventBase.NewLogEvent event_) => LogEventBase.Regist(key_, event_);
 }
 
 /// <summary>
 /// ログ イベント(ベース)
 /// </summary>
 [Sort(99)]
-internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
+internal partial class LogEventBase : ToDataBase, IComparer, IComparable
 {
     /// <summary>
     /// コンストラクタ
@@ -69,7 +70,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <summary>
     /// 各イベントの文字とデリゲートを紐づけるリスト
     /// </summary>
-    private static SortedList<string, NewLogEvent> _listEventData = new ();
+    private static SortedList<string, NewLogEvent> _listEventData = new();
 
     /// <summary>
     /// 登録関数
@@ -86,7 +87,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <summary>
     /// 現在時間を取り扱わない時間として利用する
     /// </summary>
-    public readonly static DateTime NotAnalysisEventTime = DateTime.Now;
+    public static readonly DateTime NotAnalysisEventTime = DateTime.Now;
 
 
     /// <summary>
@@ -96,7 +97,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <summary>
     /// 現在のイベント番号(重複なし)
     /// </summary>
-    public static long NowEventNumber = 0;
+    public static long NowEventNumber;
 
     /// <summary>
     /// 日付設定に利用
@@ -108,13 +109,13 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <summary>
     /// イベント番号
     /// </summary>
-    [Column("No", Order =1)]
+    [Column("No", Order = 1)]
     public long EventNumber { get; protected set; } = 0;
-    
+
     /// <summary>
     /// イベント時間
     /// </summary>
-    [Column("DateTime", Order =2)]
+    [Column("DateTime", Order = 2)]
     public DateTime EventDateTime
     {
         get => _eventDateTime;
@@ -134,6 +135,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// イベント日付
     /// </summary>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public DateTime EventDate() => EventDateTimeUnit(TimeSpan.TicksPerDay);
 
     /// <summary>
@@ -142,7 +144,8 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// </summary>
     /// <param name="timeSpan_">時間帯</param>
     /// <returns></returns>
-    public DateTime EventDateTimeUnit(long timeSpan_) =>new DateTime(EventDateTime.Ticks - (EventDateTime.Ticks % timeSpan_));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public DateTime EventDateTimeUnit(long timeSpan_) => new DateTime(EventDateTime.Ticks - (EventDateTime.Ticks % timeSpan_));
 
     /// <summary>
     /// 登録してある
@@ -160,7 +163,8 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
             return newEvent?.Invoke(list);
         }
 
-        if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
+        //if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
+        if (list.Length == 2 && list[0].Contains('/') == true && list[1].Contains(':') == true)
         {
             // タイムスタンプ
             return new LogEventTimeStamp(list);
@@ -193,9 +197,9 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
         {
             if (string.IsNullOrEmpty(tmp) == true)
             {
-                if (s.Contains("\"") == true)
+                if (s.Contains('\"') == true)
                 {
-                    if (s.IndexOf("\"") == s.LastIndexOf("\""))
+                    if (s.IndexOf('\"') == s.LastIndexOf('\"'))
                     {
                         tmp += s;
                         continue;
@@ -204,7 +208,7 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
             }
             else
             {
-                if (s.Contains("\"") == true)
+                if (s.Contains('\"') == true)
                 {
                     tmp += s;
                     rtn.Add(tmp);
@@ -243,23 +247,23 @@ internal partial class LogEventBase: ToDataBase ,IComparer, IComparable
     /// <param name="a_"></param>
     /// <param name="b_"></param>
     /// <returns></returns>
-    public int Compare(object? a_, object? b_)
-    {
-        if (a_ is LogEventBase a)
-        {
-            //if (b_ is LogEventBase b)
-            //{
-            //    return (int)(a.EventNumber - b.EventNumber);
-            //}
-            return a.CompareTo(b_);
-        }
-        return -1;
-    }
+    public int Compare(object? a_, object? b_) => (a_ is LogEventBase a) ? a.CompareTo(b_) : -1;
+    //{
+    //    if (a_ is LogEventBase a)
+    //    {
+    //        //if (b_ is LogEventBase b)
+    //        //{
+    //        //    return (int)(a.EventNumber - b.EventNumber);
+    //        //}
+    //        return a.CompareTo(b_);
+    //    }
+    //    return -1;
+    //}
 
     /// <summary>
     /// 比較処理
     /// </summary>
     /// <param name="b_"></param>
     /// <returns></returns>
-    public int CompareTo(object? b_)=> (b_ is LogEventBase b) ? (int)(this.EventNumber - b.EventNumber) : -1;
+    public int CompareTo(object? b_) => (b_ is LogEventBase b) ? (int)(EventNumber - b.EventNumber) : -1;
 }

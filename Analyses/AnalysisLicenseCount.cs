@@ -15,7 +15,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// ライセンスの利用数計算
 /// </summary>
 /// 
-internal sealed class AnalysisLicenseCount:ToDataBase
+internal sealed class AnalysisLicenseCount : ToDataBase
 {
     /// <summary>
     /// ライセンスのカウント処理
@@ -26,18 +26,21 @@ internal sealed class AnalysisLicenseCount:ToDataBase
         /// <summary>
         /// 集計カウント
         /// </summary>
-        public int Count = 0;
+        public int Count;
         /// <summary>
         /// サーバーの保有数
         /// </summary>
-        public int ServerHave = 0;
+        public int ServerHave;
         /// <summary>
         /// サーバの貸出数(=集計カウント)
         /// </summary>
-        public int CheckOutInCurrent = 0;
+        public int CheckOutInCurrent;
 
         public LicenseCount()
         {
+            Count = 0;
+            ServerHave = 0;
+            CheckOutInCurrent = 0;
         }
 
         public LicenseCount(LicenseCount c_)
@@ -65,7 +68,7 @@ internal sealed class AnalysisLicenseCount:ToDataBase
         ListCount = new();
         foreach (var key in listCount_.Keys)
         {
-            ListCount.Add(key, new (listCount_[key]));
+            ListCount.Add(key, new(listCount_[key]));
         }
 
         //LogFile.Instance.WriteLine($"{eventBase_.GetType()}{string.Join(",", ListCount.Values.Select(x_ => $"[{x_.Count}][{x_.ServerHave}][{x_.CheckOutInCurrent}]"))}");
@@ -80,7 +83,7 @@ internal sealed class AnalysisLicenseCount:ToDataBase
     /// <summary>
     /// ライセンスカウント情報
     /// </summary>
-    public SortedList<string, LicenseCount> ListCount { get; private set; } 
+    public SortedList<string, LicenseCount> ListCount { get; private set; }
 
     /// <summary>
     /// 文字列化
@@ -93,7 +96,7 @@ internal sealed class AnalysisLicenseCount:ToDataBase
     /// <returns></returns>
     public List<string> ListValue()
     {
-        var rtn =new List<string>();
+        var rtn = new List<string>();
 
         rtn.Add($"{EventBase.EventDateTime.ToShortDateString()}");
         rtn.Add($"{EventBase.EventDateTime.ToShortTimeString()}");

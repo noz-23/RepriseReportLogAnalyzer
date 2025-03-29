@@ -27,7 +27,7 @@ namespace RepriseReportLogAnalyzer.Managers;
 /// <summary>
 /// 解析処理管理
 /// </summary>
-class AnalysisManager : INotifyPropertyChanged
+internal sealed class AnalysisManager : INotifyPropertyChanged
 {
     /// <summary>
     /// コンストラクタ
@@ -40,7 +40,9 @@ class AnalysisManager : INotifyPropertyChanged
         _listAnalysis.Add(_listStartShutdown);
         _listAnalysis.Add(_listUserDuration);
         _listAnalysis.Add(_listHostDuration);
-        _listAnalysis.Add(_listUserHostDuration);     
+        _listAnalysis.Add(_listUserHostDuration);
+        _runStartTime = null;
+        _runEndTime = null;
     }
 
     public void Create()
@@ -68,12 +70,12 @@ class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// カレンダーの開始
     /// </summary>
-    public DateTime? StartDate { get => (ListDate.Count() == 0) ? null : ListDate.FirstOrDefault(); }
+    public DateTime? StartDate { get => (ListDate.Count == 0) ? null : ListDate.FirstOrDefault(); }
 
     /// <summary>
     /// カレンダーの終了
     /// </summary>
-    public DateTime? EndDate { get => (ListDate.Count() == 0) ? null : ListDate.LastOrDefault(); }
+    public DateTime? EndDate { get => (ListDate.Count == 0) ? null : ListDate.LastOrDefault(); }
 
 
     public IEnumerable<LogEventBase> ListEvent(Type classType_) => _convertReportLog.ListEvent(classType_);
@@ -104,11 +106,11 @@ class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    private ProgressCountDelegate? _progressCount = null;
+    //private ProgressCountDelegate? _progressCount = null;
     //
     // _convertReportLog があるが確実にデータがはいっているタイミングで更新する
     public SortedSet<string> ListProduct { get; private set; } = new();
-    public SortedSet<(string Product,string Version)> ListProductVersion { get; private set; } = new();
+    public SortedSet<(string Product, string Version)> ListProductVersion { get; private set; } = new();
     public SortedSet<string> ListUser { get; private set; } = new();
     public SortedSet<string> ListHost { get; private set; } = new();
     public SortedSet<string> ListUserHost { get; private set; } = new();
@@ -118,19 +120,19 @@ class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// 解析処理開始時間
     /// </summary>
-    private DateTime? _runStartTime =null ;
+    private DateTime? _runStartTime;
     /// <summary>
     /// 解析処理終了時間
     /// </summary>
-    private DateTime? _runEndTime = null;
+    private DateTime? _runEndTime;
 
     /// <summary>
     /// 各処理のプログレスバー設定
     /// </summary>
     /// <param name="progressCount_"></param>
-    public void SetProgressCount(ProgressCountDelegate progressCount_)
+    public void SetProgressCount(ProgressCountCallBack progressCount_)
     {
-        _progressCount = progressCount_;
+        //_progressCount = progressCount_;
         _convertReportLog.ProgressCount = progressCount_;
         _listStartShutdown.ProgressCount = progressCount_;
         _listCheckOutIn.ProgressCount = progressCount_;
@@ -163,6 +165,8 @@ class AnalysisManager : INotifyPropertyChanged
         //
         _runStartTime = null;
         _runEndTime = null;
+
+        ConvertReportLog.Clear();
     }
 
     /// <summary>
@@ -187,9 +191,9 @@ class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// 変換処理
     /// </summary>
-    private async Task _convert() 
+    private async Task _convert()
     {
-        int max = _listFile.Count();
+        int max = _listFile.Count;
         foreach (string path_ in _listFile)
         {
             LogFile.Instance.WriteLine($"LogAnalysis: {path_}");
@@ -204,7 +208,7 @@ class AnalysisManager : INotifyPropertyChanged
     private async Task _analysis()
     {
         ListProduct.AddRange(_convertReportLog.ListProduct);
-        ListProductVersion.AddRange(_convertReportLog.ListProductEvent.Select(x_=>(x_.Product,x_.Version)));
+        ListProductVersion.AddRange(_convertReportLog.ListProductEvent.Select(x_ => (x_.Product, x_.Version)));
 
         ListUser.AddRange(_convertReportLog.ListUser);
         ListHost.AddRange(_convertReportLog.ListHost);
@@ -221,13 +225,14 @@ class AnalysisManager : INotifyPropertyChanged
         //_listHostDuration.Analysis(ListHost, _listCheckOutIn);
         //_listUserHostDuration.Analysis(ListUserHost, _listCheckOutIn);
         _listUserDuration.Analysis(_listCheckOutIn);
-        _listHostDuration.Analysis( _listCheckOutIn);
+        _listHostDuration.Analysis(_listCheckOutIn);
         _listUserHostDuration.Analysis(_listCheckOutIn);
 
         //
         _notifyPropertyChanged("StartDate");
         _notifyPropertyChanged("EndDate");
 
+        await Task.Delay(0);
     }
 
     /// <summary>
@@ -253,25 +258,25 @@ class AnalysisManager : INotifyPropertyChanged
         list.Add("\n");
 
 
-        list.Add($"License Count : {ListProduct.Count()}");
+        list.Add($"License Count : {ListProduct.Count}");
         list.AddRange(ListProductVersion.Select(x_ => $"{x_.Product},{x_.Version}"));
         list.Add("\n");
-        LogFile.Instance.WriteLine($"ListProduct:{ListProduct.Count()}");
+        LogFile.Instance.WriteLine($"ListProduct:{ListProduct.Count}");
 
-        list.Add($"User Count : {ListUser.Count()}");
+        list.Add($"User Count : {ListUser.Count}");
         list.AddRange(ListUser);
         list.Add("\n");
-        LogFile.Instance.WriteLine($"ListUser:{ListUser.Count()}");
+        LogFile.Instance.WriteLine($"ListUser:{ListUser.Count}");
 
-        list.Add($"Host Count : {ListHost.Count()}");
+        list.Add($"Host Count : {ListHost.Count}");
         list.AddRange(ListHost);
         list.Add("\n");
-        LogFile.Instance.WriteLine($"ListHost:{ListHost.Count()}");
+        LogFile.Instance.WriteLine($"ListHost:{ListHost.Count}");
 
-        list.Add($"User@Host Count : {ListUserHost.Count()}");
+        list.Add($"User@Host Count : {ListUserHost.Count}");
         list.AddRange(ListUserHost);
         list.Add("\n");
-        LogFile.Instance.WriteLine($"ListUserHost:{ListUserHost.Count()}");
+        LogFile.Instance.WriteLine($"ListUserHost:{ListUserHost.Count}");
 
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
         LogFile.Instance.WriteLine($"Write:{path_}");
@@ -282,14 +287,14 @@ class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     /// <param name="path_"></param>
     /// <param name="classType_"></param>
-    public async Task WriteText(string path_, Type classType_)=> await _convertReportLog.WriteEventText(path_, classType_);
+    public async Task WriteText(string path_, Type classType_) => await _convertReportLog.WriteEventText(path_, classType_);
 
     /// <summary>
     /// 結合情報(Start Shutdown)のテキストファイル出力
     /// </summary>
     /// <param name="path_"></param>
     /// <returns></returns>
-    public async Task WriteJoinStartShutdownText(string path_)=> await _listStartShutdown.WriteJoinText(path_);
+    public async Task WriteJoinStartShutdownText(string path_) => await _listStartShutdown.WriteJoinText(path_);
 
     /// <summary>
     /// 結合情報(CheckOut CheckIn)のテキストファイル出力
@@ -297,7 +302,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="path_"></param>
     /// <returns></returns>
     public async Task WriteJoinCheckOutInText(string path_) => await _listCheckOutIn.WriteJoinText(path_);
-    
+
     /// <summary>
     /// 解析系のテキストファイル出力
     /// </summary>
@@ -318,7 +323,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     /// <param name="classType_"></param>
     /// <returns></returns>
-    public IEnumerable<List<string>> ListEventValue(Type classType_)=> _convertReportLog.ListEvent(classType_).Select(x => x.ListValue(classType_));
+    public IEnumerable<List<string>> ListEventValue(Type classType_) => _convertReportLog.ListEvent(classType_).Select(x => x.ListValue(classType_));
 
     /// <summary>
     /// 結合情報(Start Shutdown)のリスト化したデータ
@@ -344,7 +349,7 @@ class AnalysisManager : INotifyPropertyChanged
     /// <param name="classType_"></param>
     /// <param name="selected_"></param>
     /// <returns></returns>
-    public ListStringStringPair ListEventHeader(Type classType_, long selected_)=> _listAnalysis.Find(f_ => f_.GetType() == classType_)?.ListHeader(selected_) ?? new ();
+    public ListStringStringPair ListEventHeader(Type classType_, long selected_) => _listAnalysis.Find(f_ => f_.GetType() == classType_)?.ListHeader(selected_) ?? new();
 
 
     /// <summary>
@@ -357,7 +362,7 @@ class AnalysisManager : INotifyPropertyChanged
     {
         var find = _listAnalysis.Find(f_ => f_.GetType() == classType_);
 
-        return find?.ListValue(selected_) ?? default;
+        return find?.ListValue(selected_) ?? new List<List<string>>();
     }
 
     /// <summary>
@@ -407,7 +412,7 @@ class AnalysisManager : INotifyPropertyChanged
         plot_.Plot.Clear();
         _setPlotLabel(plot_, date_, group_);
 
-        long timeSpan =(date_==null) ? TimeSpan.TicksPerDay: 30 * TimeSpan.TicksPerMinute;
+        long timeSpan = (date_ == null) ? TimeSpan.TicksPerDay : 30 * TimeSpan.TicksPerMinute;
         // x 軸の値
         var listX = _listX(date_);
 
@@ -486,7 +491,7 @@ class AnalysisManager : INotifyPropertyChanged
                 break;
         }
 
-        title +=(date_==null) ? "" : $" [{date_.GetValueOrDefault().ToShortDateString()}]";
+        title += (date_ == null) ? "" : $" [{date_.GetValueOrDefault().ToShortDateString()}]";
         plot_.Plot.Title(title);
 
         plot_.Plot.XLabel(xlabel);

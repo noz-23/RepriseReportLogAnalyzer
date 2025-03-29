@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace RepriseReportLogAnalyzer.Windows;
 
-public delegate void ProgressCountDelegate(int count_, int max_, string str_ = "");
+public delegate void ProgressCountCallBack(int count, int max, string str = "");
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml

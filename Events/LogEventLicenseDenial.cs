@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// license denial
 /// </summary>
-[Sort(13)][Table("TbLicenseDenial")]
+[Sort(13)]
+[Table("TbLicenseDenial")]
 internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, ILogEventProduct, ILogEventWhy
 {
     /// <summary>
@@ -49,44 +50,44 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
         ProcessId = list_[9];
 
         EventDateTime = _GetDateTime(list_[10], list_[11]);
-        LogFormat = (list_[11].Contains(".") == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+        LogFormat = (list_[11].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
     //license denial
     //DENY product version user host “isv_def” count why last_attempt pid mm/dd hh:mm
     //DENY product version user host “isv_def” count why last_attempt pid mm/dd hh:mm:ss.tenths_of_msec
     //0    1       2       3    4     5          6     7   8            9   10    11
-    [Column("Product", Order =11)]
+    [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order =12)]
+    [Column("Version", Order = 12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order =13)]
+    [Column("Product Version", Order = 13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Isv Def", Order =101)]
+    [Column("Isv Def", Order = 101)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Count", Order =102)]
+    [Column("Count", Order = 102)]
     public int Count { get; private set; } = -1;
 
-    [Column("Why", Order =103)]
+    [Column("Why", Order = 103)]
     public StatusValue Why { get; private set; } = StatusValue.Success;
 
-    [Column("Last Attempt", Order =104)]
+    [Column("Last Attempt", Order = 104)]
     public string LastAttempt { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order =105)]
+    [Column("Process ID", Order = 105)]
     public string ProcessId { get; private set; } = string.Empty;
     //
 

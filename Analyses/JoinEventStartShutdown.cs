@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
 
@@ -18,7 +19,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 ///  重複情報
 /// </summary>
 [Table("TbJoinJoinEventStartShutdown")]
-internal sealed class JoinEventStartShutdown:ToDataBase
+internal sealed class JoinEventStartShutdown : ToDataBase
 {
     /// <summary>
     /// コンストラクタ
@@ -55,5 +56,6 @@ internal sealed class JoinEventStartShutdown:ToDataBase
     /// <summary>
     /// スキップ セット
     /// </summary>
-    public void SetSkip()=> IsSkip = (long)SelectData.ECLUSION;    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetSkip() => IsSkip = (long)SelectData.ECLUSION;
 }

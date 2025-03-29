@@ -33,6 +33,7 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// </summary>
     public ListAnalysisStartShutdown()
     {
+        ProgressCount = null;
     }
 
     public static ListStringLongPair ListSelect { get => _listSelect; }
@@ -46,7 +47,7 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    public ProgressCountDelegate? ProgressCount = null;
+    public ProgressCountCallBack? ProgressCount;
 
     /// <summary>
     /// 解析処理
@@ -63,10 +64,10 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
         foreach (var start in listStart)
         {
             // 同じ終了データが続いた場合、二つ目はスキップ(利用しない)
-            var shutdown = listShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber);
+            var shutdown = listShutdown.ToList().Find(down_ => down_.EventNumber > start.EventNumber) ?? new LogEventShutdown();
 
             var startShutdown = new AnalysisStartShutdown(start, shutdown);
-            this.Add(startShutdown);
+            Add(startShutdown);
             //
             if (listSkipNumber.Contains(start.EventNumber) == true)
             {
@@ -104,7 +105,7 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
         // ヘッダー
         list.Add(Header(skip_));
         // データ
-        list.AddRange(ListValue(skip_).Select(x_ => string.Join(",",x_)));
+        list.AddRange(ListValue(skip_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
     }
 
@@ -130,7 +131,7 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     public IEnumerable<List<string>> ListValue(long skip_)
     {
         var list = (skip_ == (long)(SelectData.ALL)) ? this : ListNoIncludeSkip();
-        return list.Select(x_ =>  x_.ListValue());
+        return list.Select(x_ => x_.ListValue());
     }
 
     /// <summary>
@@ -151,10 +152,10 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// 結合情報ヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
+    public static string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
     /// <summary>
     /// 結合情報データ項目
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<List<string>> ListJoinValue()=> this.Select(x_ => x_.JoinEvent().ListValue());
+    public IEnumerable<List<string>> ListJoinValue() => this.Select(x_ => x_.JoinEvent().ListValue());
 }

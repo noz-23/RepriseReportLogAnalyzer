@@ -27,7 +27,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// </summary>
 [Sort(2)]
 [Table("TbAnalysisCheckOutCheckIn")]
-[Description("Join Check-Out And Check-In"),Category("Analyses")]
+[Description("Join Check-Out And Check-In"), Category("Analyses")]
 internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IAnalysisOutputFile
 {
     /// <summary>
@@ -35,6 +35,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// </summary>
     public ListAnalysisCheckOutIn()
     {
+        ProgressCount = null;
     }
 
     /// <summary>
@@ -42,24 +43,24 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// </summary>
     /// <param name="list_">グループ集計</param>
     public ListAnalysisCheckOutIn(IEnumerable<AnalysisCheckOutIn> list_)
-    { 
+    {
         this.AddRange(list_);
     }
 
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    public ProgressCountDelegate? ProgressCount = null;
+    public ProgressCountCallBack? ProgressCount;
 
     /// <summary>
     /// 解析内容
     /// </summary>
-    private const string _ANALYSIS = "[CheckOut - CheckIn]";
+    private readonly string _ANALYSIS = "[CheckOut - CheckIn]";
 
     /// <summary>
     /// 重複検出用(product user@host)
     /// </summary>
-    private const string _KEY_PRODUCT_USER_HOST = "{0} {1}";
+    private readonly string _KEY_PRODUCT_USER_HOST = "{0} {1}";
 
     /// <summary>
     /// コンボボックスの項目
@@ -101,7 +102,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             var listCheckIn = new SortedList<long, LogEventCheckIn>(log_.ListEvent<LogEventCheckIn>(startShutdown).ToDictionary(x_ => x_.EventNumber));
             //
             LogFile.Instance.WriteLine($"{startShutdown.StartDateTime.ToString()} - {startShutdown.ShutdownDateTime.ToString()} : {listCheckOut.Count()}");
-            var listCheckOutIn=new List<AnalysisCheckOutIn>();
+            var listCheckOutIn = new List<AnalysisCheckOutIn>();
 
             int count = 0;
             int max = listCheckOut.Count();
@@ -126,7 +127,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             }
 
             // グループ分け
-            var divCheckOutIn =listCheckOutIn.GroupBy(x_=>string.Format(_KEY_PRODUCT_USER_HOST, x_.Product, x_.UserHost));
+            var divCheckOutIn = listCheckOutIn.GroupBy(x_ => string.Format(_KEY_PRODUCT_USER_HOST, x_.Product, x_.UserHost));
             // 重複のチェック
             _setDuplication(divCheckOutIn);
             // リストに追加
@@ -151,14 +152,14 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             var listValue = new SortedSet<AnalysisCheckOutIn>();
             listValue.AddRange(dataGroup_);
 
-            if (listValue.Any() == false)
+            if (listValue.Count <= 1)
             {
                 Interlocked.Increment(ref count);
                 return;
             }
             foreach (var data in listValue)
             {
-                if(listNoCheck.Contains(data) == true)
+                if (listNoCheck.Contains(data) == true)
                 {
                     continue;
                 }
@@ -167,7 +168,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
                 list.ToList().ForEach(x_ =>
                 {
                     x_.JoinEvent().SetDuplication();
-                    listNoCheck.Add(x_); 
+                    listNoCheck.Add(x_);
                 });
             }
             //
@@ -182,7 +183,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
                 // チェックアウト時間のみが範囲
                 var list = listValue.Where(x_ => data.IsWithInRange(x_.CheckOutNumber()) && (listNoCheck.Contains(x_) == false)).OrderBy(x_ => x_.CheckInNumber());
 
-                if (list.Any() ==true)
+                if (list.Any() == true)
                 {
                     // 時間(最後)を更新して追加
                     var renew = list.Last();
@@ -260,7 +261,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// 結合情報ヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public string JoinHeader() => ToDataBase.Header(typeof(JoinEventCheckOutIn));
+    public static string JoinHeader() => ToDataBase.Header(typeof(JoinEventCheckOutIn));
     /// <summary>
     /// 結合所法データ項目
     /// </summary>

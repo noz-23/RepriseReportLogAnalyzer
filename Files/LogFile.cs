@@ -15,7 +15,7 @@ namespace RepriseReportLogAnalyzer.Files;
 /// <summary>
 /// ログファイル
 /// </summary>
-class LogFile
+internal sealed class LogFile
 {
     /// <summary>
     /// シングルトン

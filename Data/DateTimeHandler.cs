@@ -41,7 +41,7 @@ internal sealed class DateTimeHandler : SqlMapper.TypeHandler<DateTimeOffset>
 
     public override void SetValue(IDbDataParameter parameter, DateTimeOffset value)
     {
-        DateTime paramVal = value.ToOffset(this.databaseTimeZone.BaseUtcOffset).DateTime;
+        DateTime paramVal = value.ToOffset(databaseTimeZone.BaseUtcOffset).DateTime;
         parameter.Value = paramVal;
     }
 }

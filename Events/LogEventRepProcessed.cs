@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// support for a product
 /// </summary>
-[Sort(72)][Table("TbRepProcessed")]
+[Sort(72)]
+[Table("TbRepProcessed")]
 internal sealed class LogEventRepProcessed : LogEventBase
 {
     /// <summary>
@@ -43,6 +44,6 @@ internal sealed class LogEventRepProcessed : LogEventBase
 
     //REPROCESSED with rlmanon vx.y
     //0           1    2       3
-    [Column("Version", Order =101)]
+    [Column("Version", Order = 101)]
     public string Version { get; private set; } = string.Empty;
 }

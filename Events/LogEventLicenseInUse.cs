@@ -25,7 +25,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// license in use
 /// </summary>
-[Sort(15)][Table("TbLicenseInUse")]
+[Sort(15)]
+[Table("TbLicenseInUse")]
 internal sealed class LogEventLicenseInUse : LogEventBase, ILogEventUserHost, ILogEventProduct
 {
     /// <summary>
@@ -56,40 +57,40 @@ internal sealed class LogEventLicenseInUse : LogEventBase, ILogEventUserHost, IL
     //license in use
     //INUSE product version pool# user host “isv_def” count server_handle share_handle process_id mm/dd hh:mm:ss
     //0     1       2       3     4    5     6          7     8             9            10         11    12
-    [Column("Product", Order =11)]
+    [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order =12)]
+    [Column("Version", Order = 12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order =13)]
+    [Column("Product Version", Order = 13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Pool", Order =101)]
+    [Column("Pool", Order = 101)]
     public string Pool { get; private set; } = string.Empty;
 
-    [Column("Isv Def", Order =102)]
+    [Column("Isv Def", Order = 102)]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Count", Order =103)]
+    [Column("Count", Order = 103)]
     public int Count { get; private set; } = -1;
 
-    [Column("Server Handle", Order =104)]
+    [Column("Server Handle", Order = 104)]
     public string HandleServer { get; private set; } = string.Empty;
 
-    [Column("Share Handle", Order =105)]
+    [Column("Share Handle", Order = 105)]
     public string HandleShare { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order =106)]
+    [Column("Process ID", Order = 106)]
     public string ProcessId { get; private set; } = string.Empty;
     //
 

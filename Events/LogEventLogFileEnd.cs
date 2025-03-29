@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file end
 /// </summary>
-[Sort(75)][Table("TbLogFileEnd")]
+[Sort(75)]
+[Table("TbLogFileEnd")]
 internal sealed class LogEventLogFileEnd : LogEventBase
 {
     /// <summary>

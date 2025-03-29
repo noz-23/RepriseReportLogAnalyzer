@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// Temporary license creation/removal
 /// </summary>
-[Sort(74)][Table("TbLicenseTemporary")]
+[Sort(74)]
+[Table("TbLicenseTemporary")]
 internal sealed class LogEventLicenseTemporary : LogEventBase, ILogEventUserHost, ILogEventProduct
 {
     /// <summary>
@@ -63,40 +64,40 @@ internal sealed class LogEventLicenseTemporary : LogEventBase, ILogEventUserHost
     //Temporary license creation/removal
     //TEMP[create | remove | restart | expired] product version license-pool user host “isv_def” expdate exptime server_handle mm/dd hh:mm:ss
     //0    1                                    2       3       4            5    6     7          8       9       10            11    12
-    [Column("Product", Order =11)]
+    [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order =12)]
+    [Column("Version", Order = 12)]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order =13)]
+    [Column("Product Version", Order = 13)]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
 
-    [Column("License Temporary", Order =10)]
+    [Column("License Temporary", Order = 10)]
     public LicenseTemporaryType LicenseTemporary { get; private set; } = LicenseTemporaryType.CREATE;
 
-    [Column("License Pool", Order =102)]
+    [Column("License Pool", Order = 102)]
     public string LicensePool { get; private set; } = string.Empty;
 
-    [Column("Isv Def", Order =103)]
+    [Column("Isv Def", Order = 103)]
     public string IsvDef { get; private set; } = string.Empty;
     //
-    [Column("Expired Date", Order =104)]
+    [Column("Expired Date", Order = 104)]
     public string ExpiredDate { get; private set; } = string.Empty;
 
-    [Column("Expired Time", Order =105)]
+    [Column("Expired Time", Order = 105)]
     public string ExpiredTime { get; private set; } = string.Empty;
 
-    [Column("Server Handle", Order =106)]
+    [Column("Server Handle", Order = 106)]
     public string HandleServer { get; private set; } = string.Empty;
     //
 }

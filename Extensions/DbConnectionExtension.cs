@@ -10,7 +10,6 @@ using Dapper;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
-using ScottPlot.MultiplotLayouts;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 
@@ -24,23 +23,23 @@ public static class DbConnectionExtension
     /// <summary>
     /// 単一/Summy テーブル
     /// </summary>
-    private const string _TABLE_SUMMY = "TbSummy";
+    private static readonly string _TABLE_SUMMY = "TbSummy";
 
     /// <summary>
     /// データベースにテーブル作成(単一/Summy)
     /// </summary>
     /// <param name="src_"></param>
     /// <param name="name_"></param>
-    public static void CreateTable(this DbConnection src_, string name_)
+    public static void CreateTable(this DbConnection src, string name)
     {
-        var table = _TABLE_SUMMY + name_;
-        string query = $"CREATE TABLE '{table}' ('{name_}' TEXT);";
+        var table = _TABLE_SUMMY + name;
+        string query = $"CREATE TABLE '{table}' ('{name}' TEXT);";
 
         LogFile.Instance.WriteLine($"[{query}]");
 
         try
         {
-            src_.Execute(query);
+            src.Execute(query);
         }
         catch (Exception ex_)
         {
@@ -54,15 +53,15 @@ public static class DbConnectionExtension
     /// <param name="src_"></param>
     /// <param name="classType_"></param>
     /// <param name="list_"></param>
-    public static void CreateTable(this DbConnection src_, Type classType_, ListStringStringPair ?list_ =null)
+    public static void CreateTable(this DbConnection src, Type classType, ListStringStringPair? list = null)
     {
-        list_ ??= ToDataBase.ListHeader(classType_);
+        list ??= ToDataBase.ListHeader(classType);
 
-        LogFile.Instance.WriteLine($"[{classType_.Name}] [{list_.Count()}]");
+        LogFile.Instance.WriteLine($"[{classType.Name}] [{list.Count}]");
 
         try
         {
-            src_.Execute(_createTabel(classType_, list_));
+            src.Execute(_createTabel(classType, list));
         }
         catch (Exception ex_)
         {
@@ -76,23 +75,23 @@ public static class DbConnectionExtension
     /// <param name="src_"></param>
     /// <param name="listValue_"></param>
     /// <param name="tran_"></param>
-    public static void Insert(this DbConnection src_, string name_, IEnumerable<string> listValue_)
+    public static void Insert(this DbConnection src, string name, IEnumerable<string> listValue)
     {
-        var table = _TABLE_SUMMY + name_;
-        var query = $"INSERT INTO '{table}' ('{name_}') VALUES('{string.Join("'),('", listValue_)}');";
+        var table = _TABLE_SUMMY + name;
+        var query = $"INSERT INTO '{table}' ('{name}') VALUES('{string.Join("'),('", listValue)}');";
 
         LogFile.Instance.WriteLine($"[{query}]");
 
-        if (listValue_.Any() == false)
+        if (listValue.Any() == false)
         {
             return;
         }
 
-        foreach (var lv in listValue_)
+        foreach (var lv in listValue)
         {
             try
             {
-                src_.Execute(query, null);
+                src.Execute(query, null);
             }
             catch (Exception ex_)
             {
@@ -109,20 +108,20 @@ public static class DbConnectionExtension
     /// <param name="header_"></param>
     /// <param name="listValue_"></param>
     /// <param name="tran_"></param>
-    public static void Insert(this DbConnection src_, Type classType_, string header_, IEnumerable<List<string>> listValue_, DbTransaction? tran_ = null)
+    public static void Insert(this DbConnection src, Type classType, string header, IEnumerable<List<string>> listValue, DbTransaction? tran = null)
     {
-        LogFile.Instance.WriteLine($"[{classType_.Name}] [{header_}] [{listValue_.Count()}]");
+        LogFile.Instance.WriteLine($"[{classType.Name}] [{header}] [{listValue.Count()}]");
 
-        if (listValue_.Any() == false)
+        if (listValue.Any() == false)
         {
             return;
         }
 
-        foreach (var lv in listValue_)
+        foreach (var lv in listValue)
         {
             try
             {
-                src_.Execute( _insert(classType_,header_, lv), null,tran_);
+                src.Execute(_insert(classType, header, lv), null, tran);
             }
             catch (Exception ex_)
             {
@@ -131,7 +130,7 @@ public static class DbConnectionExtension
         }
     }
 
-    private static string _tableName(Type classType_) =>classType_.GetAttribute<TableAttribute>()?.Name?? classType_.Name;
+    private static string _tableName(Type classType_) => classType_.GetAttribute<TableAttribute>()?.Name ?? classType_.Name;
 
     /// <summary>
     /// テーブル作成処理クエリ

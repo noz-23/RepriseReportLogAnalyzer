@@ -19,14 +19,14 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックインを結合
 /// </summary>
-internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
+internal sealed class AnalysisCheckOutIn : ToDataBase, IComparer, IComparable
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="checkOut_">チェックアウト イベント</param>
     /// <param name="checkIn_">チェックイン or シャットダウン イベント</param>
-    public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase? checkIn_)
+    public AnalysisCheckOutIn(LogEventCheckOut checkOut_, LogEventBase checkIn_)
     {
         _checkOut = checkOut_;
         _checkIn = checkIn_;
@@ -37,7 +37,7 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// <summary>
     /// チェックアウト時間
     /// </summary>
-    [Column("CheckOut Date Time", Order =101)]
+    [Column("CheckOut Date Time", Order = 101)]
     public DateTime CheckOutDateTime { get => _checkOut.EventDateTime; }
 
     /// <summary>
@@ -84,41 +84,36 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     public string UserHost { get => _checkOut.UserHost; }
 
     /// <summary>
-    /// チェックアウト イベント
-    /// </summary>
-    private readonly LogEventCheckOut _checkOut;
-    /// <summary>
-    /// チェックイン(シャットダウン) イベント
-    /// </summary>
-    private readonly LogEventBase? _checkIn = null;
-    /// <summary>
-    /// 結合情報
-    /// </summary>
-    private readonly JoinEventCheckOutIn _joinEvent;
-
-    /// <summary>
     /// チェックアウト イベント(リフレクションで呼び出さないため関数化)
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogEventCheckOut CheckOut() => _checkOut;
+    private readonly LogEventCheckOut _checkOut;
 
     /// <summary>
     /// チェックイン イベント(リフレクションで呼び出さないため関数化)
     /// </summary>
-    public LogEventBase? CheckIn() => _checkIn;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public LogEventBase CheckIn() => _checkIn;
+    private readonly LogEventBase _checkIn;
 
     /// <summary>
     /// 結合情報(リフレクションで呼び出さないため関数化)
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public JoinEventCheckOutIn JoinEvent() => _joinEvent;
+    private readonly JoinEventCheckOutIn _joinEvent;
 
     /// <summary>
     /// チェックアウトのイベント番号
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public long CheckOutNumber() => _checkOut.EventNumber;
 
     /// <summary>
     /// チェックインのイベント番号
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public long CheckInNumber() => _checkIn?.EventNumber ?? LogEventBase.NowEventNumber;
 
     /// <summary>
@@ -126,28 +121,32 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// </summary>
     /// <param name="number_">イベント番号</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsWithInRange(long number_)=> (number_ > CheckOutNumber()) && (number_ < CheckInNumber());
+    public bool IsWithInRange(long number_) => (number_ > CheckOutNumber()) && (number_ < CheckInNumber());
 
     /// <summary>
     /// チェックアウトとチェックインの間のイベントか？
     /// </summary>
     /// <param name="dateTime_">イベント時間</param>
-    public bool IsWithInRange(DateTime dateTime_)=> (dateTime_ > CheckOutDateTime) && (dateTime_ < CheckInDateTime);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsWithInRange(DateTime dateTime_) => (dateTime_ > CheckOutDateTime) && (dateTime_ < CheckInDateTime);
 
     /// <summary>
     /// 重複を取り除いたチェックインの時間
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public DateTime JointDateTime() => _joinEvent.CheckIn()?.EventDateTime ?? LogEventBase.NowDateTime;
 
     /// <summary>
     /// 重複を取り除いた利用時間
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TimeSpan DurationDuplication() => (JointDateTime() - CheckOutDateTime);
 
     /// <summary>
     /// グループ集計する名称
     /// </summary>
     /// <param name="group_"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GroupName(AnalysisGroup group_)
     {
         switch (group_)
@@ -172,7 +171,7 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// リスト化したヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public static ListStringStringPair ListHeader()=> ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
+    public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
 
     /// <summary>
     /// リスト化したデータ(重複除去)
@@ -180,7 +179,7 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// <returns></returns>
     public List<string> ListDuplicationValue()
     {
-        return new () 
+        return new()
         {
             $"{CheckOutDateTime.ToString()}",
             $"{JointDateTime().ToString()}",
@@ -200,12 +199,12 @@ internal sealed class AnalysisCheckOutIn: ToDataBase, IComparer, IComparable
     /// <param name="a_"></param>
     /// <param name="b_"></param>
     /// <returns></returns>
-    public int Compare(object? a_, object? b_)=> (a_ is AnalysisCheckOutIn a) ? a.CompareTo(b_) : -1;
+    public int Compare(object? a_, object? b_) => (a_ is AnalysisCheckOutIn a) ? a.CompareTo(b_) : -1;
 
     /// <summary>
     /// 比較処理
     /// </summary>
     /// <param name="b_"></param>
     /// <returns></returns>
-    public int CompareTo(object? b_) => (b_ is AnalysisCheckOutIn b) ? (int)(this.CheckOutNumber() - b.CheckOutNumber()) : -1;
+    public int CompareTo(object? b_) => (b_ is AnalysisCheckOutIn b) ? (int)(CheckOutNumber() - b.CheckOutNumber()) : -1;
 }

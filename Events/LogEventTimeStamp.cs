@@ -17,7 +17,8 @@ namespace RepriseReportLogAnalyzer.Events;
 /// <summary>
 /// periodic timestamp
 /// </summary>
-[Sort(99)][Table("TbTimeStamp")]
+[Sort(99)]
+[Table("TbTimeStamp")]
 internal sealed class LogEventTimeStamp : LogEventBase, ILicenseCount
 {
     /// <summary>

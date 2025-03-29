@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// meter decrement
 /// </summary>
-[Sort(73)][Table("TbMeterDecrement")]
+[Sort(73)]
+[Table("TbMeterDecrement")]
 internal sealed class LogEventMeterDecrement : LogEventBase
 {
     /// <summary>
@@ -46,13 +47,13 @@ internal sealed class LogEventMeterDecrement : LogEventBase
     //meter decrement
     //METER_DEC license_handle meter_counter amount_decremented mm/dd hh:mm:ss[.tenths_of_msec]
     //0         1              2             3                  4     5
-    [Column("License Handle", Order =101)]
+    [Column("License Handle", Order = 101)]
     public string HandleLicense { get; private set; } = string.Empty;
 
-    [Column("Meter Counter", Order =102)]
+    [Column("Meter Counter", Order = 102)]
     public string CounterMeter { get; private set; } = string.Empty;
 
-    [Column("Amount Decremented", Order =103)]
+    [Column("Amount Decremented", Order = 103)]
     public string AmountDecremented { get; private set; } = string.Empty;
 
 }

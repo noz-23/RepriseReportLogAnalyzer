@@ -11,13 +11,18 @@ namespace RepriseReportLogAnalyzer.Views;
 /// <summary>
 /// カウント系の表示
 /// </summary>
-internal class LicenseView :BaseView
+internal sealed class LicenseView : BaseView
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public LicenseView()
+    public LicenseView() : base()
     {
+        _isChecked = true;
+        _name = string.Empty;
+        _count = 0;
+        _have = 0;
+        _duration = TimeSpan.Zero;
     }
 
     /// <summary>
@@ -28,7 +33,7 @@ internal class LicenseView :BaseView
         get => _isChecked;
         set => _SetValue(ref _isChecked, value);
     }
-    private bool _isChecked = true;
+    private bool _isChecked;
 
     /// <summary>
     /// メインの名称
@@ -38,7 +43,7 @@ internal class LicenseView :BaseView
         get => _name;
         set => _SetValue(ref _name, value);
     }
-    public string _name = string.Empty;
+    public string _name;
 
     /// <summary>
     /// カウント
@@ -48,7 +53,7 @@ internal class LicenseView :BaseView
         get => _count;
         set => _SetValue(ref _count, value);
     }
-    public int _count = 0;
+    public int _count;
 
     /// <summary>
     /// 最大値
@@ -58,7 +63,7 @@ internal class LicenseView :BaseView
         get => _have;
         set => _SetValue(ref _have, value);
     }
-    public int _have = 0;
+    public int _have;
 
     /// <summary>
     /// 期間
@@ -68,6 +73,6 @@ internal class LicenseView :BaseView
         get => _duration;
         set => _SetValue(ref _duration, value);
     }
-    public TimeSpan _duration = TimeSpan.Zero;
+    public TimeSpan _duration;
 
 }

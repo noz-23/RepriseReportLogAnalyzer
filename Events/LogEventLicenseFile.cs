@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// log file start
 /// </summary>
-[Sort(31)][Table("TbLicenseFile")]
+[Sort(31)]
+[Table("TbLicenseFile")]
 internal sealed class LogEventLicenseFile : LogEventBase
 {
     /// <summary>
@@ -43,6 +44,6 @@ internal sealed class LogEventLicenseFile : LogEventBase
 
     //LICENSE FILE filename
     //0       1    2
-    [Column("FileName", Order =101)]
+    [Column("FileName", Order = 101)]
     public string FileName { get; private set; } = string.Empty;
 }

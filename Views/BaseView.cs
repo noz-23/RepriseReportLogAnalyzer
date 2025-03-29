@@ -16,12 +16,19 @@ namespace RepriseReportLogAnalyzer.Views
     /// </summary>
     public class BaseView : INotifyPropertyChanged
     {
+        public BaseView()
+        {
+            PropertyChanged = null;
+            SuspendedPropertyChanged = false;
+        }
+
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// プロパティの変更通知を一時無効化
         /// </summary>
-        public bool SuspendedPropertyChanged { get; set; } = false;
+        public bool SuspendedPropertyChanged { get; set; }
         /// <summary>
         /// プロパティの変更を通知する
         /// </summary>

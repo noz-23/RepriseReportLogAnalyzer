@@ -19,7 +19,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// 重複情報
 /// </summary>
 [Table("TbJoinEventCheckOutIn")]
-internal sealed class JoinEventCheckOutIn:ToDataBase
+internal sealed class JoinEventCheckOutIn : ToDataBase
 {
     /// <summary>
     /// コンストラクタ
@@ -70,8 +70,9 @@ internal sealed class JoinEventCheckOutIn:ToDataBase
     /// <summary>
     /// 重複取り除いた場合のイベント
     /// </summary>
-    private LogEventBase _checkIn;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogEventBase CheckIn() => _checkIn;
+    private LogEventBase _checkIn;
 
     /// <summary>
     /// 

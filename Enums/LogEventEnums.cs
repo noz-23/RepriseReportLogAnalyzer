@@ -10,9 +10,12 @@ using System.ComponentModel;
 
 namespace RepriseReportLogAnalyzer.Enums;
 
-internal enum SelectData:long
-{ 
-    ECLUSION =-1,
+internal enum SelectData : long
+{
+    [Description("There is some kind of Exclusion")]
+    ECLUSION = -1,
+
+    [Description("There are All without exclusions")]
     ALL = 0,
 }
 
@@ -30,9 +33,16 @@ internal enum AnalysisGroup
 
 internal enum LogFormat
 {
+    [Description("No difference in format")]
     NONE,
+
+    [Description("Small Format")]
     SMALL,
+
+    [Description("Standard Format")]
     STANDARD,
+
+    [Description("Detailed Format")]
     DETAILED
 }
 

@@ -13,7 +13,7 @@ namespace RepriseReportLogAnalyzer.Views;
 /// <summary>
 /// 出力系の表示
 /// </summary>
-public class OutputView:BaseView
+sealed public class OutputView : BaseView
 {
 
     /// <summary>
@@ -22,15 +22,25 @@ public class OutputView:BaseView
     /// <param name="type_"></param>
     /// <param name="name_"></param>
     /// <param name="list_"></param>
-    public OutputView(Type type_, string name_="", ListStringLongPair? list_=null)
+    public OutputView(Type? type_, string name_ = "", ListStringLongPair? list_ = null) : this()
     {
-        Name =(string.IsNullOrEmpty(name_)==true) ? type_.Name:name_;
-        ClassType=type_;
+        Name = (string.IsNullOrEmpty(name_) == true) ? type_?.Name ?? string.Empty : name_;
+        ClassType = type_;
 
         list_?.ToList().ForEach(x_ => ListSelect.Add(x_));
 
         _NotifyPropertyChanged("SelectedIndex");
     }
+
+    public OutputView() : base()
+    {
+        _isChecked = false;
+        _name = string.Empty;
+        _selectedIndex = -1;
+        _selectedValue = -1;
+        ClassType = null;
+    }
+
 
     /// <summary>
     /// チェック状態
@@ -40,7 +50,7 @@ public class OutputView:BaseView
         get => _isChecked;
         set => _SetValue(ref _isChecked, value);
     }
-    private bool _isChecked = false;
+    private bool _isChecked;
 
     /// <summary>
     /// 基本の表示
@@ -50,7 +60,7 @@ public class OutputView:BaseView
         get => _name;
         set => _SetValue(ref _name, value);
     }
-    public string _name = string.Empty;
+    private string _name;
 
     /// <summary>
     /// コンボボックスの位置
@@ -60,7 +70,7 @@ public class OutputView:BaseView
         get => _selectedIndex;
         set => _SetValue(ref _selectedIndex, value);
     }
-    private int _selectedIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>
     /// コンボボックスの値
@@ -75,7 +85,7 @@ public class OutputView:BaseView
     /// <summary>
     /// クラスタイプ
     /// </summary>
-    public Type ClassType { get; private set; }
+    public Type? ClassType { get; private set; }
 
     /// <summary>
     /// コンボボックス表示内容

@@ -29,6 +29,7 @@
             Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
             AutoGenerateColumns="False"
             AllowDrop="True"
+            SelectionMode="Single"
             HeadersVisibility="None"
             MouseDown="_mouseDown"
             MouseMove="_mouseMove"

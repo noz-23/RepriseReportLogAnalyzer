@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// Authentication data
 /// </summary>
-[Sort(70)][Table("TbAuthentication")]
+[Sort(70)]
+[Table("TbAuthentication")]
 internal sealed class LogEventAuthentication : LogEventBase
 {
     /// <summary>
@@ -44,9 +45,9 @@ internal sealed class LogEventAuthentication : LogEventBase
 
     //AUTH section signature
     //0    1       2
-    [Column("Section",Order =101)]
+    [Column("Section", Order = 101)]
     public string Section { get; private set; } = string.Empty;
 
-    [Column("Signature", Order =102)]
+    [Column("Signature", Order = 102)]
     public string Signature { get; private set; } = string.Empty;
 }

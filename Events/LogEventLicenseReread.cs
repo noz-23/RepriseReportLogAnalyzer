@@ -24,7 +24,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// server reread of license/option file
 /// </summary>
-[Sort(32)][Table("TbLicenseReread")]
+[Sort(32)]
+[Table("TbLicenseReread")]
 internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
 {
     /// <summary>
@@ -47,13 +48,13 @@ internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
     //REREAD user host mm/dd hh:mm:ss
     //0      1    2    3     4
     //
-    [Column("User", Order =21)]
+    [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order =22)]
+    [Column("Host", Order = 22)]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order =23)]
+    [Column("User@Host", Order = 23)]
     public string UserHost { get => User + "@" + Host; }
     //
 }

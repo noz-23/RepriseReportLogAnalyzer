@@ -31,7 +31,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
     public ListAnalysisLicenseUser() : base(AnalysisGroup.USER)
-    { 
+    {
     }
 
     /// <summary>
@@ -93,22 +93,23 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     public ListAnalysisLicenseGroup(AnalysisGroup group_)
     {
         _group = group_;
+        ProgressCount = null;
     }
 
     /// <summary>
     /// プロット表示数
     /// </summary>
-    public const int TOP_PLOT_USE =25;
+    public const int TOP_PLOT_USE = 25;
 
     /// <summary>
     /// プロット用の文字列
     /// </summary>
-    private const string _GROUP_FORMAT = "{0:D2}.{1}";
+    private readonly string _GROUP_FORMAT = "{0:D2}.{1}";
 
     /// <summary>
     /// 解析内容
     /// </summary>
-    private const string _ANALYSIS = "[License Group Duration]";
+    private readonly string _ANALYSIS = "[License Group Duration]";
 
     protected static ListStringLongPair _ListSelect { get => liistSelect; }
     private static ListStringLongPair liistSelect = new()
@@ -121,7 +122,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    public ProgressCountDelegate? ProgressCount = null;
+    public ProgressCountCallBack? ProgressCount;
 
     /// <summary>
     /// グループ内容
@@ -136,7 +137,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <summary>
     /// 対応するグループリスト
     /// </summary>
-    private SortedSet<string> _listGroup =new();
+    private SortedSet<string> _listGroup = new();
 
     /// <summary>
     /// 解析
@@ -150,7 +151,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         }
 
         // プロダクトのコピー
-        _listProduct.UnionWith(listCheckOutIn_.Select(x_=>x_.Product));
+        _listProduct.UnionWith(listCheckOutIn_.Select(x_ => x_.Product));
         // グループのコピー
         _listGroup.UnionWith(listCheckOutIn_.Select(x_ => x_.GroupName(_group)));
 
@@ -167,12 +168,12 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         ProgressCount?.Invoke(0, max, _ANALYSIS + _group.Description());
         foreach (var group in listGroup)
         {
-            this[group.Key] = new (group);
+            this[group.Key] = new(group);
             ProgressCount?.Invoke(++count, max);
         }
     }
 
-     /// <summary>
+    /// <summary>
     /// リスト表示するグループ情報
     /// </summary>
     /// <param name="date_">指定日付(null:一覧)</param>
@@ -184,7 +185,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
 
         var flg = (date_ == null);
 
-        foreach (var group in this.Keys)
+        foreach (var group in Keys)
         {
             var list = this[group]?.Where(x_ => ((x_.CheckOut().EventDate() == date_) && AnalysisManager.Instance.IsProductChecked(x_.Product) == true) || flg);
 
@@ -199,6 +200,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
                 rtn.Add(view);
             }
         }
+        await Task.Delay(0);
 
         return rtn.OrderByDescending(x_ => x_.Duration).ToList();
     }
@@ -218,8 +220,8 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         int count = 1;
         foreach (var group in listGroup)
         {
-            
-            rtn[string.Format(_GROUP_FORMAT,count, group)] = new();
+
+            rtn[string.Format(_GROUP_FORMAT, count, group)] = new();
             count++;
         }
         foreach (var time in listX_)
@@ -227,12 +229,13 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
             count = 1;
             foreach (var group in listGroup)
             {
-                var list =( timeSpan_ != TimeSpan.TicksPerDay) ?this[group].Where(x_=>x_.IsWithInRange(time)==true): this[group].Where(x_ => (x_.CheckOut().EventDate() == time));
-                rtn[string.Format(_GROUP_FORMAT, count, group)].Add((list.Count() == 0) ? double.NaN : count);
+                var list = (timeSpan_ != TimeSpan.TicksPerDay) ? this[group].Where(x_ => x_.IsWithInRange(time) == true) : this[group].Where(x_ => (x_.CheckOut().EventDate() == time));
+                rtn[string.Format(_GROUP_FORMAT, count, group)].Add((list.Any() == false) ? double.NaN : count);
 
                 count++;
             }
         }
+        await Task.Delay(0);
 
         return rtn;
     }
@@ -248,7 +251,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         // ヘッダー
         list.Add(Header(product_));
         // データ
-        list.AddRange(ListValue(product_).Select(x_=>string.Join(",",x_)));
+        list.AddRange(ListValue(product_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
 
         LogFile.Instance.WriteLine($"Write:{path_}");
@@ -257,14 +260,14 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <summary>
     /// ヘッダー
     /// </summary>
-    public string Header(long product_) => "'"+string.Join("','", ListHeader(product_).Select(x_ => x_.Key))+"'";
+    public string Header(long product_) => "'" + string.Join("','", ListHeader(product_).Select(x_ => x_.Key)) + "'";
 
     /// <summary>
     /// リスト化したヘッダー
     /// </summary>
     /// <param name="product_"></param>
     /// <returns></returns>
-    
+
     public ListStringStringPair ListHeader(long product_)
     {
         var rtn = new ListStringStringPair();

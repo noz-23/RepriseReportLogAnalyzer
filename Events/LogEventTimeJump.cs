@@ -23,7 +23,8 @@ internal sealed partial class LogEventRegist
 /// <summary>
 /// server time jump
 /// </summary>
-[Sort(97)][Table("TbTimeJump")]
+[Sort(97)]
+[Table("TbTimeJump")]
 internal sealed class LogEventTimeJump : LogEventBase
 {
     /// <summary>
@@ -43,6 +44,6 @@ internal sealed class LogEventTimeJump : LogEventBase
     //server time jump
     //TIMEJUMP[+ | -]minutes mm/dd hh:mm:ss
     //0        1             2     3
-    [Column("Minutes", Order =101)]
+    [Column("Minutes", Order = 101)]
     public string Minutes { get; private set; } = string.Empty;
 }

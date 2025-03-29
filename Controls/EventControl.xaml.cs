@@ -29,8 +29,11 @@ public partial class EventControl : UserControl
         _init();
     }
 
-    private const string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
+    private readonly string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
 
+    /// <summary>
+    /// 初期化
+    /// </summary>
     private void _init()
     {
         _comboBox.Items.Add(new OutputView(null, "NONE"));
@@ -40,7 +43,7 @@ public partial class EventControl : UserControl
         var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass && t_.Namespace == _NAME_SPACE_EVENT).Distinct().OrderBy(t_ => t_.GetAttribute<SortAttribute>()?.Sort);
         foreach (var t in tyepInNamespace)
         {
-            if (t.GetInterfaces().Where(t_ => t_.Name == typeof(ILogEventWhy).Name).Count() > 0)
+            if (t.GetInterfaces().Where(t_ => t_.Name == typeof(ILogEventWhy).Name).Any() == true)
             {
                 _comboBox.Items.Add(new OutputView(t));
                 LogFile.Instance.WriteLine($"{t.Name}");
@@ -63,7 +66,7 @@ public partial class EventControl : UserControl
             }
             _dataGrid.ItemsSource = null;
 
-            var listEvent =AnalysisManager.Instance.ListEvent(selected.ClassType);
+            var listEvent = AnalysisManager.Instance.ListEvent(selected.ClassType);
             _dataGrid.ItemsSource = listEvent;
 
             LogFile.Instance.WriteLine($"{listEvent.Count()}");
