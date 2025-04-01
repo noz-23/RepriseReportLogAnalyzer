@@ -12,9 +12,10 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <!-- グローバリゼーション インバリアント モード設定 -->
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <InvariantGlobalization>false</InvariantGlobalization>
     <PredefinedCulturesOnly>false</PredefinedCulturesOnly>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <NeutralLanguage>ja-JP</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="icon.ico" />

@@ -1,6 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RepriseReportLogAnalyzer.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FORMAT_DATE_TIME" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">yyyy/MM/dd hh:mm:ss</Value>
+    </Setting>
+    <Setting Name="FORMAT_TIME_SPAN" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">d\.hh\:mm\:ss</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

@@ -184,26 +184,13 @@ internal sealed class ConvertReportLog
     {
         public bool Equals(ILogEventProduct? a_, ILogEventProduct? b_)
         {
-            if (a_ == null)
-            {
-                return false;
-            }
-            if (b_ == null)
+            if (a_ == null || b_ == null)
             {
                 return false;
             }
 
-            if (a_.Product != b_.Product)
-            {
-                return false;
-            }
-            if (a_.Version != b_.Version)
-            {
-                return false;
-            }
-
-            return true;
+            return (a_.Product == b_.Product) && (a_.Version == b_.Version);
         }
-        public int GetHashCode(ILogEventProduct codeh_) => codeh_.Product.GetHashCode() ^ codeh_.Version.GetHashCode();
+        public int GetHashCode(ILogEventProduct codeh_) =>HashCode.Combine(codeh_.Product,codeh_.Version);
     }
 }

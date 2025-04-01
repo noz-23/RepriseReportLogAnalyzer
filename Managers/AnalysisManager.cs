@@ -43,6 +43,7 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         _listAnalysis.Add(_listUserHostDuration);
         _runStartTime = null;
         _runEndTime = null;
+        _progressCount = null;
     }
 
     public void Create()
@@ -106,7 +107,7 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// プログレスバー 解析処理 更新デリゲート
     /// </summary>
-    //private ProgressCountDelegate? _progressCount = null;
+    private ProgressCountCallBack? _progressCount;
     //
     // _convertReportLog があるが確実にデータがはいっているタイミングで更新する
     public SortedSet<string> ListProduct { get; private set; } = new();
@@ -132,7 +133,7 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     /// <param name="progressCount_"></param>
     public void SetProgressCount(ProgressCountCallBack progressCount_)
     {
-        //_progressCount = progressCount_;
+        _progressCount = progressCount_;
         _convertReportLog.ProgressCount = progressCount_;
         _listStartShutdown.ProgressCount = progressCount_;
         _listCheckOutIn.ProgressCount = progressCount_;
@@ -186,6 +187,9 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         await _analysis(); // 解析
 
         _runEndTime = DateTime.Now;
+
+
+        _progressCount?.Invoke(0, 0, $"Analysis End");
     }
 
     /// <summary>
@@ -328,12 +332,12 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     /// <summary>
     /// 結合情報(Start Shutdown)のリスト化したデータ
     /// </summary>
-    public IEnumerable<List<string>> ListJoinStartShutdownValeu() => _listStartShutdown.ListJoinValue();
+    public IEnumerable<List<string>> ListJoinStartShutdownValue() => _listStartShutdown.ListJoinValue();
 
     /// <summary>
     /// 結合情報(CheckOut CheckIn)のリスト化したデータ
     /// </summary>
-    public IEnumerable<List<string>> ListJoinCheckOutInValeu() => _listCheckOutIn.ListJoinValue();
+    public IEnumerable<List<string>> ListJoinCheckOutInValue() => _listCheckOutIn.ListJoinValue();
 
     /// <summary>
     /// 解析系のヘッダー

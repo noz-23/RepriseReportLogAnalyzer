@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -43,9 +44,8 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
         Host = list_[4];
         IsvDef = list_[5];
         //
-        Count = int.Parse(list_[6]);
-        //Why = int.Parse(list_[7]);
-        Why = (StatusValue)int.Parse(list_[7]);
+        Count = int.Parse(list_[6], CultureInfo.InvariantCulture);
+        Why = (StatusValue)int.Parse(list_[7], CultureInfo.InvariantCulture);
         LastAttempt = list_[8];
         ProcessId = list_[9];
 

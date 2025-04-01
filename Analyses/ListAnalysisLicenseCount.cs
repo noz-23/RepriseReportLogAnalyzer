@@ -16,6 +16,7 @@ using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -330,9 +331,9 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
                 var haveMax = listTime?.Select(x_ => x_.ListCount[product].ServerHave).Max() ?? 0;
                 var outInMax = listTime?.Select(x_ => x_.ListCount[product].CheckOutInCurrent).Max() ?? 0;
 
-                list.Add(countMax.ToString());
-                list.Add(haveMax.ToString());
-                //add.Add(outInMax.ToString());
+                list.Add(countMax.ToString(CultureInfo.InvariantCulture));
+                list.Add(haveMax.ToString(CultureInfo.InvariantCulture));
+                //add.Add(outInMax.ToString(CultureInfo.InvariantCulture));
             }
             rtn.Add(list);
         }

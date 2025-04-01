@@ -12,6 +12,7 @@ using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Analyses;
@@ -181,9 +182,9 @@ internal sealed class AnalysisCheckOutIn : ToDataBase, IComparer, IComparable
     {
         return new()
         {
-            $"{CheckOutDateTime.ToString()}",
-            $"{JointDateTime().ToString()}",
-            $"{DurationDuplication().ToString(@"d\.hh\:mm\:ss")}",
+            $"{CheckOutDateTime.ToString(Properties.Settings.Default.FORMAT_DATE_TIME, CultureInfo.InvariantCulture)}",
+            $"{JointDateTime().ToString(Properties.Settings.Default.FORMAT_DATE_TIME, CultureInfo.InvariantCulture)}",
+            $"{DurationDuplication().ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture)}",
             $"{Product}",
             $"{Version}",
             $"{ProductVersion}",

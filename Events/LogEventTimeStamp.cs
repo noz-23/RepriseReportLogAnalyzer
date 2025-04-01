@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -30,7 +31,7 @@ internal sealed class LogEventTimeStamp : LogEventBase, ILicenseCount
         // small
         // std
         // detailed
-        EventDateTime = DateTime.Parse(list_[0] + " " + list_[1]);
+        EventDateTime = DateTime.Parse(list_[0] + " " + list_[1], CultureInfo.InvariantCulture);
         LogFormat = LogFormat.NONE;
     }
 

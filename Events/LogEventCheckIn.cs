@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -38,42 +39,49 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
         //if (list_.Count() < 4)
         if (list_.Length < 4)
         {
-            // small
-            //Why = int.Parse(list_[1]);
-            Why = (StatusValue)int.Parse(list_[1]);
-            Count = int.Parse(list_[2]);
-            HandleServer = list_[3];
-            //HandleServerNum = Convert.ToInt32(HandleServer, 16);
-
-            //
-            EventDateTime = DateTime.Parse(_NowDate + " " + list_[4]);
-            LogFormat = LogFormat.SMALL;
-
-        }
-        else
+            _initSmall(list_);
+        }else
         {
-            // std
-            // detailed
-            //Why = int.Parse(list_[1]);
-            Why = (StatusValue)int.Parse(list_[1]);
-            Product = list_[2];
-            Version = list_[3];
-            User = list_[4];
-            Host = list_[5];
-            IsvDef = list_[6];
-            //
-            Count = int.Parse(list_[7]);
-            CountCurrent = int.Parse(list_[8]);
-            ResuseCurrent = int.Parse(list_[9]);
-            //
-            HandleServer = list_[10];
-            //
-            EventDateTime = _GetDateTime(list_[11], list_[12]);
-
-            LogFormat = (list_[12].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+            _initStandardDetail(list_);
         }
 
         _checkOut = null;
+    }
+    private void _initSmall(string[] list_)
+    {
+        // small
+        //Why = int.Parse(list_[1]);
+        Why = (StatusValue)int.Parse(list_[1], CultureInfo.InvariantCulture);
+        Count = int.Parse(list_[2], CultureInfo.InvariantCulture);
+        HandleServer = list_[3];
+        //HandleServerNum = Convert.ToInt32(HandleServer, 16);
+
+        //
+        EventDateTime = DateTime.Parse(_NowDate + " " + list_[4], CultureInfo.InvariantCulture);
+        LogFormat = LogFormat.SMALL;
+    }
+
+    private void _initStandardDetail(string[] list_)
+    {
+        // std
+        // detailed
+        //Why = int.Parse(list_[1]);
+        Why = (StatusValue)int.Parse(list_[1], CultureInfo.InvariantCulture);
+        Product = list_[2];
+        Version = list_[3];
+        User = list_[4];
+        Host = list_[5];
+        IsvDef = list_[6];
+        //
+        Count = int.Parse(list_[7], CultureInfo.InvariantCulture);
+        CountCurrent = int.Parse(list_[8], CultureInfo.InvariantCulture);
+        ResuseCurrent = int.Parse(list_[9], CultureInfo.InvariantCulture);
+        //
+        HandleServer = list_[10];
+        //
+        EventDateTime = _GetDateTime(list_[11], list_[12]);
+
+        LogFormat = (list_[12].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
 

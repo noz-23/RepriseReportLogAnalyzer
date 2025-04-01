@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Windows;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -72,21 +73,11 @@ public partial class AnalysisControl : UserControl
         _buttonAnalysis.IsEnabled = false;
         _startDateTime = DateTime.Now;
 
-        if (_dataGrid.Items.Count == 0)
-        {
-            return;
-        }
-
-        var list = new List<string>();
-        foreach (string path_ in _dataGrid.Items)
-        {
-            list.Add(path_);
-        }
         LogFile.Instance.WriteLine($"Analysis Start");
 
         var win = new WaitWindow()
         {
-            Run = async () => await AnalysisManager.Instance.Analysis(list),
+            Run = async () => await AnalysisManager.Instance.Analysis(_dataGirdItems()),
             Owner = Application.Current.MainWindow
         };
         win.ShowDialog();
@@ -96,9 +87,21 @@ public partial class AnalysisControl : UserControl
         if (App.Current.MainWindow is MainWindow mainWindow)
         {
             await mainWindow._resultControl.SetDate();
-            _textLabel.Text = $"Runing [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]".Trim();
         }
         LogFile.Instance.WriteLine($"Analysis End");
+    }
+
+    private List<string> _dataGirdItems()
+    {
+        var rtn = new List<string>();
+        if (_dataGrid.Items.Count > 0)
+        {
+            foreach (string path_ in _dataGrid.Items)
+            {
+                rtn.Add(path_);
+            }
+        }
+        return rtn;
     }
 
     /// <summary>
@@ -132,7 +135,7 @@ public partial class AnalysisControl : UserControl
             }
 
             StringBuilder str = new StringBuilder("Runing ");
-            str.Append($"{_resultTitle} [{(DateTime.Now - _startDateTime):hh\\:mm\\:ss}]");
+            str.Append($"{_resultTitle} [{(DateTime.Now - _startDateTime).ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture)}]");
             _textLabel.Text = str.ToString();
 
             _progressBar.Value = count_;
@@ -165,15 +168,9 @@ public partial class AnalysisControl : UserControl
     {
         var nowPoint = e_.GetPosition(null);
 
-        if (e_.LeftButton == MouseButtonState.Released == true)
-        {
-            return;
-        }
-        if (Math.Abs(nowPoint.X - _startPoint.X) < SystemParameters.MinimumHorizontalDragDistance)
-        {
-            return;
-        }
-        if (Math.Abs(nowPoint.Y - _startPoint.Y) < SystemParameters.MinimumVerticalDragDistance)
+        if ( e_.LeftButton == MouseButtonState.Released == true
+          || Math.Abs(nowPoint.X - _startPoint.X) < SystemParameters.MinimumHorizontalDragDistance
+          || Math.Abs(nowPoint.Y - _startPoint.Y) < SystemParameters.MinimumVerticalDragDistance)
         {
             return;
         }
@@ -201,7 +198,8 @@ public partial class AnalysisControl : UserControl
             var hit = VisualTreeHelper.HitTest(_dataGrid, dropPositon);
             if (hit.VisualHit.GetParentOfType<ItemsControl>() is ItemsControl dropItem)
             {
-                var str = (_dataGrid.Items.Count > 0) ? _dataGrid.Items[_dataGrid.Items.Count - 1].ToString() : string.Empty;
+                // 最終行の文字列
+                var str = _dataGridLasItem();
 
                 // ドロップ先のViewを取得
                 var dropView = (dropItem.DataContext as string) ?? str;
@@ -227,5 +225,7 @@ public partial class AnalysisControl : UserControl
             }
         }
     }
+
+    private string _dataGridLasItem()=> (_dataGrid.Items.Count > 0) ? _dataGrid.Items[_dataGrid.Items.Count - 1]?.ToString()??string.Empty : string.Empty;
 
 }

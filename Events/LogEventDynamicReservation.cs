@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -42,8 +43,8 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
         User = list_[2];
         Host = list_[3];
         //
-        LicensePool = int.Parse(list_[4]);
-        Count = int.Parse(list_[5]);
+        LicensePool = int.Parse(list_[4], CultureInfo.InvariantCulture);
+        Count = int.Parse(list_[5], CultureInfo.InvariantCulture);
         //
         StringData = list_[6];
         EventDateTime = _GetDateTime(list_[7], list_[8]);

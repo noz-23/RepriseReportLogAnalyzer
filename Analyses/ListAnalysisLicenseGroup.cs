@@ -17,6 +17,7 @@ using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -314,7 +315,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
                 var sum = new TimeSpan(listCount.Sum(x => x.DurationDuplication().Ticks));
                 var days = new HashSet<DateTime>(listCount.Select(x => x.CheckOutDateTime.Date));
 
-                list.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
+                list.Add($"{sum.ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture)}");
                 list.Add($"{days.Count}");
                 list.Add($"{listCount.Count}");
                 rtn.Add(list);
@@ -328,7 +329,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
                 var sum = new TimeSpan(listProduct.Sum(x => x.DurationDuplication().Ticks));
                 var days = new HashSet<DateTime>(listProduct.Select(x => x.CheckOutDateTime.Date));
 
-                list.Add($"{sum.ToString(@"d\.hh\:mm\:ss")}");
+                list.Add($"{sum.ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture)}");
                 list.Add($"{days.Count}");
                 list.Add($"{listProduct.Count()}");
             }

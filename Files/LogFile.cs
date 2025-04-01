@@ -7,6 +7,7 @@
  * 
  */
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -58,7 +59,7 @@ internal sealed class LogFile
     /// <param name="member_">関数</param>
     public void WriteLine(string message_, [CallerFilePath] string soruce_ = "", [CallerLineNumber] int line_ = -1, [CallerMemberName] string member_ = "")
     {
-        Trace.WriteLine($"{DateTime.Now.ToString()} [{Path.GetFileName(soruce_)}({line_})][{member_}]\n{message_}\n");
+        Trace.WriteLine($"{DateTime.Now.ToString(@"yyyy/MM/dd hh:mm:ss", CultureInfo.InvariantCulture)} [{Path.GetFileName(soruce_)}({line_})][{member_}]\n{message_}\n");
         Trace.Flush();
     }
 }

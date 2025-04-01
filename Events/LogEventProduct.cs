@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -43,9 +44,9 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
         Version = list_[2];
         Pool = list_[3];
         //
-        Count = int.Parse(list_[4]);
-        Reservations = int.Parse(list_[5]);
-        LimitSoft = int.Parse(list_[6]);
+        Count = int.Parse(list_[4], CultureInfo.InvariantCulture);
+        Reservations = int.Parse(list_[5], CultureInfo.InvariantCulture);
+        LimitSoft = int.Parse(list_[6], CultureInfo.InvariantCulture);
         //
         HostId = list_[7];
         Contract = list_[8];
@@ -54,15 +55,15 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
         LineItem = list_[11];
         Options = list_[12];
         //
-        Share = int.Parse(list_[13]);
-        ShareMax = int.Parse(list_[14]);
-        ShareType = int.Parse(list_[15]);
-        CountNamedUser = int.Parse(list_[16]);
-        MeterType = int.Parse(list_[17]);
-        MeterCounter = int.Parse(list_[18]);
-        MeterInitialDecrement = int.Parse(list_[19]);
-        MeterPeriod = int.Parse(list_[20]);
-        MeterPeriodDecrement = int.Parse(list_[21]);
+        Share = int.Parse(list_[13], CultureInfo.InvariantCulture);
+        ShareMax = int.Parse(list_[14], CultureInfo.InvariantCulture);
+        ShareType = int.Parse(list_[15], CultureInfo.InvariantCulture);
+        CountNamedUser = int.Parse(list_[16], CultureInfo.InvariantCulture);
+        MeterType = int.Parse(list_[17], CultureInfo.InvariantCulture);
+        MeterCounter = int.Parse(list_[18], CultureInfo.InvariantCulture);
+        MeterInitialDecrement = int.Parse(list_[19], CultureInfo.InvariantCulture);
+        MeterPeriod = int.Parse(list_[20], CultureInfo.InvariantCulture);
+        MeterPeriodDecrement = int.Parse(list_[21], CultureInfo.InvariantCulture);
 
         EventDateTime = NowDateTime;
         LogFormat = LogFormat.NONE;

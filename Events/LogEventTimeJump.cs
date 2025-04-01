@@ -9,6 +9,7 @@
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -37,7 +38,7 @@ internal sealed class LogEventTimeJump : LogEventBase
         // std
         // detailed
         Minutes = list_[1];
-        EventDateTime = DateTime.Parse(list_[2] + " " + list_[3]);
+        EventDateTime = DateTime.Parse(list_[2] + " " + list_[3], CultureInfo.InvariantCulture);
         LogFormat = LogFormat.NONE;
     }
 

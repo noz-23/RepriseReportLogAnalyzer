@@ -17,6 +17,7 @@ using RepriseReportLogAnalyzer.Windows;
 using ScottPlot;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -101,7 +102,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             var listCheckOut = log_.ListEvent<LogEventCheckOut>(startShutdown).OrderByDescending(x_ => x_.EventNumber);
             var listCheckIn = new SortedList<long, LogEventCheckIn>(log_.ListEvent<LogEventCheckIn>(startShutdown).ToDictionary(x_ => x_.EventNumber));
             //
-            LogFile.Instance.WriteLine($"{startShutdown.StartDateTime.ToString()} - {startShutdown.ShutdownDateTime.ToString()} : {listCheckOut.Count()}");
+            LogFile.Instance.WriteLine($"{startShutdown.StartDateTime.ToString(Properties.Settings.Default.FORMAT_DATE_TIME, CultureInfo.InvariantCulture)} - {startShutdown.ShutdownDateTime.ToString(Properties.Settings.Default.FORMAT_DATE_TIME, CultureInfo.InvariantCulture)} : {listCheckOut.Count()}");
             var listCheckOutIn = new List<AnalysisCheckOutIn>();
 
             int count = 0;
@@ -111,15 +112,17 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             foreach (var checkOut in listCheckOut)
             {
                 // 対応するチェックインを探す
-                var checkIn = listCheckIn.Where(x_ => x_.Key > checkOut.EventNumber).Select(x_ => x_.Value).ToList().Find(f_ => checkOut.IsFindCheckIn(f_.HandleServer, f_.EventNumber)) ?? startShutdown.EventShutdown();
+                //var checkIn = listCheckIn.Where(x_ => x_.Key > checkOut.EventNumber).Select(x_ => x_.Value).ToList().Find(f_ => checkOut.IsFindCheckIn(f_.HandleServer, f_.EventNumber)) ?? startShutdown.EventShutdown();
+                var checkIn = listCheckIn.Where(x_ => x_.Key > checkOut.EventNumber).Select(x_ => x_.Value).ToList().Find(f_ => checkOut.HandleServer== f_.HandleServer) ?? startShutdown.EventShutdown();
 
-                if (checkIn is LogEventCheckIn delIn)
-                {
-                    // 対のチェックアウト情報の登録
-                    delIn.SetLogEventCheckOut(checkOut);
-                    // スピードアップのため検索リストから検出したデータを削除
-                    listCheckIn.Remove(delIn.EventNumber);
-                }
+                //if (checkIn is LogEventCheckIn delIn)
+                //{
+                //    // 対のチェックアウト情報の登録
+                //    delIn.SetLogEventCheckOut(checkOut);
+                //    // スピードアップのため検索リストから検出したデータを削除
+                //    listCheckIn.Remove(delIn.EventNumber);
+                //}
+                listCheckIn.Remove(checkIn.EventNumber);
 
                 listCheckOutIn.Add(new AnalysisCheckOutIn(checkOut, checkIn));
                 //

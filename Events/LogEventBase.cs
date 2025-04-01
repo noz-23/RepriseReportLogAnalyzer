@@ -12,6 +12,7 @@ using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -104,7 +105,7 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
     /// </summary>
     protected static long _NowYear { get => NowDateTime.Year; }
     protected static long _NowMonth { get => NowDateTime.Month; }
-    protected static string _NowDate { get => NowDateTime.ToString("MM/dd/yyyy"); }
+    protected static string _NowDate { get => NowDateTime.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture); }
 
     /// <summary>
     /// イベント番号
@@ -235,10 +236,10 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
     protected static DateTime _GetDateTime(string date_, string time_)
     {
         var listDate = date_.Split('/');
-        var month = int.Parse(listDate[0]);
+        var month = int.Parse(listDate[0], CultureInfo.InvariantCulture);
         // New Year
         var year = (month < _NowMonth) ? (_NowYear + 1) : (_NowYear);
-        return DateTime.Parse(date_ + "/" + year + " " + time_);
+        return DateTime.Parse(date_ + "/" + year + " " + time_, CultureInfo.InvariantCulture);
     }
 
     /// <summary>

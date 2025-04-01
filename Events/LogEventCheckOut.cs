@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -39,48 +40,57 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
         //if (list_.Count() < 10)
         if (list_.Length < 10)
         {
-            // smail
-            Product = list_[1];
-            Version = list_[2];
-            User = list_[3];
-            Host = list_[4];
-            IsvDef = list_[5];
-            Count = int.Parse(list_[6]);
-            //
-            HandleServer = list_[7];
-            HandleShare = list_[8];
-            //
-            EventDateTime = DateTime.Parse(_NowDate + " " + list_[9]);
-            LogFormat = LogFormat.SMALL;
-        }
-        else
+            _initSmall(list_);
+        }else
         {
-            // std
-            // detailed
-            Product = list_[1];
-            Version = list_[2];
-            Pool = list_[3];
-            User = list_[4];
-            Host = list_[5];
-            IsvDef = list_[6];
-            //
-            Count = int.Parse(list_[7]);
-            CountCurrent = int.Parse(list_[8]);
-            ResuseCurrent = int.Parse(list_[9]);
-            //
-            HandleServer = list_[10];
-            //HandleServerNum = Convert.ToInt32(HandleServer,16);
-            HandleShare = list_[11];
-            //
-            ProcessId = list_[12];
-            Project = list_[13];
-            RequestedProduct = list_[14];
-            RequestedVersion = list_[15];
-
-            //
-            EventDateTime = _GetDateTime(list_[16], list_[17]);
-            LogFormat = (list_[17].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+            _initStandardDetail(list_);
         }
+    }
+
+    private void _initSmall(string[] list_)
+    {
+        // smail
+        Product = list_[1];
+        Version = list_[2];
+        User = list_[3];
+        Host = list_[4];
+        IsvDef = list_[5];
+        Count = int.Parse(list_[6], CultureInfo.InvariantCulture);
+        //
+        HandleServer = list_[7];
+        HandleShare = list_[8];
+        //
+        EventDateTime = DateTime.Parse(_NowDate + " " + list_[9], CultureInfo.InvariantCulture);
+        LogFormat = LogFormat.SMALL;
+    }
+
+    private void _initStandardDetail(string[] list_)
+    {
+        // std
+        // detailed
+        Product = list_[1];
+        Version = list_[2];
+        Pool = list_[3];
+        User = list_[4];
+        Host = list_[5];
+        IsvDef = list_[6];
+        //
+        Count = int.Parse(list_[7], CultureInfo.InvariantCulture);
+        CountCurrent = int.Parse(list_[8], CultureInfo.InvariantCulture);
+        ResuseCurrent = int.Parse(list_[9], CultureInfo.InvariantCulture);
+        //
+        HandleServer = list_[10];
+        //HandleServerNum = Convert.ToInt32(HandleServer,16);
+        HandleShare = list_[11];
+        //
+        ProcessId = list_[12];
+        Project = list_[13];
+        RequestedProduct = list_[14];
+        RequestedVersion = list_[15];
+
+        //
+        EventDateTime = _GetDateTime(list_[16], list_[17]);
+        LogFormat = (list_[17].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
     //checkout

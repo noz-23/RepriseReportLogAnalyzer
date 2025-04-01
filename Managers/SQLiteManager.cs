@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -64,9 +65,14 @@ namespace RepriseReportLogAnalyzer.Managers
         /// </summary>
         /// <param name="name_"></param>
         public void CreateTable(string name_) => _connection?.CreateTable(name_);
-
         public void Insert(string name_, IEnumerable<string> listValue_) => _connection?.Insert(name_, listValue_);
 
+
+        public void CreateTableAndInsert(string name_, IEnumerable<string> listValue_)
+        {
+            CreateTable(name_);
+            Insert(name_, listValue_);
+        }
 
         /// <summary>
         /// テーブル作成処理
@@ -98,6 +104,17 @@ namespace RepriseReportLogAnalyzer.Managers
                 }
                 tran?.Commit();
             }
+        }
+
+        public void CreateTableAndInsert(Type classType_, IEnumerable<List<string>> list_)
+        {
+            CreateTable(classType_);
+            Insert(classType_, ToDataBase.Header(classType_),list_);
+        }
+        public void CreateTableAndInsert(Type classType_, long select_)
+        {
+            CreateTable(classType_, AnalysisManager.Instance.ListEventHeader(classType_, select_));
+            Insert(classType_, AnalysisManager.Instance.EventHeader(classType_, select_), AnalysisManager.Instance.ListEventValue(classType_,select_));
         }
 
         public void Dispose()

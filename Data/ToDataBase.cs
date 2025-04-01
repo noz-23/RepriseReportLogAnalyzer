@@ -10,6 +10,7 @@ using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Reflection;
 
 namespace RepriseReportLogAnalyzer.Data;
@@ -73,32 +74,15 @@ internal class ToDataBase
 
         foreach (var prop in listPropetyInfo)
         {
-            //var classType = prop.PropertyType;
-            //if (classType == typeof(TimeSpan))
-            //{
-            //    rtn.Add($"{prop.GetValue(this):d\\.hh\\:mm\\:ss}");
-
-            //}
-            //else if (classType == typeof(StatusValue))
-            //{
-            //    var val = prop.GetValue(this)?.ToString() ?? "0";
-
-            //    //var num = (StatusValue)Enum.Parse(typeof(StatusValue), val);
-            //    var num = Enum.Parse<StatusValue>(val);
-            //    rtn.Add($"{(long)num}");
-            //}
-            //else
-            //{
-            //    var val = prop.GetValue(this)?.ToString() ?? "0";
-            //}
             rtn.Add((_listToStringCallBack.TryGetValue(prop.PropertyType, out var callBack) == true) ? callBack(prop, this) : prop.GetValue(this)?.ToString() ?? "0");
         }
         return rtn;
     }
-
+    
     private static Dictionary<Type, ToStringCallBack> _listToStringCallBack = new()
     {
-        { typeof(TimeSpan),(prop_,obj_)=>$"{prop_.GetValue(obj_):d\\.hh\\:mm\\:ss}"},
+        { typeof(DateTime),(prop_,obj_)=>( prop_.GetValue(obj_) is DateTime dateTime) ? dateTime.ToString(Properties.Settings.Default.FORMAT_DATE_TIME, CultureInfo.InvariantCulture) : prop_.GetValue(obj_).ToString() },
+        { typeof(TimeSpan),(prop_,obj_)=>( prop_.GetValue(obj_) is TimeSpan timeSpan) ? timeSpan.ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture) : prop_.GetValue(obj_).ToString()},
         { typeof(StatusValue),(prop_,obj_)=>
             {
                 var val = prop_.GetValue(obj_)?.ToString() ?? "0";
