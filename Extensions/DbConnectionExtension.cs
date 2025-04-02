@@ -127,9 +127,9 @@ public static class DbConnectionExtension
             {
                 LogFile.Instance.WriteLine(ex_.Message);
             }
+            tran?.Commit();
         }
     }
-
     private static string _tableName(Type classType_) => classType_.GetAttribute<TableAttribute>()?.Name ?? classType_.Name;
 
     /// <summary>
@@ -142,7 +142,6 @@ public static class DbConnectionExtension
     {
         var listColunm = new List<string>();
         list_.ForEach(column_ => listColunm.Add($"'{column_.Key}' {column_.Value}"));
-
 
         var rtn = $"CREATE TABLE {_tableName(classType_)} ({string.Join(",", listColunm)});";
         LogFile.Instance.WriteLine(rtn);

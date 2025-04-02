@@ -103,9 +103,9 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
     /// <summary>
     /// 日付設定に利用
     /// </summary>
-    protected static long _NowYear { get => NowDateTime.Year; }
-    protected static long _NowMonth { get => NowDateTime.Month; }
-    protected static string _NowDate { get => NowDateTime.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture); }
+    private static long _nowYear { get => NowDateTime.Year; }
+    private static long _nowMonth { get => NowDateTime.Month; }
+    private static string _nowDate { get => NowDateTime.ToString("MM/dd", CultureInfo.InvariantCulture); }
 
     /// <summary>
     /// イベント番号
@@ -238,9 +238,12 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
         var listDate = date_.Split('/');
         var month = int.Parse(listDate[0], CultureInfo.InvariantCulture);
         // New Year
-        var year = (month < _NowMonth) ? (_NowYear + 1) : (_NowYear);
+        var year = (month < _nowMonth) ? (_nowYear + 1) : (_nowYear);
         return DateTime.Parse(date_ + "/" + year + " " + time_, CultureInfo.InvariantCulture);
     }
+
+    protected static DateTime _GetDateTime(string time_) => _GetDateTime( _nowDate, time_);
+
 
     /// <summary>
     /// 比較処理

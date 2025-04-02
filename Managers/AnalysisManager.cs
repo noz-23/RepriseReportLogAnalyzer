@@ -149,6 +149,16 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     private void _clear()
     {
+        _clearList();
+        _clearAnalysis();
+        //
+        _clearTime();
+        //
+        ConvertReportLog.Clear();
+    }
+
+    private void _clearList()
+    {
         ListProduct.Clear();
         ListProductVersion.Clear();
         ListUser.Clear();
@@ -156,18 +166,22 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         ListUserHost.Clear();
         ListDate.Clear();
         ListDateTime.Clear();
-        //
+    }
+
+    private void _clearAnalysis()
+    {
         _listStartShutdown.Clear();
         _listCheckOutIn.Clear();
         _listLicenseCount.Clear();
         _listUserDuration.Clear();
         _listHostDuration.Clear();
         _listUserHostDuration.Clear();
-        //
+    }
+
+    private void _clearTime()
+    {
         _runStartTime = null;
         _runEndTime = null;
-
-        ConvertReportLog.Clear();
     }
 
     /// <summary>

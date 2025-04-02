@@ -90,7 +90,7 @@ internal sealed class AnalysisStartShutdown : ToDataBase
     /// シャットダウン イベント番号
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public long ShudownNumber() => _shutdown?.EventNumber ?? LogEventBase.NowEventNumber;
+    public long ShudownNumber() => _shutdown.EventNumber;
 
     /// <summary>
     /// スタートとシャットダウンの間のイベントか？

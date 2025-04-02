@@ -72,7 +72,7 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
     //support for a product
     //PRODUCT name     version pool# count #reservations soft_limit “hostid” “contract” “customer” “issuer” “line_item” “options”        share max_share type named_user_count meter_type meter_counter meter_initial_decrement meter_period meter_period_decrement
     //0       1        2       3     4     5             6           7          8            9            10         11            12                13    14        15   16               17         18            19                      20           21
-    //PRODUCT AbcName  25      1     1     0             1           ""         "A-B-C-D-E"  ""           ""         ""            "LA:xx_XX TY:XXX" 3     0         0    0                0          0             0                       0            0
+    //PRODUCT AbcName  XY      1     1     0             1           ""         "A-B-C-D-E"  ""           ""         ""            "LA:xx_XX TY:XXX" 3     0         0    0                0          0             0                       0            0
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 

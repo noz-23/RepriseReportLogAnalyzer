@@ -49,12 +49,12 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     private void _initSmall(string[] list_)
     {
         // small
-        //Why = int.Parse(list_[1]);
-        Why = (StatusValue)int.Parse(list_[1], CultureInfo.InvariantCulture);
-        Count = int.Parse(list_[2], CultureInfo.InvariantCulture);
-        HandleServer = list_[3];
+        Why = (StatusValue)int.Parse(list_[_INDEX_WHY], CultureInfo.InvariantCulture);
+        Count = int.Parse(list_[_INDEX_SML_COUNT], CultureInfo.InvariantCulture);
+        HandleServer = list_[_INDEX_SML_SERVER_HANDLE];
         //
-        EventDateTime = DateTime.Parse(_NowDate + " " + list_[4], CultureInfo.InvariantCulture);
+        //EventDateTime = DateTime.Parse(_NowDate + " " + list_[_INDEX_SML_TIME], CultureInfo.InvariantCulture);
+        EventDateTime = _GetDateTime(list_[_INDEX_SML_TIME]);
         LogFormat = LogFormat.SMALL;
     }
 
@@ -62,26 +62,45 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     {
         // std
         // detailed
-        Why = (StatusValue)int.Parse(list_[1], CultureInfo.InvariantCulture);
-        Product = list_[2];
-        Version = list_[3];
-        User = list_[4];
-        Host = list_[5];
-        IsvDef = list_[6];
+        Why = (StatusValue)int.Parse(list_[_INDEX_WHY], CultureInfo.InvariantCulture);
+        Product = list_[_INDEX_STD_PRODUCT];
+        Version = list_[_INDEX_STD_VERSION];
+        User = list_[_INDEX_STD_USER];
+        Host = list_[_INDEX_STD_HOST];
+        IsvDef = list_[_INDEX_STD_ISV_DEF];
         //
-        Count = int.Parse(list_[7], CultureInfo.InvariantCulture);
+        Count = int.Parse(list_[_INDEX_STD_COUNT], CultureInfo.InvariantCulture);
         //
-        HandleServer = list_[8];
+        HandleServer = list_[_INDEX_STD_SERVER_HANDLE];
         //
-        EventDateTime = _GetDateTime(list_[9], list_[10]);
+        EventDateTime = _GetDateTime(list_[_INDEX_STD_DATE], list_[_INDEX_STD_TIME]);
         LogFormat = (list_[10].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
     //dequeue
+    //DEQUE why count   server_handle hh:mm
     //DEQUE why product version       user  host “isv_def” count server_handle mm/dd hh:mm:ss
     //DEQUE why product version       user  host “isv_def” count server_handle mm/dd hh:mm:ss.tenths_of_msec
-    //DEQUE why count   server_handle hh:mm
     //0     1   2       3             4     5     6          7     8             9     10
+    private const int _INDEX_WHY = 1;
+    //
+    private const int _INDEX_SML_COUNT = 2;
+    private const int _INDEX_SML_SERVER_HANDLE = 3;
+    private const int _INDEX_SML_TIME = 4;
+    //
+    private const int _INDEX_STD_PRODUCT = 2;
+    private const int _INDEX_STD_VERSION = 3;
+    private const int _INDEX_STD_USER = 4;
+    private const int _INDEX_STD_HOST = 5;
+    private const int _INDEX_STD_ISV_DEF = 6;
+    private const int _INDEX_STD_COUNT = 7;
+    private const int _INDEX_STD_SERVER_HANDLE = 8;
+    private const int _INDEX_STD_DATE = 9;
+    private const int _INDEX_STD_TIME = 10;
+    //
+
+
+
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 

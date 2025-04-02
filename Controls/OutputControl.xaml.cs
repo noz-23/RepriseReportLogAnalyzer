@@ -96,17 +96,18 @@ public partial class OutputControl : UserControl
                                 　.Where(t_ => t_.IsSubclassOf(typeof(LogEventBase)) == true)
                                 　.Distinct();
 
-        foreach (var t in listEventClass)
-        {
-            var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_EVENT, string.Empty));
-            ListEvent.Add(view);
+        listEventClass.ToList().ForEach(t_ => _addEvent(t_));
 
-            _listSavetEvent[view.Name] = view.IsChecked;
-            LogFile.Instance.WriteLine($"{t.Name}");
-        }
+        ListEvent.Sort((a_, b_) => a_.Sort -b_.Sort);
+    }
 
-        ListEvent.Sort((a_, b_) => (a_?.ClassType?.GetAttribute<SortAttribute>()?.Sort ?? -1)
-                                 - (b_?.ClassType?.GetAttribute<SortAttribute>()?.Sort ?? -1));
+    private void _addEvent(Type classType_)
+    {
+        var view = new OutputView(classType_, classType_.Name.Replace(_CLASS_NAME_EVENT, string.Empty));
+        ListEvent.Add(view);
+
+        _listSavetEvent[view.Name] = view.IsChecked;
+        LogFile.Instance.WriteLine($"{classType_.Name}");
     }
 
     private void _initAnalysis(Assembly asm_)
@@ -115,33 +116,34 @@ public partial class OutputControl : UserControl
         var listAnalysisClass = asm_.GetTypes()
                                     .Where(t_ => t_.GetInterfaces().Any(t_ => t_ == typeof(IAnalysisOutputFile)) == true)
                                     .Distinct();
-        foreach (var t in listAnalysisClass)
+
+        listAnalysisClass.ToList().ForEach(t_ => _addAnalysis(t_));
+
+        ListAnalysis.Sort((a_, b_) => a_.Sort - b_.Sort);
+    }
+    private void _addAnalysis(Type classType_)
+    {
+        var listCombo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static)
+                        .Select(p_ => p_.GetValue(null)).OfType<ListStringLongPair>();
+        if (listCombo.Any())
         {
-            var listCombo = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static)
-                            　.Select(p_ => p_.GetValue(null)).OfType<ListStringLongPair>();
-            if (listCombo.Any())
-            {
-                var view = new OutputView(t, t.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty), listCombo.First());
-                ListAnalysis.Add(view);
+            var view = new OutputView(classType_, classType_.Name.Replace(_CLASS_NAME_ANALYSIS, string.Empty), listCombo.First());
+            ListAnalysis.Add(view);
 
-                _listSavetAnalysis[view.Name] = view.IsChecked;
-                LogFile.Instance.WriteLine($"{t.Name}");
-            }
-            //}
+            _listSavetAnalysis[view.Name] = view.IsChecked;
+            LogFile.Instance.WriteLine($"{classType_.Name}");
         }
-        ListAnalysis.Sort((a_, b_) => (a_?.ClassType?.GetAttribute<SortAttribute>()?.Sort ?? -1) 
-                                    - (b_?.ClassType?.GetAttribute<SortAttribute>()?.Sort ?? -1));
-
     }
 
 
     private void _loaded(object sender_, RoutedEventArgs e_)
     {
-        foreach (var v in ListAnalysis)
-        {
-            // なんかうまくバインドされないため
-            v.SelectedIndex = 0;
-        }
+        //foreach (var v in ListAnalysis)
+        //{
+        //    v.SelectedIndex = 0;
+        //}
+        // なんかうまくバインドされないため
+        ListAnalysis.ForEach(v_ => v_.SelectedIndex = 0);
     }
 
     /// <summary>
@@ -303,17 +305,8 @@ public partial class OutputControl : UserControl
 
     private async Task _saveCsvEvent(string outputFolder_)
     {
-        foreach (var view in ListEvent)
+        foreach (var view in ListEvent.Where(v_ => v_.IsChecked == true && v_.ClassType != null))
         {
-            if (view.IsChecked == false)
-            {
-                continue;
-            }
-            if (view.ClassType == null)
-            {
-                continue;
-            }
-
             var outPath = outputFolder_ + @"\" + view.Name + @".csv";
             LogFile.Instance.WriteLine($"Write : {outPath}");
 
@@ -342,17 +335,8 @@ public partial class OutputControl : UserControl
 
     private async Task _saveCsvAnalysis(string outputFolder_) 
     {
-        foreach (var view in ListAnalysis)
+        foreach (var view in ListAnalysis.Where(v_=> v_.IsChecked == true && v_.ClassType != null))
         {
-            if (view.IsChecked == false)
-            {
-                continue;
-            }
-            if (view.ClassType == null)
-            {
-                continue;
-            }
-
             string outPath = outputFolder_ + @"\" + view.Name + @".csv";
             LogFile.Instance.WriteLine($"Write : {outPath}");
 
@@ -412,16 +396,16 @@ public partial class OutputControl : UserControl
 
     private void _saveSqlEvent(SQLiteManager sql_)
     {
-        foreach (var view in ListEvent)
+        foreach (var view in ListEvent.Where(v_=> v_.IsChecked==true && v_.ClassType !=null))
         {
-            if (view.IsChecked == false)
-            {
-                continue;
-            }
-            if (view.ClassType == null)
-            {
-                continue;
-            }
+            //if (view.IsChecked == false)
+            //{
+            //    continue;
+            //}
+            //if (view.ClassType == null)
+            //{
+            //    continue;
+            //}
             //sql_.CreateTable(view.ClassType);
             //sql_.Insert(view.ClassType, ToDataBase.Header(view.ClassType), AnalysisManager.Instance.ListEventValue(view.ClassType));
             sql_.CreateTableAndInsert(view.ClassType, AnalysisManager.Instance.ListEventValue(view.ClassType));
@@ -447,16 +431,16 @@ public partial class OutputControl : UserControl
 
     private void _saveSqlAnalysis(SQLiteManager sql_)
     {
-        foreach (var view in ListAnalysis)
+        foreach (var view in ListAnalysis.Where(v_ => v_.IsChecked == true && v_.ClassType != null))
         {
-            if (view.IsChecked == false)
-            {
-                continue;
-            }
-            if (view.ClassType == null)
-            {
-                continue;
-            }
+            //if (view.IsChecked == false)
+            //{
+            //    continue;
+            //}
+            //if (view.ClassType == null)
+            //{
+            //    continue;
+            //}
             //sql_.CreateTable(view.ClassType, AnalysisManager.Instance.ListEventHeader(view.ClassType, view.SelectedValue));
             //sql_.Insert(view.ClassType, AnalysisManager.Instance.EventHeader(view.ClassType, view.SelectedValue), AnalysisManager.Instance.ListEventValue(view.ClassType, view.SelectedValue));
             sql_.CreateTableAndInsert(view.ClassType, view.SelectedValue);

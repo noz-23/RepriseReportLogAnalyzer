@@ -6,12 +6,14 @@
  * Licensed under the MIT License 
  * 
  */
+using OpenTK.Compute.OpenCL;
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -43,61 +45,111 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
             _initSmall(list_);
         }else
         {
-            _initStandardDetail(list_);
+            _initStandard(list_);
         }
     }
 
     private void _initSmall(string[] list_)
     {
         // smail
-        Product = list_[1];
-        Version = list_[2];
-        User = list_[3];
-        Host = list_[4];
-        IsvDef = list_[5];
-        Count = int.Parse(list_[6], CultureInfo.InvariantCulture);
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        User = list_[_INDEX_SML_USER];
+        Host = list_[_INDEX_SML_HOST];
+        IsvDef = list_[_INDEX_SML_ISV_DEF];
+        Count = int.Parse(list_[_INDEX_SML_COUNT], CultureInfo.InvariantCulture);
         //
-        HandleServer = list_[7];
-        HandleShare = list_[8];
+        HandleServer = list_[_INDEX_SML_SERVER_HANDLE];
+        HandleShare = list_[_INDEX_SML_SHARE_HANDLE];
         //
-        EventDateTime = DateTime.Parse(_NowDate + " " + list_[9], CultureInfo.InvariantCulture);
+        //EventDateTime = DateTime.Parse(_NowDate + " " + list_[_INDEX_SML_TIME], CultureInfo.InvariantCulture);
+        EventDateTime = _GetDateTime(list_[_INDEX_SML_TIME]);
+
         LogFormat = LogFormat.SMALL;
     }
 
-    private void _initStandardDetail(string[] list_)
+    private void _initStandard(string[] list_)
     {
         // std
         // detailed
-        Product = list_[1];
-        Version = list_[2];
-        Pool = list_[3];
-        User = list_[4];
-        Host = list_[5];
-        IsvDef = list_[6];
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        Pool = list_[_INDEX_STD_POOL];
+        User = list_[_INDEX_STD_USER];
+        Host = list_[_INDEX_STD_HOST];
+        IsvDef = list_[_INDEX_STD_ISV_DEF];
         //
-        Count = int.Parse(list_[7], CultureInfo.InvariantCulture);
-        CountCurrent = int.Parse(list_[8], CultureInfo.InvariantCulture);
-        ResuseCurrent = int.Parse(list_[9], CultureInfo.InvariantCulture);
+        Count = int.Parse(list_[_INDEX_STD_COUNT], CultureInfo.InvariantCulture);
+        CountCurrent = int.Parse(list_[_INDEX_STD_USE_CURRENT], CultureInfo.InvariantCulture);
+        ResuseCurrent = int.Parse(list_[_INDEX_STD_RESUSE_CURRENT], CultureInfo.InvariantCulture);
         //
-        HandleServer = list_[10];
-        //HandleServerNum = Convert.ToInt32(HandleServer,16);
-        HandleShare = list_[11];
+        HandleServer = list_[_INDEX_STD_SERVER_HANDLE];
+        HandleShare = list_[_INDEX_STD_SHARE_HANDLE];
         //
-        ProcessId = list_[12];
-        Project = list_[13];
-        RequestedProduct = list_[14];
-        RequestedVersion = list_[15];
+        ProcessId = list_[_INDEX_STD_PROCESS_ID];
+        Project = list_[_INDEX_STD_PROJECT];
+        RequestedProduct = list_[_INDEX_STD_REQUEST_PRODUCT];
+        RequestedVersion = list_[_INDEX_STD_REQUEST_VERSION];
 
         //
-        EventDateTime = _GetDateTime(list_[16], list_[17]);
+        EventDateTime = _GetDateTime(list_[_INDEX_STD_DATE], list_[_INDEX_STD_TIME]);
         LogFormat = (list_[17].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+
+        if (LogFormat == LogFormat.STANDARD)
+        {
+            _initDetail(list_);
+        }
+    }
+
+    private void _initDetail(string[] list)
+    {
+        ClientMachineOsInfo = list[_INDEX_STD_CLIENT_MACHINE_OS_INFO];
+        ApplicationArgv0 = list[_INDEX_STD_APPLICATION_ARGV0];
+        RoamDays = list[_INDEX_STD_ROAM_DAYS];
+        RoamHandle = list[_INDEX_STD_ROAM_HANDLE];
+        ClientIpAddress = list[_INDEX_STD_CLIENT_IP_ADDRESS];
     }
 
     //checkout
+    //OUT product version user  host “isv_def” count      server_handle share_handle hh:mm
     //OUT product version pool# user  host      “isv_def” count         cur_use      cur_resuse server_handle share_handle process_id “project” “requested product” “requested version” mm/dd hh:mm:ss
     //OUT product version pool# user  host      “isv_def” count         cur_use      cur_resuse server_handle share_handle process_id “project” “requested product” “requested version” mm/dd hh:mm:ss.tenths_of_msec “client_machine_os_info” “application argv0” roam_days roam_handle client-ip-address
-    //OUT product version user  host “isv_def” count      server_handle share_handle hh:mm
     //0   1       2       3     4     5          6          7             8            9          10            11           12          13          14                    15                   16    17                       18                         19                   20        21          22
+    private const int _INDEX_PRODUCT = 1;
+    private const int _INDEX_VERSION = 2;
+    //
+    private const int _INDEX_SML_USER = 3;
+    private const int _INDEX_SML_HOST = 4;
+    private const int _INDEX_SML_ISV_DEF = 5;
+    private const int _INDEX_SML_COUNT = 6;
+    private const int _INDEX_SML_SERVER_HANDLE = 7;
+    private const int _INDEX_SML_SHARE_HANDLE = 8;
+    private const int _INDEX_SML_TIME = 9;
+    //
+    private const int _INDEX_STD_POOL = 3;
+    private const int _INDEX_STD_USER = 4;
+    private const int _INDEX_STD_HOST = 5;
+    private const int _INDEX_STD_ISV_DEF = 6;
+    private const int _INDEX_STD_COUNT = 7;
+    private const int _INDEX_STD_USE_CURRENT = 8;
+    private const int _INDEX_STD_RESUSE_CURRENT = 9;
+    private const int _INDEX_STD_SERVER_HANDLE = 10;
+    private const int _INDEX_STD_SHARE_HANDLE = 11;
+    private const int _INDEX_STD_PROCESS_ID = 12;
+    private const int _INDEX_STD_PROJECT = 13;
+
+    private const int _INDEX_STD_REQUEST_PRODUCT = 14;
+    private const int _INDEX_STD_REQUEST_VERSION = 15;
+
+    private const int _INDEX_STD_DATE = 16;
+    private const int _INDEX_STD_TIME = 17;
+    //
+    private const int _INDEX_STD_CLIENT_MACHINE_OS_INFO = 18;
+    private const int _INDEX_STD_APPLICATION_ARGV0 = 19;
+    private const int _INDEX_STD_ROAM_DAYS = 20;
+    private const int _INDEX_STD_ROAM_HANDLE = 21;
+    private const int _INDEX_STD_CLIENT_IP_ADDRESS = 22;
+    //
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 
@@ -134,11 +186,6 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
     [Column("Server Handle", Order = 106)]
     public string HandleServer { get; private set; } = string.Empty;
 
-    //public int HandleServerNum()=> _handleServerNum;
-    //private int _handleServerNum = 1;
-    //public int HandleServerNum { get; private set; } = -1;
-
-
     [Column("Share Handle", Order = 107)]
     public string HandleShare { get; private set; } = string.Empty;
 
@@ -154,17 +201,31 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
     [Column("Requested Version", Order = 111)]
     public string RequestedVersion { get; private set; } = string.Empty;
     //
+    [Column("Client Machine OS Info", Order = 201)]
+    public string ClientMachineOsInfo { get; private set; } = string.Empty;
 
+    [Column("Application Argv0", Order = 202)]
+    public string ApplicationArgv0 { get; private set; } = string.Empty;
+
+    [Column("Roam Days", Order = 203)]
+    public string RoamDays { get; private set; } = string.Empty;
+
+    [Column("Roam Handle", Order = 204)]
+    public string RoamHandle { get; private set; } = string.Empty;
+
+    [Column("Client IP Address", Order = 205)]
+    public string ClientIpAddress { get; private set; } = string.Empty;
+    //
     /// <summary>
     /// チェックアウト に対応するチェックイン情報か
     /// </summary>
     /// <param name="checkIn_"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsFindCheckIn(LogEventCheckIn checkIn_) => IsFindCheckIn(checkIn_.HandleServer, checkIn_.EventNumber);
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public bool IsFindCheckIn(LogEventCheckIn checkIn_) => IsFindCheckIn(checkIn_.HandleServer, checkIn_.EventNumber);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsFindCheckIn(string hande_, long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public bool IsFindCheckIn(string hande_, long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
 
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);

@@ -222,7 +222,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         foreach (var group in listGroup)
         {
 
-            rtn[string.Format(_GROUP_FORMAT, count, group)] = new();
+            rtn[string.Format(CultureInfo.InvariantCulture, _GROUP_FORMAT, count, group)] = new();
             count++;
         }
         foreach (var time in listX_)
@@ -231,7 +231,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
             foreach (var group in listGroup)
             {
                 var list = (timeSpan_ != TimeSpan.TicksPerDay) ? this[group].Where(x_ => x_.IsWithInRange(time) == true) : this[group].Where(x_ => (x_.CheckOut().EventDate() == time));
-                rtn[string.Format(_GROUP_FORMAT, count, group)].Add((list.Any() == false) ? double.NaN : count);
+                rtn[string.Format(CultureInfo.InvariantCulture, _GROUP_FORMAT, count, group)].Add((list.Any() == false) ? double.NaN : count);
 
                 count++;
             }

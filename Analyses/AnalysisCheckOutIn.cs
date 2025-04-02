@@ -115,7 +115,7 @@ internal sealed class AnalysisCheckOutIn : ToDataBase, IComparer, IComparable
     /// チェックインのイベント番号
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public long CheckInNumber() => _checkIn?.EventNumber ?? LogEventBase.NowEventNumber;
+    public long CheckInNumber() => _checkIn.EventNumber;
 
     /// <summary>
     /// チェックアウトとチェックインの間のイベントか？
@@ -135,7 +135,7 @@ internal sealed class AnalysisCheckOutIn : ToDataBase, IComparer, IComparable
     /// 重複を取り除いたチェックインの時間
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public DateTime JointDateTime() => _joinEvent.CheckIn()?.EventDateTime ?? LogEventBase.NowDateTime;
+    public DateTime JointDateTime() => _joinEvent.CheckIn().EventDateTime;
 
     /// <summary>
     /// 重複を取り除いた利用時間

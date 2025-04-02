@@ -135,7 +135,7 @@ public partial class AnalysisControl : UserControl
             }
 
             StringBuilder str = new StringBuilder("Runing ");
-            str.Append($"{_resultTitle} [{(DateTime.Now - _startDateTime).ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture)}]");
+            str.Append(CultureInfo.InvariantCulture,$"{_resultTitle} [{(DateTime.Now - _startDateTime).ToString(Properties.Settings.Default.FORMAT_TIME_SPAN, CultureInfo.InvariantCulture)}]");
             _textLabel.Text = str.ToString();
 
             _progressBar.Value = count_;

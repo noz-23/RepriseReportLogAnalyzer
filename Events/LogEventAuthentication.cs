@@ -36,8 +36,8 @@ internal sealed class LogEventAuthentication : LogEventBase
         // small
         // std
         // detailed
-        Section = list_[1];
-        Signature = list_[2];
+        Section = list_[_INDEX_SECTION];
+        Signature = list_[_INDEX_SIGNATURE];
 
         EventDateTime = NowDateTime;
         LogFormat = LogFormat.NONE;
@@ -45,6 +45,10 @@ internal sealed class LogEventAuthentication : LogEventBase
 
     //AUTH section signature
     //0    1       2
+    private const int _INDEX_SECTION =1;
+    private const int _INDEX_SIGNATURE = 2;
+
+
     [Column("Section", Order = 101)]
     public string Section { get; private set; } = string.Empty;
 

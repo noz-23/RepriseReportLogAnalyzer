@@ -6,6 +6,7 @@
  * Licensed under the MIT License 
  * 
  */
+using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Interfaces;
 
 namespace RepriseReportLogAnalyzer.Views;
@@ -91,4 +92,7 @@ sealed public class OutputView : BaseView
     /// コンボボックス表示内容
     /// </summary>
     public ListStringLongPair ListSelect { get; private set; } = new();
+
+    public int Sort { get => ClassType?.Sort() ?? -1; }
+
 }

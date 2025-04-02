@@ -130,7 +130,7 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             }
 
             // グループ分け
-            var divCheckOutIn = listCheckOutIn.GroupBy(x_ => string.Format(_KEY_PRODUCT_USER_HOST, x_.Product, x_.UserHost));
+            var divCheckOutIn = listCheckOutIn.GroupBy(x_ => string.Format(CultureInfo.InvariantCulture, _KEY_PRODUCT_USER_HOST, x_.Product, x_.UserHost));
             // 重複のチェック
             _setDuplication(divCheckOutIn);
             // リストに追加

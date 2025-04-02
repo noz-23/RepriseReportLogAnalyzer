@@ -39,47 +39,76 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
         //if (list_.Count() < 12)
         if (list_.Length < 12)
         {
-            // small
-            Product = list_[1];
-            Version = list_[2];
-            User = list_[3];
-            Host = list_[4];
-            IsvDef = list_[5];
-            Count = int.Parse(list_[6], CultureInfo.InvariantCulture);
-            //
-            HandleServer = list_[7];
-            //
-            EventDateTime = DateTime.Parse(_NowDate + " " + list_[8], CultureInfo.InvariantCulture);
-            LogFormat = LogFormat.SMALL;
+            _initSmall(list_);
         }
         else
         {
-            // std
-            // detailed
-            Product = list_[1];
-            Version = list_[2];
-            User = list_[3];
-            Host = list_[4];
-            IsvDef = list_[5];
-            //
-            Count = int.Parse(list_[6]);
-            //
-            HandleServer = list_[7];
-            //
-            Project = list_[8];
-            RequestedProduct = list_[9];
-            RequestedVersion = list_[10];
-            //
-            EventDateTime = _GetDateTime(list_[11], list_[12]);
-            LogFormat = (list_[12].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+            _initStandardDetail(list_);
         }
     }
 
+    private void _initSmall(string[] list_)
+    {
+        // small
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
+        IsvDef = list_[_INDEX_ISV_DEF];
+        Count = int.Parse(list_[_INDEX_COUNT], CultureInfo.InvariantCulture);
+        //
+        HandleServer = list_[_INDEX_SERVER_HANDLE];
+        //
+        //EventDateTime = DateTime.Parse(_NowDate + " " + list_[_INDEX_SML_TIME], CultureInfo.InvariantCulture);
+        EventDateTime = _GetDateTime(list_[_INDEX_SML_TIME]);
+        LogFormat = LogFormat.SMALL;
+    }
+
+    private void _initStandardDetail(string[] list_)
+    {
+        // std
+        // detailed
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
+        IsvDef = list_[_INDEX_ISV_DEF];
+        //
+        Count = int.Parse(list_[_INDEX_COUNT], CultureInfo.InvariantCulture);
+        //
+        HandleServer = list_[_INDEX_SERVER_HANDLE];
+        //
+        Project = list_[_INDEX_STD_PROJECT];
+        RequestedProduct = list_[_INDEX_STD_REQUEST_PRODUCT];
+        RequestedVersion = list_[_INDEX_STD_REQUEST_VERSION];
+        //
+        EventDateTime = _GetDateTime(list_[_INDEX_STD_DATE], list_[_INDEX_STD_TIME]);
+        LogFormat = (list_[_INDEX_STD_TIME].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+    }
+
     //queue
+    //QUE product version user host “isv_def” count server_handle hh:mm
     //QUE product version user host “isv_def” count server_handle “project” “requested product” “requested version” mm/dd hh:mm:ss
     //QUE product version user host “isv_def” count server_handle “project” “requested product” “requested version” mm/dd hh:mm:ss.tenths_of_msec
-    //QUE product version user host “isv_def” count server_handle hh:mm
     //0   1       2       3    4     5          6     7             8            9                     10                   11    12
+    private const int _INDEX_PRODUCT = 1;
+    private const int _INDEX_VERSION = 2;
+    private const int _INDEX_USER = 3;
+    private const int _INDEX_HOST = 4;
+    private const int _INDEX_ISV_DEF = 5;
+    private const int _INDEX_COUNT = 6;
+    private const int _INDEX_SERVER_HANDLE = 7;
+    //
+    private const int _INDEX_SML_TIME = 8;
+    //
+    private const int _INDEX_STD_PROJECT = 8;
+    private const int _INDEX_STD_REQUEST_PRODUCT = 9;
+    private const int _INDEX_STD_REQUEST_VERSION = 10;
+
+    private const int _INDEX_STD_DATE = 11;
+    private const int _INDEX_STD_TIME = 12;
+    //
+
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 

@@ -35,11 +35,9 @@ internal static class ObservableCollectionExtension
         if (find == null)
         {
             src_.Add(view_);
+            return;
         }
-        else
-        {
-            find.Count = view_.Count;
-            find.Have = view_.Have;
-        }
+        find.Count = view_.Count;
+        find.Have = view_.Have;
     }
 }
