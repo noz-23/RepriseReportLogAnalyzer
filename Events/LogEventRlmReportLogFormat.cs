@@ -7,7 +7,6 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -36,14 +35,14 @@ internal sealed class LogEventRlmReportLogFormat : LogEventBase
         // small
         // std
         // detailed
-        Version = list_[6];
-
-        EventDateTime = NowDateTime;
-        LogFormat = LogFormat.NONE;
+        Version = list_[_INDEX_VERSION];
     }
 
     //RLM Report Log Format d, version x.y authentication flag
     //0   1      2   3      4  5       6
+    private const int _INDEX_VERSION = 6;
+    //
+
     [Column("Version", Order = 101)]
     public string Version { get; private set; } = string.Empty;
 }

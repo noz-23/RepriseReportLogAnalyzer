@@ -7,7 +7,6 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,24 +36,35 @@ internal sealed class LogEventRoamExtend : LogEventBase, ILogEventUserHost, ILog
         // small
         // std
         // detailed
-        Product = list_[1];
-        Version = list_[2];
-        Pool = list_[3];
-        User = list_[4];
-        Host = list_[5];
-        IsvDef = list_[6];
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        Pool = list_[_INDEX_POOL];
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
+        IsvDef = list_[_INDEX_ISV_DEF];
         //
-        DaysExtended = list_[7];
-        HandleServer = list_[8];
-        ProcessId = list_[9];
+        DaysExtended = list_[_INDEX_DAYS_EXTENDED];
+        HandleServer = list_[_INDEX_SERVER_HANDLE];
+        ProcessId = list_[_INDEX_PROCESS_ID];
         //
-        EventDateTime = _GetDateTime(list_[10], list_[11]);
-        LogFormat = LogFormat.NONE;
+        EventDateTime = _GetDateTime(list_[_INDEX_DATE], list_[_INDEX_DATE]);
     }
 
     //roam extend
     //ROAM_EXTEND product version pool# user host “isv_def” #days_extended server_handle process_id mm/dd hh:mm:ss
     //0           1       2       3     4    5     6          7              8             9          10    11
+    private const int _INDEX_PRODUCT = 1;
+    private const int _INDEX_VERSION = 2;
+    private const int _INDEX_POOL = 3;
+    private const int _INDEX_USER = 4;
+    private const int _INDEX_HOST = 5;
+    private const int _INDEX_ISV_DEF = 6;
+    private const int _INDEX_DAYS_EXTENDED = 7;
+    private const int _INDEX_SERVER_HANDLE = 8;
+    private const int _INDEX_PROCESS_ID = 9;
+    private const int _INDEX_DATE = 10;
+    private const int _INDEX_TIME = 11;
+    //
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 

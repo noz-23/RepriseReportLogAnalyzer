@@ -7,7 +7,6 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
@@ -38,14 +37,18 @@ internal sealed class LogEventStart : LogEventBase
         // small
         // std
         // detailed
-        HostName = list_[1];
-        EventDateTime = DateTime.Parse(list_[2] + " " + list_[3], CultureInfo.InvariantCulture);
-        LogFormat = LogFormat.NONE;
+        HostName = list_[_INDEX_HOST_NAME];
+        // 年の表示があるためそのまま時間へ変換
+        EventDateTime = DateTime.Parse(list_[_INDEX_DATE] + " " + list_[_INDEX_TIME], CultureInfo.InvariantCulture);
     }
 
 
     //START hostname mm/dd/yyyy hh:mm
     //0     1        2          3
+    private const int _INDEX_HOST_NAME = 1;
+    private const int _INDEX_DATE = 2;
+    private const int _INDEX_TIME = 3;
+    //
     [Column("Host Name", Order = 101)]
     public string HostName { get; private set; } = string.Empty;
 }

@@ -37,6 +37,7 @@ internal static class ObservableCollectionExtension
             src_.Add(view_);
             return;
         }
+        // すでにある場合は値更新
         find.Count = view_.Count;
         find.Have = view_.Have;
     }

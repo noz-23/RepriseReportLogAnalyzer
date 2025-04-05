@@ -6,15 +6,12 @@
  * Licensed under the MIT License 
  * 
  */
-using OpenTK.Compute.OpenCL;
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
-using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -40,7 +37,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
     public LogEventCheckOut(string[] list_) : base()
     {
         //if (list_.Count() < 10)
-        if (list_.Length < 10)
+        if (list_.Length <= _INDEX_SML_TIME)
         {
             _initSmall(list_);
         }else
@@ -62,9 +59,7 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
         HandleServer = list_[_INDEX_SML_SERVER_HANDLE];
         HandleShare = list_[_INDEX_SML_SHARE_HANDLE];
         //
-        //EventDateTime = DateTime.Parse(_NowDate + " " + list_[_INDEX_SML_TIME], CultureInfo.InvariantCulture);
         EventDateTime = _GetDateTime(list_[_INDEX_SML_TIME]);
-
         LogFormat = LogFormat.SMALL;
     }
 
@@ -93,9 +88,9 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
 
         //
         EventDateTime = _GetDateTime(list_[_INDEX_STD_DATE], list_[_INDEX_STD_TIME]);
-        LogFormat = (list_[17].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
-
-        if (LogFormat == LogFormat.STANDARD)
+        LogFormat = (list_[_INDEX_STD_TIME].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+        //
+        if (LogFormat == LogFormat.DETAILED)
         {
             _initDetail(list_);
         }
@@ -237,17 +232,18 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
         {
             return false;
         }
-        //if (listOutIn_[Product] == CountCurrent)
         if (listCount_[Product].CheckOutInCurrent == CountCurrent)
         {
             // 重複チェック
             return false;
         }
 
-        //listCount_[Product]++;
-        //listOutIn_[Product] = CountCurrent;
-        listCount_[Product].Count++;
-        listCount_[Product].CheckOutInCurrent = CountCurrent;
+        //listCount_[Product].Count++;
+        //listCount_[Product].CheckOutInCurrent = CountCurrent;
+        var data = listCount_[Product];
+        data.Count++;
+        data.CheckOutInCurrent = CountCurrent;
+        listCount_[Product] = data;
 
         return true;
     }

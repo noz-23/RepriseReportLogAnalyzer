@@ -37,7 +37,7 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
     public LogEventQueue(string[] list_) : base()
     {
         //if (list_.Count() < 12)
-        if (list_.Length < 12)
+        if (list_.Length <= _INDEX_SML_TIME)
         {
             _initSmall(list_);
         }

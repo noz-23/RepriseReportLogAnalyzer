@@ -36,9 +36,15 @@ namespace RepriseReportLogAnalyzer.Managers
             }
             Open(path_);
         }
+        /// <summary>
+        /// コネクション
+        /// </summary>
 
         private SQLiteConnection? _connection;
 
+        /// <summary>
+        /// クローズ処理
+        /// </summary>
         public void Close()
         {
             _connection?.Close();
@@ -46,6 +52,10 @@ namespace RepriseReportLogAnalyzer.Managers
             _connection = null;
         }
 
+        /// <summary>
+        /// オープン処理
+        /// </summary>
+        /// <param name="path_"></param>
         public void Open(string path_)
         {
             LogFile.Instance.WriteLine($"Open [{path_}]");
@@ -65,14 +75,6 @@ namespace RepriseReportLogAnalyzer.Managers
         /// </summary>
         /// <param name="name_"></param>
         public void CreateTable(string name_) => _connection?.CreateTable(name_);
-        public void Insert(string name_, IEnumerable<string> listValue_) => _connection?.Insert(name_, listValue_);
-
-
-        public void CreateTableAndInsert(string name_, IEnumerable<string> listValue_)
-        {
-            CreateTable(name_);
-            Insert(name_, listValue_);
-        }
 
         /// <summary>
         /// テーブル作成処理
@@ -80,6 +82,11 @@ namespace RepriseReportLogAnalyzer.Managers
         /// <param name="classType_"></param>
         public void CreateTable(Type classType_) => _connection?.CreateTable(classType_);
         public void CreateTable(Type classType_, ListStringStringPair list_) => _connection?.CreateTable(classType_, list_);
+
+        /// <summary>
+        /// データ挿入処理(単一)
+        /// </summary>
+        public void Insert(string name_, IEnumerable<string> listValue_) => _connection?.Insert(name_, listValue_);
 
         /// <summary>
         /// データ挿入処理
@@ -106,6 +113,16 @@ namespace RepriseReportLogAnalyzer.Managers
             }
         }
 
+        /// <summary>
+        /// テーブルを作って、データを挿入
+        /// </summary>
+        /// <param name="name_"></param>
+        /// <param name="listValue_"></param>
+        public void CreateTableAndInsert(string name_, IEnumerable<string> listValue_)
+        {
+            CreateTable(name_);
+            Insert(name_, listValue_);
+        }
         public void CreateTableAndInsert(Type classType_, IEnumerable<List<string>> list_)
         {
             CreateTable(classType_);
@@ -117,6 +134,9 @@ namespace RepriseReportLogAnalyzer.Managers
             Insert(classType_, AnalysisManager.Instance.EventHeader(classType_, select_), AnalysisManager.Instance.ListEventValue(classType_,select_));
         }
 
+        /// <summary>
+        /// Using を利用するため
+        /// </summary>
         public void Dispose()
         {
             Close();

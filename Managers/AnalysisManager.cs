@@ -7,13 +7,13 @@
  * 
  */
 using RepriseReportLogAnalyzer.Analyses;
+using RepriseReportLogAnalyzer.Controls;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Views;
-using RepriseReportLogAnalyzer.Windows;
 using ScottPlot;
 using ScottPlot.WPF;
 using System.Collections.ObjectModel;
@@ -35,14 +35,15 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     public static AnalysisManager Instance = new AnalysisManager();
     private AnalysisManager()
     {
+        // 解析系のリスト作成
         _listAnalysis.Add(_listCheckOutIn);
         _listAnalysis.Add(_listLicenseCount);
         _listAnalysis.Add(_listStartShutdown);
         _listAnalysis.Add(_listUserDuration);
         _listAnalysis.Add(_listHostDuration);
         _listAnalysis.Add(_listUserHostDuration);
-        _runStartTime = null;
-        _runEndTime = null;
+        //
+        _clearTime();
         _progressCount = null;
     }
 
@@ -78,7 +79,11 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     /// </summary>
     public DateTime? EndDate { get => (ListDate.Count == 0) ? null : ListDate.LastOrDefault(); }
 
-
+    /// <summary>
+    /// イベントリストの取得
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <returns></returns>
     public IEnumerable<LogEventBase> ListEvent(Type classType_) => _convertReportLog.ListEvent(classType_);
 
 
@@ -126,7 +131,6 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     /// 解析処理終了時間
     /// </summary>
     private DateTime? _runEndTime;
-
     /// <summary>
     /// 各処理のプログレスバー設定
     /// </summary>
@@ -154,9 +158,12 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         //
         _clearTime();
         //
-        ConvertReportLog.Clear();
+        ConvertReportLog.EventClear();
     }
 
+    /// <summary>
+    /// 各リストのクリア
+    /// </summary>
     private void _clearList()
     {
         ListProduct.Clear();
@@ -168,6 +175,9 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         ListDateTime.Clear();
     }
 
+    /// <summary>
+    /// 各解析系のクリア
+    /// </summary>
     private void _clearAnalysis()
     {
         _listStartShutdown.Clear();
@@ -178,6 +188,9 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         _listUserHostDuration.Clear();
     }
 
+    /// <summary>
+    /// 時間のクリア
+    /// </summary>
     private void _clearTime()
     {
         _runStartTime = null;
@@ -236,16 +249,11 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         //
         _listStartShutdown.Analysis(_convertReportLog);
         _listCheckOutIn.Analysis(_convertReportLog, _listStartShutdown.ListNoIncludeSkip()); //
-        //_listLicenseCount.Analysis(_convertReportLog, _listCheckOutIn);
         _listLicenseCount.Analysis(_convertReportLog);
         //
-        //_listUserDuration.Analysis(ListUser, _listCheckOutIn);
-        //_listHostDuration.Analysis(ListHost, _listCheckOutIn);
-        //_listUserHostDuration.Analysis(ListUserHost, _listCheckOutIn);
         _listUserDuration.Analysis(_listCheckOutIn);
         _listHostDuration.Analysis(_listCheckOutIn);
         _listUserHostDuration.Analysis(_listCheckOutIn);
-
         //
         _notifyPropertyChanged("StartDate");
         _notifyPropertyChanged("EndDate");
@@ -398,7 +406,6 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
     public async Task SetData(DateTime? date_, AnalysisGroup group_)
     {
         // Product は使いまわし(チェックのため)
-
         var list = await _listLicenseCount.ListView(date_);
         foreach (var view in list)
         {
@@ -517,10 +524,6 @@ internal sealed class AnalysisManager : INotifyPropertyChanged
         //plot_.Plot.ShowLegend(Edge.Right); // なぜか二重に表示されるので見合わせ
         plot_.Plot.ShowLegend(pos);
 
-
         LogFile.Instance.WriteLine($"Title [{title}] Y Label{ylabel}");
-
-
     }
-
 }

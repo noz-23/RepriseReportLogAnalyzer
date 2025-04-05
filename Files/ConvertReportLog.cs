@@ -7,9 +7,9 @@
  * 
  */
 using RepriseReportLogAnalyzer.Analyses;
+using RepriseReportLogAnalyzer.Controls;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Interfaces;
-using RepriseReportLogAnalyzer.Windows;
 using System.IO;
 using System.Text;
 
@@ -26,7 +26,7 @@ internal sealed class ConvertReportLog: List<LogEventBase>
     public ConvertReportLog()
     {
         ProgressCount = null;
-        Clear();
+        EventClear();
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ internal sealed class ConvertReportLog: List<LogEventBase>
     public ProgressCountCallBack? ProgressCount;
 
 
-    public static void Clear() => LogEventBase.Clear();
+    public static void EventClear() => LogEventBase.Clear();
 
     /// <summary>
     /// 解析開始
@@ -62,6 +62,10 @@ internal sealed class ConvertReportLog: List<LogEventBase>
         ProgressCount?.Invoke(max, max, $"{_CONVERT}[{Path.GetFileName(filePath_)}]");
     }
 
+    /// <summary>
+    /// 文字列からイベントを変換追加
+    /// </summary>
+    /// <param name="list_"></param>
     private void _addEvent(IEnumerable<string> list_)
     {
         foreach (var s in list_)
@@ -161,11 +165,8 @@ internal sealed class ConvertReportLog: List<LogEventBase>
     /// <param name="classType_"></param>
     public async Task WriteEventText(string path_, Type classType_)
     {
-        //var list = new List<string>();
         // ヘッダー
-        //list.Add(LogEventBase.Header(classType_));
         var list = new List<string>() { LogEventBase.Header(classType_) };
-
         // データ
         list.AddRange(_listToString(classType_));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -175,9 +176,7 @@ internal sealed class ConvertReportLog: List<LogEventBase>
 
     public async Task WriteEventText<T>(string path_) where T : LogEventBase
     {
-        //var list = new List<string>();
         // ヘッダー
-        //list.Add(LogEventBase.Header(typeof(T)));
         var list = new List<string>() { LogEventBase.Header(typeof(T)) };
 
         // データ
@@ -186,22 +185,4 @@ internal sealed class ConvertReportLog: List<LogEventBase>
 
         LogFile.Instance.WriteLine($"Write:{path_}");
     }
-
-    /// <summary>
-    /// プロダクトの比較
-    /// </summary>
-    //private sealed class CompareProduct : IEqualityComparer<ILogEventProduct>
-    //{
-    //    public bool Equals(ILogEventProduct? a_, ILogEventProduct? b_)
-    //    {
-    //        if (a_ == null || b_ == null)
-    //        {
-    //            return false;
-    //        }
-
-    //        //return (a_.Product == b_.Product) && (a_.Version == b_.Version);
-    //        return a_.ProductVersion == b_.ProductVersion;
-    //    }
-    //    public int GetHashCode(ILogEventProduct codeh_) =>HashCode.Combine(codeh_.Product,codeh_.Version);
-    //}
 }

@@ -7,12 +7,12 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Controls;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
-using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
@@ -36,6 +36,9 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
         ProgressCount = null;
     }
 
+    /// <summary>
+    /// コンボボックスの項目
+    /// </summary>
     public static ListStringLongPair ListSelect { get => _listSelect; }
     private static ListStringLongPair _listSelect = new()
     {

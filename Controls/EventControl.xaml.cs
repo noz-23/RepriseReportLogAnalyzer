@@ -6,7 +6,6 @@
  * Licensed under the MIT License 
  * 
  */
-using RepriseReportLogAnalyzer.Attributes;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
@@ -29,8 +28,6 @@ public partial class EventControl : UserControl
         _init();
     }
 
-    private readonly string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
-
     /// <summary>
     /// 初期化
     /// </summary>
@@ -40,7 +37,7 @@ public partial class EventControl : UserControl
         var _assembly = Assembly.GetExecutingAssembly();
 
         // Why を持っているイベントの抽出
-        var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass && t_.Namespace == _NAME_SPACE_EVENT).Distinct().OrderBy(t_ => t_.Sort());
+        var tyepInNamespace = _assembly.GetTypes().Where(t_ => t_.IsClass).Distinct().OrderBy(t_ => t_.Sort());
         foreach (var t in tyepInNamespace)
         {
             if (t.GetInterfaces().Where(t_ => t_.Name == typeof(ILogEventWhy).Name).Any() == true)
@@ -54,7 +51,12 @@ public partial class EventControl : UserControl
 
     }
 
-    private void _selectionChanged(object sender, SelectionChangedEventArgs e)
+    /// <summary>
+    /// コンボボックス変更処理
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
+    private void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
     {
         if (_comboBox.SelectedValue is OutputView selected)
         {

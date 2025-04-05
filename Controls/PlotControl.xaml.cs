@@ -63,8 +63,8 @@ public partial class ResultControl : UserControl
     /// <summary>
     /// グループ変更処理
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
     private void _selectionChanged(object sender_, SelectionChangedEventArgs e_)
     {
         LogFile.Instance.WriteLine($"Selected [{_comboBox.SelectedIndex}]");

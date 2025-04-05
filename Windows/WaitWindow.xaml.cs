@@ -10,6 +10,10 @@ using System.Windows;
 
 namespace RepriseReportLogAnalyzer.Windows;
 
+/// <summary>
+/// Wiatで実行する処理のデリゲート
+/// </summary>
+/// <returns></returns>
 public delegate Task RunCallBack();
 
 /// <summary>
@@ -25,14 +29,15 @@ public partial class WaitWindow : Window
 
     public RunCallBack? Run { get; set; }
 
-    private async void _loaded(object sender, RoutedEventArgs e)
+    private async void _loaded(object sender_, RoutedEventArgs e_)
     {
+        // 実行して
         await Task.Run(async () =>
         {
             if (Run != null) { await Run.Invoke(); }
 
         });
-
+        // 閉じる
         Close();
     }
 }

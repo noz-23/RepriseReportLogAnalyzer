@@ -17,14 +17,23 @@ namespace RepriseReportLogAnalyzer.Data;
 /// </summary>
 internal sealed class DateTimeHandler : SqlMapper.TypeHandler<DateTimeOffset>
 {
+
     private readonly TimeZoneInfo databaseTimeZone = TimeZoneInfo.Local;
     public static readonly DateTimeHandler Default = new DateTimeHandler();
 
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public DateTimeHandler()
     {
 
     }
 
+    /// <summary>
+    /// 文字列 → 時間変更
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public override DateTimeOffset Parse(object value)
     {
         var storedDateTime = (value == null) ? (DateTime.MinValue) : ((DateTime)value);
@@ -38,6 +47,12 @@ internal sealed class DateTimeHandler : SqlMapper.TypeHandler<DateTimeOffset>
             return new DateTimeOffset(storedDateTime, databaseTimeZone.BaseUtcOffset);
         }
     }
+
+    /// <summary>
+    /// 時間変更 → 文字列
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="value"></param>
 
     public override void SetValue(IDbDataParameter parameter, DateTimeOffset value)
     {

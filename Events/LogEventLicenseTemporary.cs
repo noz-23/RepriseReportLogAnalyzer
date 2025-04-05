@@ -37,7 +37,7 @@ internal sealed class LogEventLicenseTemporary : LogEventBase, ILogEventUserHost
         // small
         // std
         // detailed
-        switch (list_[1])
+        switch (list_[_INDEX_LICENSE_TYPE])
         {
             default:
             case "create": LicenseTemporary = LicenseTemporaryType.CREATE; break;
@@ -46,24 +46,37 @@ internal sealed class LogEventLicenseTemporary : LogEventBase, ILogEventUserHost
             case "expired": LicenseTemporary = LicenseTemporaryType.EXPIRED; break;
         }
 
-        Product = list_[2];
-        Version = list_[3];
-        LicensePool = list_[4];
-        User = list_[5];
-        Host = list_[6];
-        IsvDef = list_[7];
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        LicensePool = list_[_INDEX_LICENSE_POOL];
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
+        IsvDef = list_[_INDEX_ISV_DEF];
         //
-        ExpiredDate = list_[8];
-        ExpiredTime = list_[9];
-        HandleServer = list_[10];
+        ExpiredDate = list_[_INDEX_EXPIRED_DATE];
+        ExpiredTime = list_[_INDEX_EXPIRED_TIME];
+        HandleServer = list_[_INDEX_SERVER_HANDLE];
 
-        EventDateTime = _GetDateTime(list_[11], list_[12]);
-        LogFormat = LogFormat.NONE;
+        EventDateTime = _GetDateTime(list_[_INDEX_DATE], list_[_INDEX_DATE]);
     }
 
     //Temporary license creation/removal
     //TEMP[create | remove | restart | expired] product version license-pool user host “isv_def” expdate exptime server_handle mm/dd hh:mm:ss
     //0    1                                    2       3       4            5    6     7          8       9       10            11    12
+    private const int _INDEX_LICENSE_TYPE = 1;
+    private const int _INDEX_PRODUCT = 2;
+    private const int _INDEX_VERSION = 3;
+    private const int _INDEX_LICENSE_POOL = 4;
+    private const int _INDEX_USER = 5;
+    private const int _INDEX_HOST = 6;
+    private const int _INDEX_ISV_DEF = 7;
+    private const int _INDEX_EXPIRED_DATE = 8;
+    private const int _INDEX_EXPIRED_TIME = 9;
+    private const int _INDEX_SERVER_HANDLE = 10;
+    private const int _INDEX_DATE = 11;
+    private const int _INDEX_TIME = 12;
+    //
+
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 

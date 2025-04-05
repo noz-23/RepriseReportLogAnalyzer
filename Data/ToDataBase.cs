@@ -21,7 +21,17 @@ namespace RepriseReportLogAnalyzer.Data;
 /// </summary>
 internal class ToDataBase
 {
+    /// <summary>
+    /// 出力しないデータ
+    /// </summary>
     public const int NO_OUPUT_DATA = 999;
+
+    /// <summary>
+    /// データの文字列指定変換デリゲード
+    /// </summary>
+    /// <param name="prop"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     private delegate string ToStringCallBack(PropertyInfo prop, object obj);
 
     /// <summary>
@@ -78,7 +88,10 @@ internal class ToDataBase
         }
         return rtn;
     }
-    
+
+    /// <summary>
+    /// データの型から文字列変換
+    /// </summary>    
     private static Dictionary<Type, ToStringCallBack> _listToStringCallBack = new()
     {
         { typeof(DateTime),(prop_,obj_)=>( prop_.GetValue(obj_) is DateTime dateTime) ? dateTime.ToString(Properties.Settings.Default.FORMAT_DATE_TIME, CultureInfo.InvariantCulture) : prop_.GetValue(obj_).ToString() },
@@ -97,45 +110,11 @@ internal class ToDataBase
     /// </summary>
     /// <param name="type_"></param>
     /// <returns></returns>
-    public static string GetDatabaseType(Type type_)
-    {
-        //if (type_ == typeof(string))
-        //{
-        //    return "TEXT";
-        //}
-        //else
-        //if (type_ == typeof(Enum))
-        //{
-        //    return "INTEGER";
-        //}
-        //else
-        //if (type_ == typeof(StatusValue))
-        //{
-        //    return "INTEGER";
-        //}
-        //else
-        //if (type_ == typeof(int))
-        //{
-        //    return "INTEGER";
-        //}
-        //else
-        //if (type_ == typeof(long))
-        //{
-        //    return "INTEGER";
-        //}
-        //else
-        //if (type_ == typeof(float))
-        //{
-        //    return "REAL";
-        //}
-        //else
-        //if (type_ == typeof(double))
-        //{
-        //    return "REAL";
-        //}
-        //return "TEXT";
-        return (_listDatabaseType.TryGetValue(type_, out var rtn)==true) ? rtn : "TEXT";
-    }
+    public static string GetDatabaseType(Type type_) => (_listDatabaseType.TryGetValue(type_, out var rtn) == true) ? rtn : "TEXT";
+
+    /// <summary>
+    /// データベース(SQL)に変換する場合のデータ型
+    /// </summary>
     private static Dictionary<Type, string> _listDatabaseType = new()
     {
         { typeof(string), "TEXT" },
@@ -152,6 +131,6 @@ internal class ToDataBase
     /// 文字列化
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => string.Join(",", ListValue(GetType()));
+    public override string ToString() => string.Join(",", ListValue(this.GetType()));
 
 }

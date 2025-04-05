@@ -7,7 +7,6 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepriseReportLogAnalyzer.Events;
@@ -37,13 +36,13 @@ internal sealed class LogEventLicenseFile : LogEventBase
         // small
         // std
         // detailed
-        FileName = list_[2];
-        EventDateTime = NowDateTime;
-        LogFormat = LogFormat.NONE;
+        FileName = list_[_INDEX_FILE_NAME];
     }
 
     //LICENSE FILE filename
     //0       1    2
+    private const int _INDEX_FILE_NAME = 2;
+    //
     [Column("FileName", Order = 101)]
     public string FileName { get; private set; } = string.Empty;
 }

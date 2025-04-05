@@ -12,7 +12,13 @@ namespace RepriseReportLogAnalyzer.Extensions;
 
 public static class EnumExtension
 {
-    // https://www.sejuku.net/blog/42539
+    /// <summary>
+    /// https://www.sejuku.net/blog/42539
+    /// 説明の取得
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="src"></param>
+    /// <returns></returns>
     public static string Description<T>(this T src) where T : Enum
     {
         var fieldInfo = typeof(T).GetField(src.ToString());

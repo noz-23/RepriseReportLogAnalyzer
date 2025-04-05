@@ -20,9 +20,25 @@ internal sealed class AnalysisLicenseCount : ToDataBase
     /// <summary>
     /// ライセンスのカウント処理
     /// </summary>
-    internal class LicenseCount : ICloneable
-
+    internal struct LicenseCount : ICloneable
     {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public LicenseCount()
+        {
+            Count = 0;
+            ServerHave = 0;
+            CheckOutInCurrent = 0;
+        }
+
+        public LicenseCount(LicenseCount c_):this()
+        {
+            Count = c_.Count;
+            ServerHave = c_.ServerHave;
+            CheckOutInCurrent = c_.CheckOutInCurrent;
+        }
+
         /// <summary>
         /// 集計カウント
         /// </summary>
@@ -36,20 +52,10 @@ internal sealed class AnalysisLicenseCount : ToDataBase
         /// </summary>
         public int CheckOutInCurrent;
 
-        public LicenseCount()
-        {
-            Count = 0;
-            ServerHave = 0;
-            CheckOutInCurrent = 0;
-        }
-
-        public LicenseCount(LicenseCount c_)
-        {
-            Count = c_.Count;
-            ServerHave = c_.ServerHave;
-            CheckOutInCurrent = c_.CheckOutInCurrent;
-        }
-
+        /// <summary>
+        ///コピー処理
+        /// </summary>
+        /// <returns></returns>
         public object Clone() => new LicenseCount(this);
     }
 
@@ -64,14 +70,7 @@ internal sealed class AnalysisLicenseCount : ToDataBase
     public AnalysisLicenseCount(LogEventBase eventBase_, IDictionary<string, LicenseCount> listCount_)
     {
         EventBase = eventBase_;
-        // 参照されるためコピー
-        ListCount = new();
-        foreach (var key in listCount_.Keys)
-        {
-            ListCount.Add(key, new(listCount_[key]));
-        }
-
-        //LogFile.Instance.WriteLine($"{eventBase_.GetType()}{string.Join(",", ListCount.Values.Select(x_ => $"[{x_.Count}][{x_.ServerHave}][{x_.CheckOutInCurrent}]"))}");
+        ListCount = new(listCount_);
     }
 
     /// <summary>
@@ -90,6 +89,7 @@ internal sealed class AnalysisLicenseCount : ToDataBase
     /// </summary>
     /// <returns></returns>
     public override string ToString() => string.Join(",", ListValue());
+
     /// <summary>
     /// リスト化したデータ
     /// </summary>

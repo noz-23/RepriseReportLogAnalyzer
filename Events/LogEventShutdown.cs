@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -42,7 +41,6 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicen
         Host = list_[2];
         //
         EventDateTime = _GetDateTime(list_[3], list_[4]);
-        LogFormat = LogFormat.NONE;
     }
 
     /// <summary>
@@ -86,10 +84,15 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicen
         //}
         foreach (var product in listCount_.Keys.ToList())
         {
-            //var data = listCount_[product];
-            listCount_[product].Count = 0;
-            listCount_[product].ServerHave = 0;
-            listCount_[product].CheckOutInCurrent = 0;
+            //listCount_[product].Count = 0;
+            //listCount_[product].ServerHave = 0;
+            //listCount_[product].CheckOutInCurrent = 0;
+            var data = listCount_[product];
+            data.Count = 0;
+            data.ServerHave = 0;
+            data.CheckOutInCurrent = 0;
+            listCount_[product] = data;
+
         }
 
         return true;

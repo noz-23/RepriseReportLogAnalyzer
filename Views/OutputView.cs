@@ -93,6 +93,9 @@ sealed public class OutputView : BaseView
     /// </summary>
     public ListStringLongPair ListSelect { get; private set; } = new();
 
+    /// <summary>
+    /// 並び替え
+    /// </summary>
     public int Sort { get => ClassType?.Sort() ?? -1; }
 
 }

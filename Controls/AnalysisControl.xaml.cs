@@ -21,6 +21,15 @@ using System.Windows.Media;
 namespace RepriseReportLogAnalyzer.Controls;
 
 /// <summary>
+/// プログレスバーの処理
+/// </summary>
+/// <param name="count"></param>
+/// <param name="max"></param>
+/// <param name="str"></param>
+
+public delegate void ProgressCountCallBack(int count, int max, string str = "");
+
+/// <summary>
 /// AnalysisControl.xaml の相互作用ロジック
 /// </summary>
 public partial class AnalysisControl : UserControl
@@ -40,6 +49,9 @@ public partial class AnalysisControl : UserControl
     /// </summary>
     private string _resultTitle = string.Empty;
 
+    /// <summary>
+    /// 計測時間表示のため
+    /// </summary>
     private DateTime _startDateTime = DateTime.Now;
 
     /// <summary>
@@ -91,6 +103,10 @@ public partial class AnalysisControl : UserControl
         LogFile.Instance.WriteLine($"Analysis End");
     }
 
+    /// <summary>
+    /// ファイル名リスト
+    /// </summary>
+    /// <returns></returns>
     private List<string> _dataGirdItems()
     {
         var rtn = new List<string>();
@@ -226,6 +242,10 @@ public partial class AnalysisControl : UserControl
         }
     }
 
+    /// <summary>
+    /// 最終行の取得
+    /// </summary>
+    /// <returns></returns>
     private string _dataGridLasItem()=> (_dataGrid.Items.Count > 0) ? _dataGrid.Items[_dataGrid.Items.Count - 1]?.ToString()??string.Empty : string.Empty;
 
 }

@@ -130,6 +130,12 @@ public static class DbConnectionExtension
             tran?.Commit();
         }
     }
+
+    /// <summary>
+    /// テーブル名の取得
+    /// </summary>
+    /// <param name="classType_"></param>
+    /// <returns></returns>
     private static string _tableName(Type classType_) => classType_.GetAttribute<TableAttribute>()?.Name ?? classType_.Name;
 
     /// <summary>

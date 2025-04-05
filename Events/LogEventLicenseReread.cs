@@ -7,7 +7,6 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,16 +36,19 @@ internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
         // small
         // std
         // detailed
-        User = list_[1];
-        Host = list_[2];
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
 
-        EventDateTime = _GetDateTime(list_[3], list_[4]);
-        LogFormat = LogFormat.NONE;
+        EventDateTime = _GetDateTime(list_[_INDEX_DATE], list_[_INDEX_TIME]);
     }
 
     //server reread of license/option file
     //REREAD user host mm/dd hh:mm:ss
     //0      1    2    3     4
+    private const int _INDEX_USER = 1;
+    private const int _INDEX_HOST = 2;
+    private const int _INDEX_DATE = 3;
+    private const int _INDEX_TIME = 4;
     //
     [Column("User", Order = 21)]
     public string User { get; private set; } = string.Empty;

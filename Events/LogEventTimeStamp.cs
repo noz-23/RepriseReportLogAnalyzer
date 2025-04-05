@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
@@ -31,14 +30,16 @@ internal sealed class LogEventTimeStamp : LogEventBase, ILicenseCount
         // small
         // std
         // detailed
-        EventDateTime = DateTime.Parse(list_[0] + " " + list_[1], CultureInfo.InvariantCulture);
-        LogFormat = LogFormat.NONE;
+        // 年の表示があるためそのまま時間へ変換
+        EventDateTime = DateTime.Parse(list_[_INDEX_DATE] + " " + list_[_INDEX_TIME], CultureInfo.InvariantCulture);
     }
 
     //periodic timestamp
     //mm/dd/yyyy hh:mm
     //0          1
-    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    private const int _INDEX_DATE = 0;
+    private const int _INDEX_TIME = 1;
+    //
     public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         return true;

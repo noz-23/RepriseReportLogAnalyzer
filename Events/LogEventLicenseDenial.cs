@@ -38,25 +38,37 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
         // small
         // std
         // detailed
-        Product = list_[1];
-        Version = list_[2];
-        User = list_[3];
-        Host = list_[4];
-        IsvDef = list_[5];
+        Product = list_[_INDEX_PRODUCT];
+        Version = list_[_INDEX_VERSION];
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
+        IsvDef = list_[_INDEX_ISV_DEF];
         //
-        Count = int.Parse(list_[6], CultureInfo.InvariantCulture);
-        Why = (StatusValue)int.Parse(list_[7], CultureInfo.InvariantCulture);
-        LastAttempt = list_[8];
-        ProcessId = list_[9];
+        Count = int.Parse(list_[_INDEX_COUNT], CultureInfo.InvariantCulture);
+        Why = (StatusValue)int.Parse(list_[_INDEX_WHY], CultureInfo.InvariantCulture);
+        LastAttempt = list_[_INDEX_LAST_ATTEMPT];
+        ProcessId = list_[_INDEX_PROCESS_ID];
 
-        EventDateTime = _GetDateTime(list_[10], list_[11]);
-        LogFormat = (list_[11].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+        EventDateTime = _GetDateTime(list_[_INDEX_DATE], list_[_INDEX_TIME]);
+        LogFormat = (list_[_INDEX_TIME].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
     //license denial
     //DENY product version user host “isv_def” count why last_attempt pid mm/dd hh:mm
     //DENY product version user host “isv_def” count why last_attempt pid mm/dd hh:mm:ss.tenths_of_msec
     //0    1       2       3    4     5          6     7   8            9   10    11
+    private const int _INDEX_PRODUCT = 1;
+    private const int _INDEX_VERSION = 2;
+    private const int _INDEX_USER = 3;
+    private const int _INDEX_HOST = 4;
+    private const int _INDEX_ISV_DEF = 5;
+    private const int _INDEX_COUNT = 6;
+    private const int _INDEX_WHY = 7;
+    private const int _INDEX_LAST_ATTEMPT = 8;
+    private const int _INDEX_PROCESS_ID = 9;
+    private const int _INDEX_DATE = 10;
+    private const int _INDEX_TIME = 11;
+    //
     [Column("Product", Order = 11)]
     public string Product { get; private set; } = string.Empty;
 

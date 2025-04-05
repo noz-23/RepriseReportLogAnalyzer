@@ -7,9 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Globalization;
 
 namespace RepriseReportLogAnalyzer.Events;
 
@@ -37,14 +35,19 @@ internal sealed class LogEventTimeJump : LogEventBase
         // small
         // std
         // detailed
-        Minutes = list_[1];
-        EventDateTime = DateTime.Parse(list_[2] + " " + list_[3], CultureInfo.InvariantCulture);
-        LogFormat = LogFormat.NONE;
+        Minutes = list_[_INDEX_MINUTES];
+
+        EventDateTime = _GetDateTime(list_[_INDEX_DATE], list_[_INDEX_DATE]);
     }
 
     //server time jump
     //TIMEJUMP[+ | -]minutes mm/dd hh:mm:ss
     //0        1             2     3
+    private const int _INDEX_MINUTES = 1;
+    private const int _INDEX_DATE = 2;
+    private const int _INDEX_TIME = 3;
+    //
+    //
     [Column("Minutes", Order = 101)]
     public string Minutes { get; private set; } = string.Empty;
 }

@@ -8,8 +8,6 @@
  */
 using Microsoft.Win32;
 using RepriseReportLogAnalyzer.Analyses;
-using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
@@ -18,7 +16,6 @@ using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
 using RepriseReportLogAnalyzer.Windows;
-using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -50,9 +47,6 @@ public partial class OutputControl : UserControl
     /// </summary>
     private readonly string _CLASS_NAME_EVENT = "LogEvent";
     private readonly string _CLASS_NAME_ANALYSIS = "ListAnalysis";
-
-    //private readonly string _NAME_SPACE_EVENT = "RepriseReportLogAnalyzer.Events";
-    //private readonly string _NAME_SPACE_ANALYSES = "RepriseReportLogAnalyzer.Analyses";
 
     /// <summary>
     /// 総合ファイルの出力
@@ -89,6 +83,10 @@ public partial class OutputControl : UserControl
         _initAnalysis(_assembly);
     }
 
+    /// <summary>
+    /// イベントログクラスの表示
+    /// </summary>
+    /// <param name="asm_"></param>
     private void _initEventLog(Assembly asm_)
     {
         // イベントの追加
@@ -101,6 +99,10 @@ public partial class OutputControl : UserControl
         ListEvent.Sort((a_, b_) => a_.Sort -b_.Sort);
     }
 
+    /// <summary>
+    /// イベントログクラスの追加
+    /// </summary>
+    /// <param name="classType_"></param>
     private void _addEvent(Type classType_)
     {
         var view = new OutputView(classType_, classType_.Name.Replace(_CLASS_NAME_EVENT, string.Empty));
@@ -110,6 +112,10 @@ public partial class OutputControl : UserControl
         LogFile.Instance.WriteLine($"{classType_.Name}");
     }
 
+    /// <summary>
+    /// 解析クラスの表示
+    /// </summary>
+    /// <param name="asm_"></param>
     private void _initAnalysis(Assembly asm_)
     {
         // 解析の追加
@@ -121,6 +127,10 @@ public partial class OutputControl : UserControl
 
         ListAnalysis.Sort((a_, b_) => a_.Sort - b_.Sort);
     }
+    /// <summary>
+    /// 解析クラスの追加
+    /// </summary>
+    /// <param name="classType_"></param>
     private void _addAnalysis(Type classType_)
     {
         var listCombo = classType_.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static)
@@ -135,7 +145,11 @@ public partial class OutputControl : UserControl
         }
     }
 
-
+    /// <summary>
+    /// 表示ごとのコンボボックス位置初期化
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
     private void _loaded(object sender_, RoutedEventArgs e_)
     {
         //foreach (var v in ListAnalysis)
@@ -231,7 +245,11 @@ public partial class OutputControl : UserControl
 
         _saveSql.IsEnabled = true;
     }
-
+    /// <summary>
+    /// 全選択イベントの変更
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
     private void _changeAllEvent(object sender_, RoutedEventArgs e_)
     {
         //var flg = _isCheckedAllEvent();
@@ -253,6 +271,12 @@ public partial class OutputControl : UserControl
             }
         }
     }
+
+    /// <summary>
+    /// 全選択解析の変更
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
 
     private void _changeAllAnalysis(object sender_, RoutedEventArgs e_)
     {
@@ -292,6 +316,12 @@ public partial class OutputControl : UserControl
         await _saveCsvAnalysis(outputFolder_);
     }
 
+    /// <summary>
+    /// Csv 出力(総合情報)
+    /// </summary>
+    /// <param name="outputFolder_"></param>
+    /// <returns></returns>
+
     private async Task _saveCsvSummy(string outputFolder_)
     {
         if (IsSaveSummy == true)
@@ -302,7 +332,11 @@ public partial class OutputControl : UserControl
             await AnalysisManager.Instance.WriteSummy(outPath);
         }
     }
-
+    /// <summary>
+    /// Csv 出力(各イベント)
+    /// </summary>
+    /// <param name="outputFolder_"></param>
+    /// <returns></returns>
     private async Task _saveCsvEvent(string outputFolder_)
     {
         foreach (var view in ListEvent.Where(v_ => v_.IsChecked == true && v_.ClassType != null))
@@ -313,8 +347,11 @@ public partial class OutputControl : UserControl
             await AnalysisManager.Instance.WriteText(outPath, view.ClassType);
         }
     }
-
-
+    /// <summary>
+    /// Csv 出力(結合系)
+    /// </summary>
+    /// <param name="outputFolder_"></param>
+    /// <returns></returns>
     private async Task _saveCsvJoin(string outputFolder_)
     {
         if (IsSaveJoinStartShutdown == true)
@@ -333,6 +370,11 @@ public partial class OutputControl : UserControl
         }
     }
 
+    /// <summary>
+    /// Csv 出力(解析情報)
+    /// </summary>
+    /// <param name="outputFolder_"></param>
+    /// <returns></returns>
     private async Task _saveCsvAnalysis(string outputFolder_) 
     {
         foreach (var view in ListAnalysis.Where(v_=> v_.IsChecked == true && v_.ClassType != null))
@@ -369,80 +411,60 @@ public partial class OutputControl : UserControl
         await Task.Delay(0);
     }
 
+    /// <summary>
+    /// Sqlite 出力(総合情報)
+    /// </summary>
+    /// <param name="sql_"></param>
 
     private void _saveSqlSummy(SQLiteManager sql_)
     {
         if (IsSaveSummy == true)
         {
-
-            //sql_.CreateTable("Product");
-            //sql_.Insert("Product", AnalysisManager.Instance.ListProductVersion.Select(x_=>x_.Product +" "+x_.Version));
             sql_.CreateTableAndInsert("Product", AnalysisManager.Instance.ListProductVersion.Select(x_ => x_.Product + " " + x_.Version));
-
-            //sql_.CreateTable(AnalysisGroup.USER.Description());
-            //sql_.Insert(AnalysisGroup.USER.Description(), AnalysisManager.Instance.ListUser);
             sql_.CreateTableAndInsert(AnalysisGroup.USER.Description(), AnalysisManager.Instance.ListUser);
-
-            //sql_.CreateTable(AnalysisGroup.HOST.Description());
-            //sql_.Insert(AnalysisGroup.HOST.Description(), AnalysisManager.Instance.ListHost);
             sql_.CreateTableAndInsert(AnalysisGroup.HOST.Description(), AnalysisManager.Instance.ListHost);
-
-            //sql_.CreateTable(AnalysisGroup.USER_HOST.Description());
-            //sql_.Insert(AnalysisGroup.USER_HOST.Description(), AnalysisManager.Instance.ListUserHost);
             sql_.CreateTableAndInsert(AnalysisGroup.USER_HOST.Description(), AnalysisManager.Instance.ListUserHost);
         }
 
     }
 
+    /// <summary>
+    /// Sqlite 出力(各イベント)
+    /// </summary>
+    /// <param name="sql_"></param>
     private void _saveSqlEvent(SQLiteManager sql_)
     {
         foreach (var view in ListEvent.Where(v_=> v_.IsChecked==true && v_.ClassType !=null))
         {
-            //if (view.IsChecked == false)
-            //{
-            //    continue;
-            //}
-            //if (view.ClassType == null)
-            //{
-            //    continue;
-            //}
-            //sql_.CreateTable(view.ClassType);
-            //sql_.Insert(view.ClassType, ToDataBase.Header(view.ClassType), AnalysisManager.Instance.ListEventValue(view.ClassType));
             sql_.CreateTableAndInsert(view.ClassType, AnalysisManager.Instance.ListEventValue(view.ClassType));
         }
 
     }
+    /// <summary>
+    /// Sqlite 出力(結合系)
+    /// </summary>
+    /// <param name="sql_"></param>
     private void _saveSqlJoin(SQLiteManager sql_)
     {
         if (IsSaveJoinStartShutdown == true)
         {
-            //sql_.CreateTable(typeof(JoinEventStartShutdown));
-            //sql_.Insert(typeof(JoinEventStartShutdown), ToDataBase.Header(typeof(JoinEventStartShutdown)), AnalysisManager.Instance.ListJoinStartShutdownValeu());
             sql_.CreateTableAndInsert(typeof(JoinEventStartShutdown), AnalysisManager.Instance.ListJoinStartShutdownValue());
         }
 
         if (IsSaveJoinCheckOutIn == true)
         {
-            //sql_.CreateTable(typeof(JoinEventCheckOutIn));
-            //sql_.Insert(typeof(JoinEventCheckOutIn), ToDataBase.Header(typeof(JoinEventCheckOutIn)), AnalysisManager.Instance.ListJoinCheckOutInValue());
             sql_.CreateTableAndInsert(typeof(JoinEventCheckOutIn), AnalysisManager.Instance.ListJoinCheckOutInValue());
         }
     }
 
+    /// <summary>
+    /// Sqlite 出力(解析情報)
+    /// </summary>
+    /// <param name="sql_"></param>
     private void _saveSqlAnalysis(SQLiteManager sql_)
     {
         foreach (var view in ListAnalysis.Where(v_ => v_.IsChecked == true && v_.ClassType != null))
         {
-            //if (view.IsChecked == false)
-            //{
-            //    continue;
-            //}
-            //if (view.ClassType == null)
-            //{
-            //    continue;
-            //}
-            //sql_.CreateTable(view.ClassType, AnalysisManager.Instance.ListEventHeader(view.ClassType, view.SelectedValue));
-            //sql_.Insert(view.ClassType, AnalysisManager.Instance.EventHeader(view.ClassType, view.SelectedValue), AnalysisManager.Instance.ListEventValue(view.ClassType, view.SelectedValue));
             sql_.CreateTableAndInsert(view.ClassType, view.SelectedValue);
         }
     }

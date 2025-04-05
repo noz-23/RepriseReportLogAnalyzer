@@ -7,13 +7,13 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Controls;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
-using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
@@ -89,7 +89,6 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// プロダクト リスト
     /// </summary>
     private SortedSet<string> _listProduct = new();
-
 
     /// <summary>
     /// 解析
@@ -235,9 +234,8 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// <param name="timeSpan_">間隔時間</param>
     public async Task WriteText(string path_, long timeSpan_ = _NO_TIME_STAMP)
     {
-        var list = new List<string>();
         // ヘッダー
-        list.Add(Header(timeSpan_));
+        var list = new List<string>() { Header(timeSpan_) };
         // データ
         list.AddRange(ListValue(timeSpan_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);

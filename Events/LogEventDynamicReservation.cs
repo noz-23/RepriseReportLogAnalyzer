@@ -39,22 +39,30 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
         // small
         // std
         // detailed
-        Reservation = (list_[1] == "create") ? ReservationType.CREATE : ReservationType.REMOVE;
-        User = list_[2];
-        Host = list_[3];
+        Reservation = (list_[_INDEX_RESERVATION] == "create") ? ReservationType.CREATE : ReservationType.REMOVE;
+        User = list_[_INDEX_USER];
+        Host = list_[_INDEX_HOST];
         //
-        LicensePool = int.Parse(list_[4], CultureInfo.InvariantCulture);
-        Count = int.Parse(list_[5], CultureInfo.InvariantCulture);
+        LicensePool = int.Parse(list_[_INDEX_LICENSE_POOL], CultureInfo.InvariantCulture);
+        Count = int.Parse(list_[_INDEX_COUNT], CultureInfo.InvariantCulture);
         //
-        StringData = list_[6];
-        EventDateTime = _GetDateTime(list_[7], list_[8]);
-        LogFormat = LogFormat.NONE;
+        StringData = list_[_INDEX_STRING];
+
+        EventDateTime = _GetDateTime(list_[_INDEX_DATE], list_[_INDEX_TIME]);
     }
 
 
     //dynamic reservation
     //DYNRES [create | remove] user host license-pool count “string” mm/dd hh:mm:ss
     //0      1                 2    3    4            5      6         7     8
+    private const int _INDEX_RESERVATION = 1;
+    private const int _INDEX_USER = 2;
+    private const int _INDEX_HOST = 3;
+    private const int _INDEX_LICENSE_POOL = 4;
+    private const int _INDEX_COUNT = 5;
+    private const int _INDEX_STRING = 6;
+    private const int _INDEX_DATE = 7;
+    private const int _INDEX_TIME = 8;
     //
     [Column("User", Order = 11)]
     public string User { get; private set; } = string.Empty;

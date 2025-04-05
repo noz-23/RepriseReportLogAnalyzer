@@ -7,13 +7,13 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Controls;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Events;
 using RepriseReportLogAnalyzer.Extensions;
 using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
-using RepriseReportLogAnalyzer.Windows;
 using ScottPlot;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -112,16 +112,10 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
             foreach (var checkOut in listCheckOut)
             {
                 // 対応するチェックインを探す
-                //var checkIn = listCheckIn.Where(x_ => x_.Key > checkOut.EventNumber).Select(x_ => x_.Value).ToList().Find(f_ => checkOut.IsFindCheckIn(f_.HandleServer, f_.EventNumber)) ?? startShutdown.EventShutdown();
+                // Where でEventNumberが大きいのにして、FindeでHandleServerが同じのを探す
                 var checkIn = listCheckIn.Where(x_ => x_.Key > checkOut.EventNumber).Select(x_ => x_.Value).ToList().Find(f_ => checkOut.HandleServer== f_.HandleServer) ?? startShutdown.EventShutdown();
 
-                //if (checkIn is LogEventCheckIn delIn)
-                //{
-                //    // 対のチェックアウト情報の登録
-                //    delIn.SetLogEventCheckOut(checkOut);
-                //    // スピードアップのため検索リストから検出したデータを削除
-                //    listCheckIn.Remove(delIn.EventNumber);
-                //}
+                // 一致したチェックインは削除(高速化)
                 listCheckIn.Remove(checkIn.EventNumber);
 
                 listCheckOutIn.Add(new AnalysisCheckOutIn(checkOut, checkIn));
@@ -157,9 +151,11 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
 
             if (listValue.Count <= 1)
             {
+                // 一つは以下は処理しない(重複なし)
                 Interlocked.Increment(ref count);
                 return;
             }
+
             foreach (var data in listValue)
             {
                 if (listNoCheck.Contains(data) == true)
@@ -211,9 +207,8 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// <param name="duplication_">ture:重複なし</param>
     public async Task WriteText(string path_, long duplication_ = 0)
     {
-        var list = new List<string>();
         // ヘッダー
-        list.Add(Header(duplication_));
+        var list = new List<string>() { Header(duplication_) };
         // データ
         list.AddRange(ListValue(duplication_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -252,9 +247,8 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// <returns></returns>
     public async Task WriteJoinText(string path_)
     {
-        var list = new List<string>();
         // ヘッダー
-        list.Add(JoinHeader());
+        var list = new List<string>() { JoinHeader() };
         // データ
         list.AddRange(ListJoinValue().Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);

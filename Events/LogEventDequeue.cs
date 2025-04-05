@@ -36,7 +36,7 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
     public LogEventDequeue(string[] list_) : base()
     {
         //if (list_.Count() < 4)
-        if (list_.Length < 4)
+        if (list_.Length <= _INDEX_SML_TIME)
         {
             _initSmall(list_);
         }
@@ -53,7 +53,6 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
         Count = int.Parse(list_[_INDEX_SML_COUNT], CultureInfo.InvariantCulture);
         HandleServer = list_[_INDEX_SML_SERVER_HANDLE];
         //
-        //EventDateTime = DateTime.Parse(_NowDate + " " + list_[_INDEX_SML_TIME], CultureInfo.InvariantCulture);
         EventDateTime = _GetDateTime(list_[_INDEX_SML_TIME]);
         LogFormat = LogFormat.SMALL;
     }
@@ -74,7 +73,7 @@ internal sealed class LogEventDequeue : LogEventBase, ILogEventUserHost, ILogEve
         HandleServer = list_[_INDEX_STD_SERVER_HANDLE];
         //
         EventDateTime = _GetDateTime(list_[_INDEX_STD_DATE], list_[_INDEX_STD_TIME]);
-        LogFormat = (list_[10].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
+        LogFormat = (list_[_INDEX_STD_TIME].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
     //dequeue

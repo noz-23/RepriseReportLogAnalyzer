@@ -7,6 +7,7 @@
  * 
  */
 using RepriseReportLogAnalyzer.Attributes;
+using RepriseReportLogAnalyzer.Controls;
 using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Extensions;
@@ -14,7 +15,6 @@ using RepriseReportLogAnalyzer.Files;
 using RepriseReportLogAnalyzer.Interfaces;
 using RepriseReportLogAnalyzer.Managers;
 using RepriseReportLogAnalyzer.Views;
-using RepriseReportLogAnalyzer.Windows;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
@@ -112,6 +112,9 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// </summary>
     private readonly string _ANALYSIS = "[License Group Duration]";
 
+    /// <summary>
+    /// コンボボックスの項目
+    /// </summary>
     protected static ListStringLongPair _ListSelect { get => liistSelect; }
     private static ListStringLongPair liistSelect = new()
     {
@@ -184,6 +187,7 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     {
         var rtn = new List<LicenseView>();
 
+        // 日付指定がない場合は全てのデータを表示
         var flg = (date_ == null);
 
         foreach (var group in Keys)
@@ -248,9 +252,8 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <param name="path_">パス</param>
     public async Task WriteText(string path_, long product_)
     {
-        var list = new List<string>();
         // ヘッダー
-        list.Add(Header(product_));
+        var list = new List<string>() { Header(product_) };
         // データ
         list.AddRange(ListValue(product_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);

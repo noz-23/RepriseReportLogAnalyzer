@@ -8,7 +8,6 @@
  */
 using RepriseReportLogAnalyzer.Analyses;
 using RepriseReportLogAnalyzer.Attributes;
-using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
@@ -64,9 +63,6 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
         MeterInitialDecrement = int.Parse(list_[19], CultureInfo.InvariantCulture);
         MeterPeriod = int.Parse(list_[20], CultureInfo.InvariantCulture);
         MeterPeriodDecrement = int.Parse(list_[21], CultureInfo.InvariantCulture);
-
-        EventDateTime = NowDateTime;
-        LogFormat = LogFormat.NONE;
     }
 
     //support for a product
@@ -146,9 +142,10 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
         {
             return false;
         }
-        //listHave_[Product] = Count;
-        //var data = listCount_[Product];
-        listCount_[Product].ServerHave = Count;
+        //listCount_[Product].ServerHave = Count;
+        var data = listCount_[Product];
+        data.ServerHave = Count;
+        listCount_[Product] = data;
 
         return true;
     }

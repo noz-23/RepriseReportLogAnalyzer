@@ -37,10 +37,8 @@ internal sealed class LogEventSwitch : LogEventBase
         // small
         // std
         // detailed
-        Switch = (list_[1] == "to") ? SwitchType.TO : SwitchType.FROM;
-        OldReportLogName = list_[2];
-        EventDateTime = NowDateTime;
-        LogFormat = LogFormat.NONE;
+        Switch = (list_[_INDEX_SWITCH] == "to") ? SwitchType.TO : SwitchType.FROM;
+        OldReportLogName = list_[_INDEX_OLD_NAME];
     }
 
     //log file end
@@ -49,6 +47,10 @@ internal sealed class LogEventSwitch : LogEventBase
 
     //SWITCH from old-reportlog-name (new in v14.0, not authenticated)
     //0      1    2                  4
+    private const int _INDEX_SWITCH = 1;
+    private const int _INDEX_OLD_NAME = 2;
+    //
+
     [Column("Switch", Order = 101)]
     public SwitchType Switch { get; private set; } = SwitchType.FROM;
 

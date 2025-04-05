@@ -37,7 +37,7 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     public LogEventCheckIn(string[] list_) : base()
     {
         //if (list_.Count() < 4)
-        if (list_.Length < 4)
+        if (list_.Length <= _INDEX_SML_TIME)
         {
             _initSmall(list_);
         }else
@@ -79,7 +79,6 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
         HandleServer = list_[_INDEX_STD_SERVER_HANDLE];
         //
         EventDateTime = _GetDateTime(list_[_INDEX_STD_DATE], list_[_INDEX_STD_TIME]);
-
         LogFormat = (list_[_INDEX_STD_TIME].Contains('.') == true) ? LogFormat.DETAILED : LogFormat.STANDARD;
     }
 
@@ -162,19 +161,19 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
         {
             return false;
         }
-        //var data = listCount_[product];
-
-        //if (listOutIn_[product] == CountCurrent)
         if (listCount_[product].CheckOutInCurrent == CountCurrent)
         {
             // 重複チェック
             return false;
         }
 
-        //listCount_[product]--;
-        //listOutIn_[product] = CountCurrent;
-        listCount_[product].Count--;
-        listCount_[product].CheckOutInCurrent = CountCurrent;
+        //listCount_[product].Count--;
+        //listCount_[product].CheckOutInCurrent = CountCurrent;
+        var data = listCount_[product];
+        data.Count--;
+        data.CheckOutInCurrent = CountCurrent;
+        listCount_[product] = data;
+
 
         return true;
     }
