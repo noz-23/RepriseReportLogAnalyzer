@@ -21,14 +21,25 @@ public delegate Task RunCallBack();
 /// </summary>
 public partial class WaitWindow : Window
 {
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public WaitWindow()
     {
         InitializeComponent();
         Run = null;
     }
 
+    /// <summary>
+    /// 実行する処理
+    /// </summary>
     public RunCallBack? Run { get; set; }
 
+    /// <summary>
+    /// ロード処理
+    /// </summary>
+    /// <param name="sender_"></param>
+    /// <param name="e_"></param>
     private async void _loaded(object sender_, RoutedEventArgs e_)
     {
         // 実行して

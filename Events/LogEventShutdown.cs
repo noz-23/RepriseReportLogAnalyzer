@@ -67,21 +67,13 @@ internal sealed class LogEventShutdown : LogEventBase, ILogEventUserHost, ILicen
     public string UserHost { get => User + "@" + Host; }
     //
 
-    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    /// <summary>
+    /// ライセンスカウント処理
+    /// </summary>
+    /// <param name="listCount_"></param>
+    /// <returns></returns>
     public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
-        //foreach (var product in listCount_.Keys.ToList())
-        //{
-        //    listCount_[product] = 0;
-        //}
-        //foreach (var product in listHave_.Keys.ToList())
-        //{
-        //    listHave_[product] = 0;
-        //}
-        //foreach (var product in listOutIn_.Keys.ToList())
-        //{
-        //    listOutIn_[product] = 0;
-        //}
         foreach (var product in listCount_.Keys.ToList())
         {
             //listCount_[product].Count = 0;

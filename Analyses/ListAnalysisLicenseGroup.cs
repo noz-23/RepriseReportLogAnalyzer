@@ -31,6 +31,9 @@ namespace RepriseReportLogAnalyzer.Analyses;
 [Description("User Usage(Duration/Days)"), Category("Analyses")]
 internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public ListAnalysisLicenseUser() : base(AnalysisGroup.USER)
     {
     }
@@ -50,6 +53,9 @@ internal sealed class ListAnalysisLicenseUser : ListAnalysisLicenseGroup, IAnaly
 
 internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public ListAnalysisLicenseHost() : base(AnalysisGroup.HOST)
     {
     }
@@ -67,6 +73,9 @@ internal sealed class ListAnalysisLicenseHost : ListAnalysisLicenseGroup, IAnaly
 [Description("User@Host Usage(Duration/Days)"), Category("Analyses")]
 internal sealed class ListAnalysisLicenseUserHost : ListAnalysisLicenseGroup, IAnalysisOutputFile
 {
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public ListAnalysisLicenseUserHost() : base(AnalysisGroup.USER_HOST)
     {
     }

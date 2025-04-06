@@ -212,20 +212,10 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
     public string ClientIpAddress { get; private set; } = string.Empty;
     //
     /// <summary>
-    /// チェックアウト に対応するチェックイン情報か
+    /// ライセンスカウント処理
     /// </summary>
-    /// <param name="checkIn_"></param>
+    /// <param name="listCount_"></param>
     /// <returns></returns>
-    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //public bool IsFindCheckIn(LogEventCheckIn checkIn_) => IsFindCheckIn(checkIn_.HandleServer, checkIn_.EventNumber);
-
-    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //public bool IsFindCheckIn(string hande_, long number_) => (hande_ == HandleServer) && (number_ > EventNumber);
-
-    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //public bool IsFindCheckIn(int hande_, long number_) => (hande_ == HandleServerNum) && (number_ > EventNumber);
-
-    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
     public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         if (string.IsNullOrEmpty(Product) == true)
@@ -238,8 +228,6 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
             return false;
         }
 
-        //listCount_[Product].Count++;
-        //listCount_[Product].CheckOutInCurrent = CountCurrent;
         var data = listCount_[Product];
         data.Count++;
         data.CheckOutInCurrent = CountCurrent;

@@ -16,6 +16,9 @@ namespace RepriseReportLogAnalyzer.Views
     /// </summary>
     public class BaseView : INotifyPropertyChanged
     {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public BaseView()
         {
             PropertyChanged = null;

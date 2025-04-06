@@ -36,11 +36,6 @@ internal interface ILogEventProduct
     string ProductVersion { get; }
 }
 
-//interface ILogEventCountCurrent : ILogEventProduct
-//{
-//    int CountCurrent { get; }
-//}
-
 internal interface ILogEventWhy
 {
     StatusValue Why { get; }

@@ -29,7 +29,7 @@ Reprise Licence Manager の Report Log を解析するアプリです。
 
 ## 4.ライセンス
 
-MIT license
+MIT license https://mit-license.org/
 
 ## 5.利用
 

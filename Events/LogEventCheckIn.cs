@@ -145,14 +145,17 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     [Column("Server Handle", Order = 106)]
     public string HandleServer { get; private set; } = string.Empty;
     //
-    //public int HandleServerNum() => _handleServerNum;
-    //private int _handleServerNum = 1;
-    //public int HandleServerNum { get; private set; } = -1;
-
+    /// <summary>
+    /// 対になるチェックアウト
+    /// </summary>
     private LogEventCheckOut? _checkOut;
     public void SetLogEventCheckOut(LogEventCheckOut checkOut_) => _checkOut = checkOut_;
 
-    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    /// <summary>
+    /// ライセンスカウント処理
+    /// </summary>
+    /// <param name="listCount_"></param>
+    /// <returns></returns>
     public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         string product = (string.IsNullOrEmpty(Product) == false) ? Product : (_checkOut != null) ? _checkOut.Product : string.Empty;
@@ -167,13 +170,10 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
             return false;
         }
 
-        //listCount_[product].Count--;
-        //listCount_[product].CheckOutInCurrent = CountCurrent;
         var data = listCount_[product];
         data.Count--;
         data.CheckOutInCurrent = CountCurrent;
         listCount_[product] = data;
-
 
         return true;
     }

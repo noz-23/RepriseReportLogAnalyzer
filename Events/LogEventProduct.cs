@@ -135,14 +135,17 @@ internal sealed class LogEventProduct : LogEventBase, ILogEventProduct, ILicense
     [Column("Meter Period Decrement", Order = 119)]
     public int MeterPeriodDecrement { get; private set; } = -1;
     //
-    //public bool SetCount(IDictionary<string, int> listCount_, IDictionary<string, int> listHave_, IDictionary<string, int> listOutIn_)
+    /// <summary>
+    /// ライセンスカウント処理
+    /// </summary>
+    /// <param name="listCount_"></param>
+    /// <returns></returns>
     public bool SetCount(IDictionary<string, AnalysisLicenseCount.LicenseCount> listCount_)
     {
         if (string.IsNullOrEmpty(Product) == true)
         {
             return false;
         }
-        //listCount_[Product].ServerHave = Count;
         var data = listCount_[Product];
         data.ServerHave = Count;
         listCount_[Product] = data;
