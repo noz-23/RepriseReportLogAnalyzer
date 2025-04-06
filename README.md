@@ -54,6 +54,8 @@ Reprise Reportlog File Format
 
  https://reprisesoftware.com/docs/admin/reportlog-format.html
 
- ## 6.履歴
+## 6.履歴
+
  0.1.0  : 2025/03/27 リリース　開始
+
  0.1.1  : 2025/04/06 リリース　不要なライブラリ削除 /コードの保守容易性指数の改善/ バグ修正
