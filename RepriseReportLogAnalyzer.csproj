@@ -16,6 +16,7 @@
     <PredefinedCulturesOnly>false</PredefinedCulturesOnly>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
     <NeutralLanguage>ja-JP</NeutralLanguage>
+    <Version>0.1.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="icon.ico" />

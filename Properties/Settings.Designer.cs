@@ -25,7 +25,7 @@ namespace RepriseReportLogAnalyzer.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("yyyy/MM/dd hh:mm:ss")]
+        [global::System.Configuration.DefaultSettingValueAttribute("yyyy/MM/dd HH:mm:ss")]
         public string FORMAT_DATE_TIME {
             get {
                 return ((string)(this["FORMAT_DATE_TIME"]));
