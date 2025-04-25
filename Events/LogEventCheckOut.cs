@@ -145,70 +145,70 @@ internal sealed class LogEventCheckOut : LogEventBase, ILogEventUserHost, ILicen
     private const int _INDEX_STD_ROAM_HANDLE = 21;
     private const int _INDEX_STD_CLIENT_IP_ADDRESS = 22;
     //
-    [Column("Product", Order = 11)]
+    [Column("Product", Order = 11, TypeName = "TEXT")]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order = 12)]
+    [Column("Version", Order = 12, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order = 13)]
+    [Column("Product Version", Order = 13, TypeName = "TEXT")]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order = 21)]
+    [Column("User", Order = 21, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 22)]
+    [Column("Host", Order = 22, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 23)]
+    [Column("User@Host", Order = 23, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Isv Def", Order = 101)]
+    [Column("Isv Def", Order = 101, TypeName = "TEXT")]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Pool", Order = 102)]
+    [Column("Pool", Order = 102, TypeName = "TEXT")]
     public string Pool { get; private set; } = string.Empty;
     //
-    [Column("Count", Order = 103)]
+    [Column("Count", Order = 103, TypeName = "INTEGER")]
     public int Count { get; private set; } = -1;
 
-    [Column("Current Count", Order = 104)]
+    [Column("Current Count", Order = 104, TypeName = "INTEGER")]
     public int CountCurrent { get; private set; } = -1;
 
-    [Column("Current Resuse", Order = 105)]
+    [Column("Current Resuse", Order = 105, TypeName = "INTEGER")]
     public int ResuseCurrent { get; private set; } = -1;
     //
-    [Column("Server Handle", Order = 106)]
+    [Column("Server Handle", Order = 106, TypeName = "TEXT")]
     public string HandleServer { get; private set; } = string.Empty;
 
-    [Column("Share Handle", Order = 107)]
+    [Column("Share Handle", Order = 107, TypeName = "TEXT")]
     public string HandleShare { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order = 108)]
+    [Column("Process ID", Order = 108, TypeName = "TEXT")]
     public string ProcessId { get; private set; } = string.Empty;
     //
-    [Column("Project", Order = 109)]
+    [Column("Project", Order = 109, TypeName = "TEXT")]
     public string Project { get; private set; } = string.Empty;
 
-    [Column("Requested Product", Order = 110)]
+    [Column("Requested Product", Order = 110, TypeName = "TEXT")]
     public string RequestedProduct { get; private set; } = string.Empty;
 
-    [Column("Requested Version", Order = 111)]
+    [Column("Requested Version", Order = 111, TypeName = "TEXT")]
     public string RequestedVersion { get; private set; } = string.Empty;
     //
-    [Column("Client Machine OS Info", Order = 201)]
+    [Column("Client Machine OS Info", Order = 201, TypeName = "TEXT")]
     public string ClientMachineOsInfo { get; private set; } = string.Empty;
 
-    [Column("Application Argv0", Order = 202)]
+    [Column("Application Argv0", Order = 202, TypeName = "TEXT")]
     public string ApplicationArgv0 { get; private set; } = string.Empty;
 
-    [Column("Roam Days", Order = 203)]
+    [Column("Roam Days", Order = 203, TypeName = "TEXT")]
     public string RoamDays { get; private set; } = string.Empty;
 
-    [Column("Roam Handle", Order = 204)]
+    [Column("Roam Handle", Order = 204, TypeName = "TEXT")]
     public string RoamHandle { get; private set; } = string.Empty;
 
-    [Column("Client IP Address", Order = 205)]
+    [Column("Client IP Address", Order = 205, TypeName = "TEXT")]
     public string ClientIpAddress { get; private set; } = string.Empty;
     //
     /// <summary>

@@ -28,7 +28,4 @@ namespace RepriseReportLogAnalyzer.Extensions
         /// <returns></returns>
         public static int Sort(this MemberInfo src_) => src_?.GetAttribute<SortAttribute>()?.Sort ?? -1;
     }
-
-
-
 }

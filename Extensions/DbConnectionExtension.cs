@@ -53,9 +53,11 @@ public static class DbConnectionExtension
     /// <param name="src_"></param>
     /// <param name="classType_"></param>
     /// <param name="list_"></param>
-    public static void CreateTable(this DbConnection src, Type classType, ListStringStringPair? list = null)
+    //public static void CreateTable(this DbConnection src, Type classType, ListStringStringPair? list = null)
+    public static void CreateTable(this DbConnection src, Type classType, List<string>? list = null)
     {
-        list ??= ToDataBase.ListHeader(classType);
+        //list ??= ToDataBase.ListHeader(classType);
+        list ??= BaseToData.ListCreateHeader(classType);
 
         LogFile.Instance.WriteLine($"[{classType.Name}] [{list.Count}]");
 
@@ -144,12 +146,14 @@ public static class DbConnectionExtension
     /// <param name="classType_"></param>
     /// <param name="list_"></param>
     /// <returns></returns>
-    private static string _createTabel(Type classType_, ListStringStringPair list_)
+    //private static string _createTabel(Type classType_, ListStringStringPair list_)
+    private static string _createTabel(Type classType_, List<string> list_)
     {
-        var listColunm = new List<string>();
-        list_.ForEach(column_ => listColunm.Add($"'{column_.Key}' {column_.Value}"));
+        //var listColunm = new List<string>();
+        //list_.ForEach(column_ => listColunm.Add($"'{column_.Key}' {column_.Value}"));
 
-        var rtn = $"CREATE TABLE {_tableName(classType_)} ({string.Join(",", listColunm)});";
+        //var rtn = $"CREATE TABLE {_tableName(classType_)} ({string.Join(",", listColunm)});";
+        var rtn = $"CREATE TABLE {_tableName(classType_)} ({string.Join(",", list_)});";
         LogFile.Instance.WriteLine(rtn);
         return rtn;
     }

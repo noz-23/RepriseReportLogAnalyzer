@@ -43,6 +43,6 @@ internal sealed class LogEventRlmReportLogFormat : LogEventBase
     private const int _INDEX_VERSION = 6;
     //
 
-    [Column("Version", Order = 101)]
+    [Column("Version", Order = 101, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 }

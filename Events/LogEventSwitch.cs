@@ -51,9 +51,9 @@ internal sealed class LogEventSwitch : LogEventBase
     private const int _INDEX_OLD_NAME = 2;
     //
 
-    [Column("Switch", Order = 101)]
+    [Column("Switch", Order = 101, TypeName = "INTEGER")]
     public SwitchType Switch { get; private set; } = SwitchType.FROM;
 
-    [Column("Old Report Log Name", Order = 102)]
+    [Column("Old Report Log Name", Order = 102, TypeName = "TEXT")]
     public string OldReportLogName { get; private set; } = string.Empty;
 }

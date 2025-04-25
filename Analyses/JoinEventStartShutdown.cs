@@ -19,7 +19,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 ///  重複情報
 /// </summary>
 [Table("TbJoinJoinEventStartShutdown")]
-internal sealed class JoinEventStartShutdown : ToDataBase
+internal sealed class JoinEventStartShutdown : BaseToData
 {
     /// <summary>
     /// コンストラクタ

@@ -51,12 +51,12 @@ internal sealed class LogEventMeterDecrement : LogEventBase
     private const int _INDEX_DATE = 4;
     private const int _INDEX_TIME = 5;
     //
-    [Column("License Handle", Order = 101)]
+    [Column("License Handle", Order = 101, TypeName = "TEXT")]
     public string HandleLicense { get; private set; } = string.Empty;
 
-    [Column("Meter Counter", Order = 102)]
+    [Column("Meter Counter", Order = 102, TypeName = "TEXT")]
     public string CounterMeter { get; private set; } = string.Empty;
 
-    [Column("Amount Decremented", Order = 103)]
+    [Column("Amount Decremented", Order = 103, TypeName = "TEXT")]
     public string AmountDecremented { get; private set; } = string.Empty;
 }

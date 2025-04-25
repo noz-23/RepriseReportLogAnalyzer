@@ -208,7 +208,8 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     public async Task WriteText(string path_, long duplication_ = 0)
     {
         // ヘッダー
-        var list = new List<string>() { Header(duplication_) };
+        //var list = new List<string>() { Header(duplication_) };
+        var list = new List<string>() { CsvHeader(duplication_) };
         // データ
         list.AddRange(ListValue(duplication_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -219,14 +220,17 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// </summary>
     /// <param name="duplication_"></param>
     /// <returns></returns>
-    public string Header(long duplication_) => AnalysisCheckOutIn.Header();
+    //public string Header(long duplication_) => AnalysisCheckOutIn.Header();
+    public string CsvHeader(long duplication_) => AnalysisCheckOutIn.CsvHeader();
 
     /// <summary>
     /// リスト化したヘッダー項目
     /// </summary>
     /// <param name="duplication_"></param>
     /// <returns></returns>
-    public ListStringStringPair ListHeader(long duplication_) => AnalysisCheckOutIn.ListHeader();
+    //public ListStringStringPair ListHeader(long duplication_) => AnalysisCheckOutIn.ListHeader();
+    public List<string> ListCreateHeader(long duplication_) => AnalysisCheckOutIn.ListCreateHeader();
+    public List<string> ListInsertHeader(long duplication_) => AnalysisCheckOutIn.ListInsertHeader();
 
     /// <summary>
     /// リスト化したデータ項目
@@ -248,7 +252,8 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     public async Task WriteJoinText(string path_)
     {
         // ヘッダー
-        var list = new List<string>() { JoinHeader() };
+        //var list = new List<string>() { JoinHeader() };
+        var list = new List<string>() { JoinCsvHeader() };
         // データ
         list.AddRange(ListJoinValue().Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -258,7 +263,9 @@ internal sealed class ListAnalysisCheckOutIn : SortedSet<AnalysisCheckOutIn>, IA
     /// 結合情報ヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public static string JoinHeader() => ToDataBase.Header(typeof(JoinEventCheckOutIn));
+    //public static string JoinHeader() => ToDataBase.Header(typeof(JoinEventCheckOutIn));
+    public static string JoinCsvHeader() => BaseToData.CsvHeader(typeof(JoinEventCheckOutIn));
+
     /// <summary>
     /// 結合所法データ項目
     /// </summary>

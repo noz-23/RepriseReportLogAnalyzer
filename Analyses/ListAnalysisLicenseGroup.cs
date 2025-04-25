@@ -262,7 +262,8 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     public async Task WriteText(string path_, long product_)
     {
         // ヘッダー
-        var list = new List<string>() { Header(product_) };
+        //var list = new List<string>() { Header(product_) };
+        var list = new List<string>() { CsvHeader(product_) };
         // データ
         list.AddRange(ListValue(product_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -273,25 +274,20 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
     /// <summary>
     /// ヘッダー
     /// </summary>
-    public string Header(long product_) => "'" + string.Join("','", ListHeader(product_).Select(x_ => x_.Key)) + "'";
+    //public string Header(long product_) => "'" + string.Join("','", ListHeader(product_).Select(x_ => x_.Key)) + "'";
+    public string CsvHeader(long product_) => string.Join("','", ListCsvHeader(product_));
 
-    /// <summary>
-    /// リスト化したヘッダー
-    /// </summary>
-    /// <param name="product_"></param>
-    /// <returns></returns>
-
-    public ListStringStringPair ListHeader(long product_)
+    public List<string> ListCsvHeader(long product_)
     {
-        var rtn = new ListStringStringPair();
-        rtn.Add(new(_group.Description(), ToDataBase.GetDatabaseType(typeof(string))));
+        var rtn = new List<string>();
+        rtn.Add($"'{_group.Description()}'");
 
         if (product_ == (long)SelectData.ALL)
         {
             // 全て
-            rtn.Add(new("Duration", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
-            rtn.Add(new("Days", ToDataBase.GetDatabaseType(typeof(long))));
-            rtn.Add(new("Count", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add("Duration");
+            rtn.Add("Days");
+            rtn.Add("Count");
 
             return rtn;
         }
@@ -299,9 +295,96 @@ internal class ListAnalysisLicenseGroup : Dictionary<string, ListAnalysisCheckOu
         // プロダクト毎
         foreach (var product in _listProduct)
         {
-            rtn.Add(new($"{product}[Duration]", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
-            rtn.Add(new($"{product}[Days]", ToDataBase.GetDatabaseType(typeof(long))));
-            rtn.Add(new($"{product}[Count]", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add($"{product}[Duration]");
+            rtn.Add($"{product}[Days]");
+            rtn.Add($"{product}[Count]");
+        }
+        return rtn;
+    }
+    /// <summary>
+    /// リスト化したヘッダー
+    /// </summary>
+    /// <param name="product_"></param>
+    /// <returns></returns>
+
+    //public ListStringStringPair ListHeader(long product_)
+    //{
+    //    var rtn = new ListStringStringPair();
+    //    //rtn.Add(new(_group.Description(), ToDataBase.GetDatabaseType(typeof(string))));
+    //    rtn.Add(new(_group.Description(), "TEXT"));
+
+    //    if (product_ == (long)SelectData.ALL)
+    //    {
+    //        // 全て
+    //        //rtn.Add(new("Duration", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
+    //        //rtn.Add(new("Days", ToDataBase.GetDatabaseType(typeof(long))));
+    //        //rtn.Add(new("Count", ToDataBase.GetDatabaseType(typeof(long))));
+    //        rtn.Add(new("Duration", "TEXT"));
+    //        rtn.Add(new("Days", "INTEGER"));
+    //        rtn.Add(new("Count", "INTEGER"));
+
+    //        return rtn;
+    //    }
+
+    //    // プロダクト毎
+    //    foreach (var product in _listProduct)
+    //    {
+    //        //rtn.Add(new($"{product}[Duration]", ToDataBase.GetDatabaseType(typeof(TimeSpan))));
+    //        //rtn.Add(new($"{product}[Days]", ToDataBase.GetDatabaseType(typeof(long))));
+    //        //rtn.Add(new($"{product}[Count]", ToDataBase.GetDatabaseType(typeof(long))));
+    //        rtn.Add(new($"{product}[Duration]", "TEXT"));
+    //        rtn.Add(new($"{product}[Days]", "INTEGER"));
+    //        rtn.Add(new($"{product}[Count]", "INTEGER"));
+    //    }
+    //    return rtn;
+    //}
+
+    public List<string> ListCreateHeader(long product_)
+    {
+        var rtn = new List<string>();
+        rtn.Add($"'{_group.Description()}' TEXT");
+
+        if (product_ == (long)SelectData.ALL)
+        {
+            // 全て
+            rtn.Add("'Duration' TEXT");
+            rtn.Add("'Days' INTEGER");
+            rtn.Add("'Count' INTEGER");
+
+            return rtn;
+        }
+
+        // プロダクト毎
+        foreach (var product in _listProduct)
+        {
+            rtn.Add($"'{product}[Duration]' TEXT");
+            rtn.Add($"'{product}[Days]' INTEGER");
+            rtn.Add($"'{product}[Count]' INTEGER");
+        }
+        return rtn;
+    }
+
+    public List<string> ListInsertHeader(long product_)
+    {
+        var rtn = new List<string>();
+        rtn.Add($"'{_group.Description()}'");
+
+        if (product_ == (long)SelectData.ALL)
+        {
+            // 全て
+            rtn.Add("'Duration'");
+            rtn.Add("'Days'");
+            rtn.Add("'Count'");
+
+            return rtn;
+        }
+
+        // プロダクト毎
+        foreach (var product in _listProduct)
+        {
+            rtn.Add($"'{product}[Duration]'");
+            rtn.Add($"'{product}[Days]'");
+            rtn.Add($"'{product}[Count]'");
         }
         return rtn;
     }

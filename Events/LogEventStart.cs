@@ -49,6 +49,6 @@ internal sealed class LogEventStart : LogEventBase
     private const int _INDEX_DATE = 2;
     private const int _INDEX_TIME = 3;
     //
-    [Column("Host Name", Order = 101)]
+    [Column("Host Name", Order = 101, TypeName = "TEXT")]
     public string HostName { get; private set; } = string.Empty;
 }

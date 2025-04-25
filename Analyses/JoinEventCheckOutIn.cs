@@ -19,7 +19,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// 重複情報
 /// </summary>
 [Table("TbJoinEventCheckOutIn")]
-internal sealed class JoinEventCheckOutIn : ToDataBase
+internal sealed class JoinEventCheckOutIn : BaseToData
 {
     /// <summary>
     /// コンストラクタ

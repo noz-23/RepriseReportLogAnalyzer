@@ -50,13 +50,13 @@ internal sealed class LogEventLicenseReread : LogEventBase, ILogEventUserHost
     private const int _INDEX_DATE = 3;
     private const int _INDEX_TIME = 4;
     //
-    [Column("User", Order = 21)]
+    [Column("User", Order = 21, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 22)]
+    [Column("Host", Order = 22, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 23)]
+    [Column("User@Host", Order = 23, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
     //
 }

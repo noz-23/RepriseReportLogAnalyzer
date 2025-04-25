@@ -15,7 +15,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// ライセンスの利用数計算
 /// </summary>
 /// 
-internal sealed class AnalysisLicenseCount : ToDataBase
+internal sealed class AnalysisLicenseCount : BaseToData
 {
     /// <summary>
     /// ライセンスのカウント処理

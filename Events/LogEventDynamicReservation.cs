@@ -64,25 +64,25 @@ internal sealed class LogEventDynamicReservation : LogEventBase, ILogEventUserHo
     private const int _INDEX_DATE = 7;
     private const int _INDEX_TIME = 8;
     //
-    [Column("User", Order = 11)]
+    [Column("User", Order = 11, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 12)]
+    [Column("Host", Order = 12, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 13)]
+    [Column("User@Host", Order = 13, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
 
-    [Column("Reservation", Order = 101)]
+    [Column("Reservation", Order = 101, TypeName = "INTEGER")]
     public ReservationType Reservation { get; private set; } = ReservationType.CREATE;
 
-    [Column("License Pool", Order = 102)]
+    [Column("License Pool", Order = 102, TypeName = "INTEGER")]
     public int LicensePool { get; private set; } = -1;
 
-    [Column("Count", Order = 103)]
+    [Column("Count", Order = 103, TypeName = "INTEGER")]
     public int Count { get; private set; } = -1;
 
-    [Column("String Data", Order = 104)]
+    [Column("String Data", Order = 104, TypeName = "TEXT")]
     public string StringData { get; private set; } = string.Empty;
     //
 }

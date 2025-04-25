@@ -65,37 +65,37 @@ internal sealed class LogEventRoamExtend : LogEventBase, ILogEventUserHost, ILog
     private const int _INDEX_DATE = 10;
     private const int _INDEX_TIME = 11;
     //
-    [Column("Product", Order = 11)]
+    [Column("Product", Order = 11, TypeName = "TEXT")]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order = 12)]
+    [Column("Version", Order = 12, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order = 13)]
+    [Column("Product Version", Order = 13, TypeName = "TEXT")]
     public string ProductVersion { get => Product + " " + Version; }
 
-    [Column("User", Order = 21)]
+    [Column("User", Order = 21, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 22)]
+    [Column("Host", Order = 22, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 23)]
+    [Column("User@Host", Order = 23, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Pool", Order = 101)]
+    [Column("Pool", Order = 101, TypeName = "TEXT")]
     public string Pool { get; private set; } = string.Empty;
     //
-    [Column("Isv Def", Order = 102)]
+    [Column("Isv Def", Order = 102, TypeName = "TEXT")]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Days Extended", Order = 103)]
+    [Column("Days Extended", Order = 103, TypeName = "TEXT")]
     public string DaysExtended { get; private set; } = string.Empty;
 
-    [Column("Server Handle", Order = 104)]
+    [Column("Server Handle", Order = 104, TypeName = "TEXT")]
     public string HandleServer { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order = 105)]
+    [Column("Process ID", Order = 105, TypeName = "TEXT")]
     public string ProcessId { get; private set; } = string.Empty;
     //
 }

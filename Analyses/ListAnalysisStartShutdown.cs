@@ -106,7 +106,8 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     {
         var list = new List<string>();
         // ヘッダー
-        list.Add(Header(skip_));
+        //list.Add(Header(skip_));
+        list.Add(CsvHeader(skip_));
         // データ
         list.AddRange(ListValue(skip_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -117,14 +118,18 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// </summary>
     /// <param name="skip_"></param>
     /// <returns></returns>
-    public string Header(long skip_) => AnalysisStartShutdown.Header();
+    //public string Header(long skip_) => AnalysisStartShutdown.Header();
+    public string CsvHeader(long skip_) => AnalysisStartShutdown.CsvHeader();
 
     /// <summary>
     /// リスト化したヘッダー
     /// </summary>
     /// <param name="skip_"></param>
     /// <returns></returns>
-    public ListStringStringPair ListHeader(long skip_) => AnalysisStartShutdown.ListHeader();
+    //public ListStringStringPair ListHeader(long skip_) => AnalysisStartShutdown.ListHeader();
+    public List<string> ListCreateHeader(long skip_) => AnalysisStartShutdown.ListCreateHeader();
+
+    public List<string> ListInsertHeader(long skip_) => AnalysisStartShutdown.ListInsertHeader();
 
     /// <summary>
     /// リスト化したデータ
@@ -146,7 +151,8 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     {
         var list = new List<string>();
         // ヘッダー
-        list.Add(JoinHeader());
+        //list.Add(JoinHeader());
+        list.Add(JoinCsvHeader());
         // データ
         list.AddRange(ListJoinValue().Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -155,7 +161,9 @@ internal sealed class ListAnalysisStartShutdown : List<AnalysisStartShutdown>, I
     /// 結合情報ヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public static string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
+    //public static string JoinHeader() => ToDataBase.Header(typeof(JoinEventStartShutdown));
+    public static string JoinCsvHeader() => BaseToData.CsvHeader(typeof(JoinEventStartShutdown));
+
     /// <summary>
     /// 結合情報データ項目
     /// </summary>

@@ -20,7 +20,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// <summary>
 /// チェックアウトとチェックインを結合
 /// </summary>
-internal sealed class AnalysisCheckOutIn : ToDataBase, IComparer, IComparable
+internal sealed class AnalysisCheckOutIn : BaseToData, IComparer, IComparable
 {
     /// <summary>
     /// コンストラクタ
@@ -166,13 +166,16 @@ internal sealed class AnalysisCheckOutIn : ToDataBase, IComparer, IComparable
     /// </summary>
     /// <returns></returns>
 
-    public static string Header() => ToDataBase.Header(typeof(AnalysisCheckOutIn));
+    //public static string Header() => ToDataBase.Header(typeof(AnalysisCheckOutIn));
+    public static string CsvHeader() => BaseToData.CsvHeader(typeof(AnalysisCheckOutIn));
 
     /// <summary>
     /// リスト化したヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
+    //public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisCheckOutIn));
+    public static List<string> ListCreateHeader() => BaseToData.ListCreateHeader(typeof(AnalysisCheckOutIn));
+    public static List<string> ListInsertHeader() => BaseToData.ListInsertHeader(typeof(AnalysisCheckOutIn));
 
     /// <summary>
     /// リスト化したデータ(重複除去)

@@ -109,40 +109,40 @@ internal sealed class LogEventQueue : LogEventBase, ILogEventUserHost, ILogEvent
     private const int _INDEX_STD_TIME = 12;
     //
 
-    [Column("Product", Order = 11)]
+    [Column("Product", Order = 11, TypeName = "TEXT")]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order = 12)]
+    [Column("Version", Order = 12, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order = 13)]
+    [Column("Product Version", Order = 13, TypeName = "TEXT")]
     public string ProductVersion { get => Product + " " + Version; }
 
-    [Column("User", Order = 21)]
+    [Column("User", Order = 21, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 22)]
+    [Column("Host", Order = 22, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 23)]
+    [Column("User@Host", Order = 23, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
 
-    [Column("Isv Def", Order = 101)]
+    [Column("Isv Def", Order = 101, TypeName = "TEXT")]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Count", Order = 102)]
+    [Column("Count", Order = 102, TypeName = "INTEGER")]
     public int Count { get; private set; } = -1;
 
-    [Column("Server Handle", Order = 103)]
+    [Column("Server Handle", Order = 103, TypeName = "TEXT")]
     public string HandleServer { get; private set; } = string.Empty;
 
-    [Column("Project", Order = 104)]
+    [Column("Project", Order = 104, TypeName = "TEXT")]
     public string Project { get; private set; } = string.Empty;
 
-    [Column("Requested Product", Order = 105)]
+    [Column("Requested Product", Order = 105, TypeName = "TEXT")]
     public string RequestedProduct { get; private set; } = string.Empty;
 
-    [Column("Requested Version", Order = 108)]
+    [Column("Requested Version", Order = 108, TypeName = "TEXT")]
     public string RequestedVersion { get; private set; } = string.Empty;
     //
 }

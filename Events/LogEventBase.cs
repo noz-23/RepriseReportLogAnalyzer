@@ -11,6 +11,7 @@ using RepriseReportLogAnalyzer.Data;
 using RepriseReportLogAnalyzer.Enums;
 using RepriseReportLogAnalyzer.Files;
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -51,7 +52,7 @@ internal sealed partial class LogEventRegist
 /// ログ イベント(ベース)
 /// </summary>
 [Sort(99)]
-internal partial class LogEventBase : ToDataBase, IComparer, IComparable
+internal partial class LogEventBase : BaseToData, IComparer, IComparable
 {
     /// <summary>
     /// コンストラクタ
@@ -113,13 +114,14 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
     /// <summary>
     /// イベント番号
     /// </summary>
-    [Column("No", Order = 1)]
+    [Key]
+    [Column("No", Order = 1, TypeName = "INTEGER")]
     public long EventNumber { get; protected set; } = 0;
 
     /// <summary>
     /// イベント時間
     /// </summary>
-    [Column("DateTime", Order = 2)]
+    [Column("DateTime", Order = 2, TypeName = "TEXT")]
     public DateTime EventDateTime
     {
         get => _eventDateTime;
@@ -132,7 +134,7 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
     private DateTime _eventDateTime;
 
 
-    [Column("Format", Order = ToDataBase.NO_OUPUT_DATA)]
+    //[Column("Format", Order = ToDataBase.NO_OUPUT_DATA)]
     public LogFormat LogFormat { get; set; } = LogFormat.NONE;
 
     /// <summary>
@@ -167,7 +169,6 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
             return newEvent?.Invoke(list);
         }
 
-        //if (list.Count() == 2 && list[0].Contains("/") == true && list[1].Contains(":") == true)
         if (list.Length == 2 && list[0].Contains('/') == true && list[1].Contains(':') == true)
         {
             // タイムスタンプ
@@ -247,7 +248,6 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
 
     protected static DateTime _GetDateTime(string time_) => _GetDateTime( _nowDate, time_);
 
-
     /// <summary>
     /// 比較処理
     /// </summary>
@@ -255,17 +255,6 @@ internal partial class LogEventBase : ToDataBase, IComparer, IComparable
     /// <param name="b_"></param>
     /// <returns></returns>
     public int Compare(object? a_, object? b_) => (a_ is LogEventBase a) ? a.CompareTo(b_) : -1;
-    //{
-    //    if (a_ is LogEventBase a)
-    //    {
-    //        //if (b_ is LogEventBase b)
-    //        //{
-    //        //    return (int)(a.EventNumber - b.EventNumber);
-    //        //}
-    //        return a.CompareTo(b_);
-    //    }
-    //    return -1;
-    //}
 
     /// <summary>
     /// 比較処理

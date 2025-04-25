@@ -48,7 +48,7 @@ internal interface IAnalysisOutputFile
     /// </summary>
     /// <param name="select_"></param>
     /// <returns></returns>
-    string Header(long select_);
+    //string Header(long select_);
     /// <summary>
     /// テキストの書き出し
     /// </summary>
@@ -60,7 +60,13 @@ internal interface IAnalysisOutputFile
     /// </summary>
     /// <param name="select_"></param>
     /// <returns></returns>
-    ListStringStringPair ListHeader(long select_);
+    //ListStringStringPair ListHeader(long select_);
+
+    string CsvHeader(long select_);
+    //List<string> ListCsvHeader(long select_);
+    List<string> ListCreateHeader(long select_);
+    List<string> ListInsertHeader(long select_);
+
     /// <summary>
     /// リスト化したデータ
     /// </summary>

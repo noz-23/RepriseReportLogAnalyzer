@@ -46,12 +46,12 @@ internal sealed class LogEventTimeZone : LogEventBase
     private const int _INDEX_DAY_LIGHT = 2;
     private const int _INDEX_RULES = 3;
     //
-    [Column("Minutes West Of UTC", Order = 101)]
+    [Column("Minutes West Of UTC", Order = 101, TypeName = "TEXT")]
     public string MinutesWestOfUTC { get; private set; } = string.Empty;
 
-    [Column("DayLight", Order = 102)]
+    [Column("DayLight", Order = 102, TypeName = "TEXT")]
     public string DayLight { get; private set; } = string.Empty;
 
-    [Column("Rules", Order = 103)]
+    [Column("Rules", Order = 103, TypeName = "TEXT")]
     public string Rules { get; private set; } = string.Empty;
 }

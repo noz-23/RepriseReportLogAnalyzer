@@ -48,6 +48,6 @@ internal sealed class LogEventTimeJump : LogEventBase
     private const int _INDEX_TIME = 3;
     //
     //
-    [Column("Minutes", Order = 101)]
+    [Column("Minutes", Order = 101, TypeName = "TEXT")]
     public string Minutes { get; private set; } = string.Empty;
 }

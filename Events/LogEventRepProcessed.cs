@@ -42,6 +42,6 @@ internal sealed class LogEventRepProcessed : LogEventBase
     //0           1    2       3
     private const int _INDEX_VERSION = 3;
     //
-    [Column("Version", Order = 101)]
+    [Column("Version", Order = 101, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 }

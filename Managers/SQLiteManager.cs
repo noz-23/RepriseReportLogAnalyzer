@@ -81,7 +81,8 @@ namespace RepriseReportLogAnalyzer.Managers
         /// </summary>
         /// <param name="classType_"></param>
         public void CreateTable(Type classType_) => _connection?.CreateTable(classType_);
-        public void CreateTable(Type classType_, ListStringStringPair list_) => _connection?.CreateTable(classType_, list_);
+        //public void CreateTable(Type classType_, ListStringStringPair list_) => _connection?.CreateTable(classType_, list_);
+        public void CreateTable(Type classType_, List<string> list_) => _connection?.CreateTable(classType_, list_);
 
         /// <summary>
         /// データ挿入処理(単一)
@@ -126,7 +127,8 @@ namespace RepriseReportLogAnalyzer.Managers
         public void CreateTableAndInsert(Type classType_, IEnumerable<List<string>> list_)
         {
             CreateTable(classType_);
-            Insert(classType_, ToDataBase.Header(classType_),list_);
+            //Insert(classType_, ToDataBase.Header(classType_),list_);
+            Insert(classType_, string.Join(",",BaseToData.ListInsertHeader(classType_)), list_);
         }
         public void CreateTableAndInsert(Type classType_, long select_)
         {

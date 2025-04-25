@@ -45,9 +45,9 @@ internal sealed class LogEventAuthentication : LogEventBase
     private const int _INDEX_SIGNATURE = 2;
 
 
-    [Column("Section", Order = 101)]
+    [Column("Section", Order = 101, TypeName ="TEXT")]
     public string Section { get; private set; } = string.Empty;
 
-    [Column("Signature", Order = 102)]
+    [Column("Signature", Order = 102, TypeName = "TEXT")]
     public string Signature { get; private set; } = string.Empty;
 }

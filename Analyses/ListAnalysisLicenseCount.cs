@@ -235,7 +235,8 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     public async Task WriteText(string path_, long timeSpan_ = _NO_TIME_STAMP)
     {
         // ヘッダー
-        var list = new List<string>() { Header(timeSpan_) };
+        //var list = new List<string>() { Header(timeSpan_) };
+        var list = new List<string>() { CsvHeader(timeSpan_) };
         // データ
         list.AddRange(ListValue(timeSpan_).Select(x_ => string.Join(",", x_)));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -268,24 +269,72 @@ internal sealed class ListAnalysisLicenseCount : List<AnalysisLicenseCount>, IAn
     /// </summary>
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
-    public string Header(long timeSpan_) => "'" + string.Join("','", ListHeader(timeSpan_).Select(x_ => x_.Key)) + "'";
+    //public string Header(long timeSpan_) => "'" + string.Join("','", ListHeader(timeSpan_).Select(x_ => x_.Key)) + "'";
+    public string CsvHeader(long timeSpan_) => string.Join("','", ListCsvHeader(timeSpan_));
+
+    public List<string> ListCsvHeader(long timeSpan_)
+    {
+        var rtn = new List<string>();
+        rtn.Add("Date TEXT");
+        rtn.Add("Time TEXT");
+        //
+        foreach (var product in _listProduct)
+        {
+            rtn.Add($"{product}[Use] INTEGER");
+            rtn.Add($"{product}[Have] INTEGER");
+        }
+
+        return rtn;
+    }
 
     /// <summary>
     /// リスト化したヘッダー
     /// </summary>
     /// <param name="timeSpan_"></param>
     /// <returns></returns>
-    public ListStringStringPair ListHeader(long timeSpan_)
+    //public ListStringStringPair ListHeader(long timeSpan_)
+    //{
+    //    var rtn = new ListStringStringPair();
+    //    //rtn.Add(new("Date", ToDataBase.GetDatabaseType(typeof(DateTime))));
+    //    //rtn.Add(new("Time", ToDataBase.GetDatabaseType(typeof(DateTime))));
+    //    rtn.Add(new("Date", "TEXT"));
+    //    rtn.Add(new("Time", "TEXT"));
+    //    //
+    //    foreach (var product in _listProduct)
+    //    {
+    //        //rtn.Add(new($"{product}[Use]", ToDataBase.GetDatabaseType(typeof(long))));
+    //        //rtn.Add(new($"{product}[Have]", ToDataBase.GetDatabaseType(typeof(long))));
+    //        rtn.Add(new($"{product}[Use]", "INTEGER"));
+    //        rtn.Add(new($"{product}[Have]", "INTEGER"));
+    //    }
+
+    //    return rtn;
+    //}
+    public List<string> ListCreateHeader(long timeSpan_)
     {
-        var rtn = new ListStringStringPair();
-        rtn.Add(new("Date", ToDataBase.GetDatabaseType(typeof(DateTime))));
-        rtn.Add(new("Time", ToDataBase.GetDatabaseType(typeof(DateTime))));
+        var rtn = new List<string>();
+        rtn.Add("'Date' TEXT");
+        rtn.Add("'Time' TEXT");
         //
         foreach (var product in _listProduct)
         {
-            rtn.Add(new($"{product}[Use]", ToDataBase.GetDatabaseType(typeof(long))));
-            rtn.Add(new($"{product}[Have]", ToDataBase.GetDatabaseType(typeof(long))));
-            //rtn.Add(new($"{product}[OutIn]", ToDataBase.GetDatabaseType(typeof(long))));
+            rtn.Add($"'{product}[Use]' INTEGER");
+            rtn.Add($"'{product}[Have]' INTEGER");
+        }
+
+        return rtn;
+    }
+
+    public List<string> ListInsertHeader(long timeSpan_)
+    {
+        var rtn = new List<string>();
+        rtn.Add("'Date'");
+        rtn.Add("'Time'");
+        //
+        foreach (var product in _listProduct)
+        {
+            rtn.Add($"'{product}[Use]'");
+            rtn.Add($"'{product}[Have]'");
         }
 
         return rtn;

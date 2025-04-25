@@ -47,7 +47,7 @@ internal sealed class LogEventIsvSpecificData : LogEventBase
     private const int _INDEX_TIME = 2;
     private const int _INDEX_ISV_SPECIFIC_DATA_HERE = 3;
     //
-    [Column("Isv Specific Data Here", Order = 101)]
+    [Column("Isv Specific Data Here", Order = 101, TypeName = "TEXT")]
     public string IsvSpecificData { get; private set; } = string.Empty;
 
 }

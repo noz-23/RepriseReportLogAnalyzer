@@ -43,6 +43,6 @@ internal sealed class LogEventLicenseFile : LogEventBase
     //0       1    2
     private const int _INDEX_FILE_NAME = 2;
     //
-    [Column("FileName", Order = 101)]
+    [Column("FileName", Order = 101, TypeName = "TEXT")]
     public string FileName { get; private set; } = string.Empty;
 }

@@ -18,7 +18,7 @@ namespace RepriseReportLogAnalyzer.Analyses;
 /// スタートとシャットダウンの時間帯
 /// (ログ集計の最後はシャットダウンとする)
 /// </summary>
-internal sealed class AnalysisStartShutdown : ToDataBase
+internal sealed class AnalysisStartShutdown : BaseToData
 {
     /// <summary>
     /// コンストラクタ
@@ -116,11 +116,17 @@ internal sealed class AnalysisStartShutdown : ToDataBase
     /// <summary>
     /// ヘッダー
     /// </summary>
-    public static string Header() => ToDataBase.Header(typeof(AnalysisStartShutdown));
+    //public static string Header() => ToDataBase.Header(typeof(AnalysisStartShutdown));
+    public static string CsvHeader() => BaseToData.CsvHeader(typeof(AnalysisStartShutdown));
+
+    public static List<string> ListCsvHeader() => BaseToData.ListCsvHeader(typeof(AnalysisStartShutdown));
 
     /// <summary>
     /// リスト化したヘッダー項目
     /// </summary>
     /// <returns></returns>
-    public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisStartShutdown));
+    //public static ListStringStringPair ListHeader() => ToDataBase.ListHeader(typeof(AnalysisStartShutdown));
+    public static List<string> ListCreateHeader() => BaseToData.ListCreateHeader(typeof(AnalysisStartShutdown));
+    public static List<string> ListInsertHeader() => BaseToData.ListInsertHeader(typeof(AnalysisStartShutdown));
+
 }

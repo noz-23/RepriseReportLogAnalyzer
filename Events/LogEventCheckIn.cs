@@ -108,41 +108,40 @@ internal sealed class LogEventCheckIn : LogEventBase, ILogEventUserHost, ILogEve
     private const int _INDEX_STD_TIME = 12;
     //
 
-    [Column("Product", Order = 11)]
+    [Column("Product", Order = 11, TypeName = "TEXT")]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order = 12)]
+    [Column("Version", Order = 12, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order = 13)]
+    [Column("Product Version", Order = 13, TypeName = "TEXT")]
     public string ProductVersion { get => Product + " " + Version; }
 
-    [Column("User", Order = 21)]
+    [Column("User", Order = 21, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 22)]
+    [Column("Host", Order = 22, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 23)]
+    [Column("User@Host", Order = 23, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Why", Order = 101)]
+    [Column("Why", Order = 101, TypeName = "INTEGER")]
     public StatusValue Why { get; private set; } = StatusValue.Success;
-    //public int Why { get; private set; } = 0;
 
-    [Column("Isv Def", Order = 102)]
+    [Column("Isv Def", Order = 102, TypeName = "TEXT")]
     public string IsvDef { get; private set; } = string.Empty;
     //
-    [Column("Count", Order = 103)]
+    [Column("Count", Order = 103, TypeName = "INTEGER")]
     public int Count { get; private set; } = -1;
 
-    [Column("Current Count", Order = 104)]
+    [Column("Current Count", Order = 104, TypeName = "INTEGER")]
     public int CountCurrent { get; private set; } = -1;
 
-    [Column("Current Resuse", Order = 105)]
+    [Column("Current Resuse", Order = 105, TypeName = "INTEGER")]
     public int ResuseCurrent { get; private set; } = -1;
 
-    [Column("Server Handle", Order = 106)]
+    [Column("Server Handle", Order = 106, TypeName = "TEXT")]
     public string HandleServer { get; private set; } = string.Empty;
     //
     /// <summary>

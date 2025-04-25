@@ -69,37 +69,37 @@ internal sealed class LogEventLicenseDenial : LogEventBase, ILogEventUserHost, I
     private const int _INDEX_DATE = 10;
     private const int _INDEX_TIME = 11;
     //
-    [Column("Product", Order = 11)]
+    [Column("Product", Order = 11, TypeName = "TEXT")]
     public string Product { get; private set; } = string.Empty;
 
-    [Column("Version", Order = 12)]
+    [Column("Version", Order = 12, TypeName = "TEXT")]
     public string Version { get; private set; } = string.Empty;
 
-    [Column("Product Version", Order = 13)]
+    [Column("Product Version", Order = 13, TypeName = "TEXT")]
     public string ProductVersion { get => Product + " " + Version; }
     //
-    [Column("User", Order = 21)]
+    [Column("User", Order = 21, TypeName = "TEXT")]
     public string User { get; private set; } = string.Empty;
 
-    [Column("Host", Order = 22)]
+    [Column("Host", Order = 22, TypeName = "TEXT")]
     public string Host { get; private set; } = string.Empty;
 
-    [Column("User@Host", Order = 23)]
+    [Column("User@Host", Order = 23, TypeName = "TEXT")]
     public string UserHost { get => User + "@" + Host; }
     //
-    [Column("Isv Def", Order = 101)]
+    [Column("Isv Def", Order = 101, TypeName = "TEXT")]
     public string IsvDef { get; private set; } = string.Empty;
 
-    [Column("Count", Order = 102)]
+    [Column("Count", Order = 102, TypeName = "INTEGER")]
     public int Count { get; private set; } = -1;
 
-    [Column("Why", Order = 103)]
+    [Column("Why", Order = 103, TypeName = "INTEGER")]
     public StatusValue Why { get; private set; } = StatusValue.Success;
 
-    [Column("Last Attempt", Order = 104)]
+    [Column("Last Attempt", Order = 104, TypeName = "TEXT")]
     public string LastAttempt { get; private set; } = string.Empty;
 
-    [Column("Process ID", Order = 105)]
+    [Column("Process ID", Order = 105, TypeName = "TEXT")]
     public string ProcessId { get; private set; } = string.Empty;
     //
 

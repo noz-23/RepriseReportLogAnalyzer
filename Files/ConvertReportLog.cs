@@ -166,7 +166,8 @@ internal sealed class ConvertReportLog: List<LogEventBase>
     public async Task WriteEventText(string path_, Type classType_)
     {
         // ヘッダー
-        var list = new List<string>() { LogEventBase.Header(classType_) };
+        //var list = new List<string>() { LogEventBase.Header(classType_) };
+        var list = new List<string>() { LogEventBase.CsvHeader(classType_) };
         // データ
         list.AddRange(_listToString(classType_));
         await File.WriteAllLinesAsync(path_, list, Encoding.UTF8);
@@ -177,7 +178,8 @@ internal sealed class ConvertReportLog: List<LogEventBase>
     public async Task WriteEventText<T>(string path_) where T : LogEventBase
     {
         // ヘッダー
-        var list = new List<string>() { LogEventBase.Header(typeof(T)) };
+        //var list = new List<string>() { LogEventBase.Header(typeof(T)) };
+        var list = new List<string>() { LogEventBase.CsvHeader(typeof(T)) };
 
         // データ
         list.AddRange(_listToString<T>());
